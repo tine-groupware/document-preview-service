@@ -106,7 +106,7 @@ class DocumentPreview
     }
 
     protected function checkExtension($path, $exts){
-        $ext = pathinfo($path, FILE_EXTENTIONS);
+        $ext = pathinfo($path, PATHINFO_EXTENSION);
         return in_array($ext, $exts);
     }
 
