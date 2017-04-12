@@ -1,0 +1,5 @@
+temp/
+vendor/
+download/
+.idea/
+log
