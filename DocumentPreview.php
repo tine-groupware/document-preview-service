@@ -32,7 +32,7 @@ class DocumentPreview
         $conf = json_decode($json, true);
         if ($this->checkConfig($conf)) {
             $logger->info("[INFO][$rhost] JSON error");
-            echo "JSON error";
+            header($_SERVER["SERVER_PROTOCOL"]." 400 Bad request JSON error");
             return;
         }
 
@@ -40,14 +40,14 @@ class DocumentPreview
         $path = $this->moveFile($dir, $logger);
         if ($path === -1) {
             $logger->err("[ERROR][$rhost] Failed to move uploaded File");
-            echo "Internal server error";
+            header($_SERVER["SERVER_PROTOCOL"]." 500 Internal server error");
             return;
         }
 
         //file check
         if (false === $this->checkExtension($path, $exts)) {
             $logger->info("[INFO][$rhost] Invalid Extension");
-            echo "Invalid Extension";
+            header($_SERVER["SERVER_PROTOCOL"]." 400 Bad request Invalid Extension");
             return;
         }
 
@@ -55,14 +55,14 @@ class DocumentPreview
         $ipcId = ftok(__FILE__, 'g');
         if ($ipcId === -1) {
             $logger->err("[ERROR][$rhost] Could not generate ftok");
-            echo "Interal server error";
+            header($_SERVER["SERVER_PROTOCOL"]." 500 Internal server error");
             return;
         }
 
         $semaphore = sem_get($ipcId, $config->get('maxProc', 4));
         if ($semaphore === false) {
             $logger->err("[ERROR][$rhost]Failed not get semaphore");
-            echo("Internal server error");
+            header($_SERVER["SERVER_PROTOCOL"]." 500 Internal server error");
             return;
         }
 
@@ -78,7 +78,7 @@ class DocumentPreview
         $rtn = $this->magic($path, $downDir);
         if ($rtn == -1) {
             $logger->err("[ERROR][$rhost] Failed to generate Image");
-            echo "Internal server error";
+            header($_SERVER["SERVER_PROTOCOL"]." 500 Internal server error");
             if (!sem_release($semaphore)) {
                 $logger->err("[ERROR][$rhost] Failed to release semaphore");
             }
