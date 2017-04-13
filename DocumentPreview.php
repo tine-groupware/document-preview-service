@@ -75,7 +75,7 @@ class DocumentPreview
             return;
         }
 
-        $rtn = $this->magic($path, $downDir);
+        $rtn = $this->magic($path, $downDir, $config);
         if ($rtn == -1) {
             $logger->err("[ERROR][$rhost] Failed to generate Image");
             header($_SERVER["SERVER_PROTOCOL"]." 500 Internal server error");
@@ -133,20 +133,10 @@ class DocumentPreview
         return $path;
     }
 
-    protected function magic($path, $downDir){
-        $key = "e34d7363ed";
-        $downDir = $downDir.$key.'/';
-        return array(
-            'thumbnail' => $downDir.'thumb.jpg',
-            'previewSmall' => array(
-                $downDir.'pres1.jpg',
-                $downDir.'pres2.jpg'
-            ),
-            'preview' => array(
-                $downDir.'pre1.jpg',
-                $downDir.'pre2.jpg'
-            ),
-        );
+    protected function magic($path, $downDir, $dir, $conf){
+        $uid = uniqid();
+        $docConverter = new documentConverter();// todo
+        echo $docConverter($path, $uid, $conf, $dir, $downDir, $config->get('tempDir', 'temp/'););
     }
 
     protected function returnImage($rtn){
