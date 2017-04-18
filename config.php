@@ -4,6 +4,8 @@ return array(
     "tempDir" => "temp/",
     // Directory to store finished files
     "downDir" => "download/",
+    // URL from downDir
+    "downUrl" => "http://nsa.cloud/",
     // Maximum concurrent processes
     "maxProc" => 4,
     // Path to Logfile
