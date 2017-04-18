@@ -6,13 +6,15 @@ class DocumentConverter
     protected $downDir = '';
     protected $downUrl = '';
     protected $logger;
+    protected $config;
 
-    public function __construct($tempDir, $downDir, $downUrl, $logger)
+    public function __construct($tempDir, $downDir, $downUrl, $logger, $config)
     {
         $this->tempDir = $tempDir;
         $this->downDir = $downDir;
         $this->downUrl = $downUrl;
         $this->logger = $logger;
+        $this->config = $config;
     }
 
     public function __invoke($path, $uid, $conf)
@@ -20,9 +22,15 @@ class DocumentConverter
         $name = pathinfo($path, PATHINFO_FILENAME);
         $ext = pathinfo($path, PATHINFO_EXTENSION);
 
+        $imageExt = $this->config->get('imgExt', array());
+        if (false === is_array($imageExt)){
+            $imageExt = $imageExt->toArray();
+        }
 
-        $docExt = array('odt', 'ods', 'doc');
-        $imageExt = array('jpg', 'png', 'gif');
+        $docExt = $this->config->get('docExt', array());
+        if (false === is_array($docExt)){
+            $docExt = $docExt->toArray();
+        }
 
         if(false === mkdir($this->downDir . $uid)) {
             return false;

@@ -1,5 +1,5 @@
 <?php
 require 'vendor/autoload.php';
 
-$foo = new DocumentPreview();
-$foo('config.php');
+$foo = new DocumentPreview('config.php');
+$foo();

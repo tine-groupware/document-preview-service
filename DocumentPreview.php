@@ -1,31 +1,41 @@
 <?php
 class DocumentPreview
 {
-    public function __invoke($configFile)
+    protected $config;
+    protected $logger;
+    protected $tempDir;
+    protected $downDir;
+    protected $downUrl;
+
+    public function __construct($configFile)
+    {
+        $this->config = new Zend\Config\Config(include($configFile));
+
+        $writer = new Zend\Log\Writer\Stream($this->config->get('logFile', 'log'));
+        $this->logger = new Zend\Log\Logger();
+        $this->logger->addWriter($writer);
+
+        $this->tempDir = $this->config->get('tempDir', 'temp/');
+        $this->downDir = $this->config->get('downDir', 'download/');
+        $this->downUrl = $this->config->get('downUrl', 'download/');
+    }
+
+    public function __invoke()
     {
         // setup
-        $config = new Zend\Config\Config(include($configFile));
 
-        $writer = new Zend\Log\Writer\Stream($config->get('logFile', 'log'));
-        $logger = new Zend\Log\Logger();
-        $logger->addWriter($writer);
 
         $rhost = $_SERVER['REMOTE_ADDR'];
 
-        $tempDir = $config->get('tempDir', 'temp/');
 
-        $downDir = $config->get('downDir', 'download/');
-
-        $downUrl = $config->get('downUrl', 'download/');
-
-        $exts = $config->get('ext', array());
+        $exts = $this->config->get('ext', array());
         if (false === is_array($exts)){
             $exts = $exts->toArray();
         }
 
         // check post
         if (false === isset($_POST["config"])) {
-            $logger->info("[INFO][$rhost]Missing arguments");
+            $this->logger->info("[INFO][$rhost]Missing arguments");
             header($_SERVER["SERVER_PROTOCOL"]." 400 Bad request missing arguments");
             return;
         }
@@ -33,23 +43,23 @@ class DocumentPreview
 
         $conf = json_decode($json, true);
         if ( false === $this->checkConfig($conf)) {
-            $logger->info("[INFO][$rhost] JSON error");
+            $this->logger->info("[INFO][$rhost] JSON error");
             header($_SERVER["SERVER_PROTOCOL"]." 400 Bad request JSON error");
             return;
         }
 
 
         // magic setup
-        $path = $this->moveFile($tempDir, $logger);
+        $path = $this->moveFile();
         if ( -1 === $path) {
-            $logger->err("[ERROR][$rhost] Failed to move uploaded File");
+            $this->logger->err("[ERROR][$rhost] Failed to move uploaded File");
             header($_SERVER["SERVER_PROTOCOL"]." 500 Internal server error");
             return;
         }
 
         //file check
         if (false === $this->checkExtension($path, $exts)) {
-            $logger->info("[INFO][$rhost] Invalid Extension");
+            $this->logger->info("[INFO][$rhost] Invalid Extension");
             header($_SERVER["SERVER_PROTOCOL"]." 400 Bad request Invalid Extension");
             return;
         }
@@ -57,29 +67,29 @@ class DocumentPreview
         //magic
         $ipcId = ftok(__FILE__, 'g');
         if (-1 === $ipcId) {
-            $logger->err("[ERROR][$rhost] Could not generate ftok");
+            $this->logger->err("[ERROR][$rhost] Could not generate ftok");
             header($_SERVER["SERVER_PROTOCOL"]." 500 Internal server error");
             return;
         }
 
-        $semaphore = sem_get($ipcId, $config->get('maxProc', 4));
+        $semaphore = sem_get($ipcId, $this->config->get('maxProc', 4));
         if (false === $semaphore) {
-            $logger->err("[ERROR][$rhost]Failed not get semaphore");
+            $this->logger->err("[ERROR][$rhost]Failed not get semaphore");
             header($_SERVER["SERVER_PROTOCOL"]." 500 Internal server error");
             return;
         }
 
         try {
-            $semAcq = $this->semAcquire($semaphore, $config);
+            $semAcq = $this->semAcquire($semaphore);
             if (false === $semAcq) {
-                $logger->info("[INFO][$rhost] Service occupied");
+                $this->logger->info("[INFO][$rhost] Service occupied");
                 echo "Service occupied";
                 return;
             }
 
-            $rtn = $this->magic($path, $conf, $tempDir, $downDir, $downUrl, $logger);
+            $rtn = $this->magic($path, $conf);
             if (false === $rtn) {
-                $logger->err("[ERROR][$rhost] Failed to generate Images");
+                $this->logger->err("[ERROR][$rhost] Failed to generate Images");
                 header($_SERVER["SERVER_PROTOCOL"] . " 500 Internal server error");
                 return;
             }
@@ -87,7 +97,7 @@ class DocumentPreview
         } finally {
             if (null !== $semaphore && true === $semAcq) {
                 if (false === sem_release($semaphore)) {
-                    $logger->err("[ERROR][$rhost] Failed to release semaphore");
+                    $this->logger->err("[ERROR][$rhost] Failed to release semaphore");
                 }
             }
         }
@@ -97,7 +107,7 @@ class DocumentPreview
 
         // clean up
         if (false === unlink($path)) {
-            $logger->err("[ERROR][$rhost] Failed to unlink " . $path);
+            $this->logger->err("[ERROR][$rhost] Failed to unlink " . $path);
         }
     }
 
@@ -108,41 +118,41 @@ class DocumentPreview
         return in_array($ext, $exts);
     }
 
-    protected function moveFile($tempDir, $logger){
+    protected function moveFile(){
         if (UPLOAD_ERR_OK !== $_FILES["file"]["error"]) {
-            $logger->err("[ERROR] File upload error");
+            $this->logger->err("[ERROR] File upload error");
             return -1;
         }
 
         $tmp_name = $_FILES["file"]["tmp_name"];
 
-        $path = $tempDir.uniqid().basename($_FILES["file"]["name"]);
+        $path = $this->tempDir.uniqid().basename($_FILES["file"]["name"]);
 
         if(false === move_uploaded_file($tmp_name, $path)){
-            $logger->err("[ERROR] Failed to move file");
+            $this->logger->err("[ERROR] Failed to move file");
             return -1;
         }
 
         if (false === is_file($path)){
-            $logger->err("[ERROR] File was not moved");
+            $this->logger->err("[ERROR] File was not moved");
             return -1;
         }
 
         return $path;
     }
 
-    protected function semAcquire($semaphore, $config){
+    protected function semAcquire($semaphore){
         $timeStarted = time();
         do {
             $semAcq = sem_acquire($semaphore, true);
             usleep(10000);
-        } while (false === $semAcq && time() - $timeStarted < $config->get('timeOut', 30));
+        } while (false === $semAcq && time() - $timeStarted < $this->config->get('timeOut', 30));
         return $semAcq;
     }
 
-    protected function magic($path, $conf, $tempDir, $downDir, $downUrl, $logger){
+    protected function magic($path, $conf){
         $uid = uniqid();
-        $docConverter = new DocumentConverter($tempDir, $downDir, $downUrl, $logger);
+        $docConverter = new DocumentConverter($this->tempDir, $this->downDir, $this->downUrl, $this->logger, $this->config);
         return $docConverter($path, $uid, $conf);
     }
 

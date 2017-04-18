@@ -14,5 +14,17 @@ return array(
     "ext" => array(
         "odt",
         "ods"
+    ),
+    "docExt" => array(
+        "doc",
+        "odt",
+        "ods",
+    ),
+    "imgExt" => array(
+        "jpg",
+        "png",
+        "gif",
+        "jpeg",
+        //RAW requires UFraw
     )
 );
