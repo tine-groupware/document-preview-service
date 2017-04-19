@@ -6,27 +6,32 @@ class DocumentPreview
     protected $tempDir;
     protected $downDir;
     protected $downUrl;
+    protected $semTimeOut;
+    protected $maxProc;
 
     public function __construct($configFile)
     {
-        $this->config = new Zend\Config\Config(include($configFile));
+        if('' === $configFile){
+            $this->config = new Zend\Config\Config(array());
+        } else {
+            $this->config = new Zend\Config\Config(include($configFile));
+        }
 
-        $writer = new Zend\Log\Writer\Stream($this->config->get('logFile', 'log'));
+        $writer = new Zend\Log\Writer\Stream($this->config->get('logFile', '/dev/zero'));
         $this->logger = new Zend\Log\Logger();
         $this->logger->addWriter($writer);
 
         $this->tempDir = $this->config->get('tempDir', 'temp/');
         $this->downDir = $this->config->get('downDir', 'download/');
         $this->downUrl = $this->config->get('downUrl', 'download/');
+        $this->semTimeOut = $this->config->get('timeOut', 30);
+        $this->maxProc = $this->config->get('maxProc', 4);
     }
 
     public function __invoke()
     {
         // setup
-
-
         $rhost = $_SERVER['REMOTE_ADDR'];
-
 
         $exts = $this->config->get('ext', array());
         if (false === is_array($exts)){
@@ -42,7 +47,7 @@ class DocumentPreview
         $json = $_POST["config"];
 
         $conf = json_decode($json, true);
-        if ( false === $this->checkConfig($conf)) {
+        if ( false === $this->checkConfig($conf, true)) {
             $this->logger->info("[INFO][$rhost] JSON error");
             header($_SERVER["SERVER_PROTOCOL"]." 400 Bad request JSON error");
             return;
@@ -72,18 +77,20 @@ class DocumentPreview
             return;
         }
 
-        $semaphore = sem_get($ipcId, $this->config->get('maxProc', 4));
+        $semaphore = sem_get($ipcId, $this->maxProc);
         if (false === $semaphore) {
             $this->logger->err("[ERROR][$rhost]Failed not get semaphore");
             header($_SERVER["SERVER_PROTOCOL"]." 500 Internal server error");
             return;
         }
 
+        $rtn = NULL;
+
         try {
             $semAcq = $this->semAcquire($semaphore);
             if (false === $semAcq) {
                 $this->logger->info("[INFO][$rhost] Service occupied");
-                echo "Service occupied";
+                echo '';//todo
                 return;
             }
 
@@ -128,7 +135,7 @@ class DocumentPreview
 
         $path = $this->tempDir.uniqid().basename($_FILES["file"]["name"]);
 
-        if(false === move_uploaded_file($tmp_name, $path)){
+        if (false === move_uploaded_file($tmp_name, $path)){
             $this->logger->err("[ERROR] Failed to move file");
             return -1;
         }
@@ -144,9 +151,10 @@ class DocumentPreview
     protected function semAcquire($semaphore){
         $timeStarted = time();
         do {
+            /** @noinspection PhpMethodParametersCountMismatchInspection */
             $semAcq = sem_acquire($semaphore, true);
             usleep(10000);
-        } while (false === $semAcq && time() - $timeStarted < $this->config->get('timeOut', 30));
+        } while (false === $semAcq && time() - $timeStarted < $this->semTimeOut);
         return $semAcq;
     }
 
@@ -160,12 +168,14 @@ class DocumentPreview
         echo json_encode($rtn);
     }
 
-    protected function checkConfig($conf){
+    protected function checkConfig($conf, $extended){
         if (false === is_array($conf)) {
             return false;
         }
-
-        return DocumentConverter::checkConfig($conf);
+        if (true === $extended) {
+            return DocumentConverter::checkConfig($conf);
+        }
+        return true;
     }
 }
 

@@ -191,8 +191,8 @@ class DocumentConverter
             ){
                 return false;
             }
-            return true;
         }
+        return true;
     }
 }
 
