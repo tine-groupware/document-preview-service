@@ -3,3 +3,4 @@ vendor/
 download/
 .idea/
 log
+test/
