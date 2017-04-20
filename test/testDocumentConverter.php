@@ -24,13 +24,30 @@ final class testDocumentPreview extends TestCase
             exec('rm -r ' . $this->workDir);
         }
         mkdir($this->workDir);
+        mkdir($this->workDir.'test1/');
+        mkdir($this->workDir.'test1/temp/');
+        mkdir($this->workDir.'test2/');
+        mkdir($this->workDir.'test2/temp/');
+        mkdir($this->workDir.'test2/temp/1248/');
+        mkdir($this->workDir.'test3/');
+        mkdir($this->workDir.'test3/temp/');
+        mkdir($this->workDir.'test3/temp/1248/');
+        mkdir($this->workDir.'test3/download/');
+        mkdir($this->workDir.'test3/download/1248');
+        mkdir($this->workDir.'test4/');
+        mkdir($this->workDir.'test4/temp/');
+        mkdir($this->workDir.'test4/download/');
+
+        exec('cp '.$this->fileDir.'imATestFile.pdf '.$this->workDir.'test2/temp/1248/');
+        exec('cp '.$this->fileDir.'*.png '.$this->workDir.'test3/temp/1248/');
     }
 
     public function tearDown()
     {
-        exec('rm -r ' . $this->workDir);
+        //exec('rm -r ' . $this->workDir);
         parent::tearDown();
     }
+
 
     /**
      * @dataProvider dataOnlySingelPage
@@ -51,40 +68,92 @@ final class testDocumentPreview extends TestCase
     }
 
     public function testConvertToPDF(){
-        mkdir($this->workDir.'test1/');
-        mkdir($this->workDir.'test1/temp/');
         $docCon = new docCon($this->workDir.'test1/temp/', $this->workDir.'test1/download/', 'test.com', $this->logger, $this->config);
         $docCon->_convertToPDF($this->fileDir.'imATestFile.odt', '1248');
         $this->assertTrue(is_file($this->workDir.'test1/temp/1248/imATestFile.pdf'));
-        exec('rm -r ' . $this->workDir.'test1/');
     }
 
     public function testCovertToPNG(){
-        mkdir($this->workDir.'test2/');
-        mkdir($this->workDir.'test2/temp/');
-        mkdir($this->workDir.'test2/temp/1248/');
         $docCon = new docCon($this->workDir.'test2/temp/', $this->workDir.'test2/download/', 'test.com', $this->logger, $this->config);
-        exec('cp '.$this->fileDir.'imATestFile.pdf '.$this->workDir.'test2/temp/1248/');
         $docCon->_covertToPNG('1248', ['t1' => ['firstPage' => false]], 'imATestFile');
         $this->assertTrue(is_file($this->workDir.'test2/temp/1248/imATestFile001.png') && is_file($this->workDir.'test2/temp/1248/imATestFile002.png') && is_file($this->workDir.'test2/temp/1248/imATestFile003.png') && is_file($this->workDir.'test2/temp/1248/imATestFile004.png') && is_file($this->workDir.'test2/temp/1248/imATestFile005.png'));
-        exec('rm -r ' . $this->workDir.'test2/');
     }
 
     public function testConvertToSize(){
-        mkdir($this->workDir.'test3/');
-        mkdir($this->workDir.'test3/temp/');
-        mkdir($this->workDir.'test3/temp/1248/');
-        mkdir($this->workDir.'test3/download/');
-        mkdir($this->workDir.'test3/download/1248');
-        exec('cp '.$this->fileDir.'*.png '.$this->workDir.'test3/temp/1248/');
         $docCon = new docCon($this->workDir.'test3/temp/', $this->workDir.'test3/download/', 'test.com', $this->logger, $this->config);
         $docCon->_convertToSize('1248', ['Key' => ['filetype' => 'jpg', 'firstPage' => false, 'x' => 50, 'y' => 70, 'color' => 'blue'], 'Yek' => ['filetype' => 'gif', 'firstPage' => true, 'x' => 100, 'y' => 190, 'color' => false]], 'png', 'imATestFile');
         $this->assertTrue(is_file($this->workDir.'test3/download/1248/Key-0.jpg') && is_file($this->workDir.'test3/download/1248/Key-1.jpg') && is_file($this->workDir.'test3/download/1248/Key-2.jpg') && is_file($this->workDir.'test3/download/1248/Key-3.jpg') && is_file($this->workDir.'test3/download/1248/Key-4.jpg') && is_file($this->workDir.'test3/download/1248/Yek.gif'));
-        exec('rm -r ' . $this->workDir.'test3/');
     }
 
     public function testCheckConfig(){
         $this->assertEquals(true, docCon::_checkConfig(['Key' => ['filetype' => 'jpg', 'firstPage' => false, 'x' => 50, 'y' => 70, 'color' => 'blue'], 'Yek' => ['filetype' => 'gif', 'firstPage' => true, 'x' => 100, 'y' => 190, 'color' => false]]));
         $this->assertEquals(false, docCon::_checkConfig([]));
+    }
+
+    /**
+     * @dataProvider dataInvoke
+     */
+    public function testInvoke($name, $conf, $uid, $expected)
+    {
+        exec('cp '.$this->fileDir.$name.' '.$this->workDir.'test4/temp/');
+        $docConverter = new DocumentConverter($this->workDir.'test4/temp/', $this->workDir.'test4/download/', 'test.com', $this->logger, $this->config);
+        $docConverter($this->workDir.'test4/temp/'.$name, $uid, json_decode($conf, true));
+        foreach ($expected as $exp){
+            $this->assertFileExists($this->workDir.$exp, $this->workDir.$exp);
+        }
+    }
+
+    public function dataInvoke()
+    {
+        return [
+            [   'imATestFile.odt',
+                '{"Key":{"filetype":"jpg","firstPage":false,"x":50,"y":70,"color":"blue"}}',
+                'U1',
+                [   $this->workDir.'test4/download/U1/Key-0.jpg',
+                    $this->workDir.'test4/download/U1/Key-1.jpg',
+                    $this->workDir.'test4/download/U1/Key-2.jpg',
+                    $this->workDir.'test4/download/U1/Key-3.jpg',
+                    $this->workDir.'test4/download/U1/Key-4.jpg'
+                ]
+            ],
+            [   'imATestFile.odt',
+                '{"Key":{"filetype":"jpg","firstPage":false,"x":50,"y":70,"color":"blue"},"Yek":{"filetype":"png","firstPage":true,"x":100,"y":190,"color":false}}',
+                'U2',
+                [   $this->workDir.'test4/download/U2/Key-0.jpg',
+                    $this->workDir.'test4/download/U2/Key-1.jpg',
+                    $this->workDir.'test4/download/U2/Key-2.jpg',
+                    $this->workDir.'test4/download/U2/Key-3.jpg',
+                    $this->workDir.'test4/download/U2/Key-4.jpg',
+                    $this->workDir.'test4/download/U2/Yek.png'
+                ]
+            ],
+            [   'imATestFile.pdf',
+                '{"Key":{"filetype":"jpg","firstPage":false,"x":50,"y":70,"color":"blue"}}',
+                'U3',
+                [   $this->workDir.'test4/download/U3/Key-0.jpg',
+                    $this->workDir.'test4/download/U3/Key-1.jpg',
+                    $this->workDir.'test4/download/U3/Key-2.jpg',
+                    $this->workDir.'test4/download/U3/Key-3.jpg',
+                    $this->workDir.'test4/download/U3/Key-4.jpg'
+                ]
+            ],
+            [   'imATestFile.pdf',
+                '{"Key":{"filetype":"jpg","firstPage":false,"x":50,"y":70,"color":"blue"},"Yek":{"filetype":"png","firstPage":true,"x":100,"y":190,"color":false}}',
+                'U4',
+                [   $this->workDir.'test4/download/U4/Key-0.jpg',
+                    $this->workDir.'test4/download/U4/Key-1.jpg',
+                    $this->workDir.'test4/download/U4/Key-2.jpg',
+                    $this->workDir.'test4/download/U4/Key-3.jpg',
+                    $this->workDir.'test4/download/U4/Key-4.jpg',
+                    $this->workDir.'test4/download/U4/Yek.png'
+                ]
+            ],
+            [   'imATestFile001.png',
+                '{"Key":{"filetype":"jpg","firstPage":false,"x":50,"y":70,"color":"blue"}}',
+                'U5',
+                [   $this->workDir.'test4/download/U5/Key.jpg',
+                ]
+            ],
+        ];
     }
 }

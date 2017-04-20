@@ -17,23 +17,32 @@ class DocumentConverter
         $this->config = $config;
     }
 
-    public function __invoke($path, $uid, $conf)
+    public function __invoke($path, $uid,array $conf)
     {
         $name = pathinfo($path, PATHINFO_FILENAME);
         $ext = pathinfo($path, PATHINFO_EXTENSION);
 
-        $imageExt = $this->config->get('imgExt', array());
+        $imageExt = $this->config->get('imgExt', array('png'));
         if (false === is_array($imageExt)){
             $imageExt = $imageExt->toArray();
         }
 
-        $docExt = $this->config->get('docExt', array());
+        $docExt = $this->config->get('docExt', array('odt'));
         if (false === is_array($docExt)){
             $docExt = $docExt->toArray();
         }
 
-        if(false === mkdir($this->downDir . $uid)) {
-            return false;
+        if(false === is_dir($this->tempDir.$uid)){
+            if(false === mkdir($this->tempDir.$uid)) {
+                return false;
+            }
+        }
+
+
+        if(false === is_dir($this->downDir.$uid)){
+            if(false === mkdir($this->downDir.$uid)) {
+                return false;
+            }
         }
 
         $inputFileType = 'png';
@@ -48,7 +57,7 @@ class DocumentConverter
             $cmd = 'mv ' . $path . ' ' . $this->tempDir . $uid . '/';
             $rtn = array();
             $err = 0;
-            exex($cmd, $rtn, $err);
+            exec($cmd, $rtn, $err);
             if (0 !== $err){
                 $this->logger->err(join(PHP_EOL, $rtn));
                 return -1;
