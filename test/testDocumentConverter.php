@@ -44,7 +44,7 @@ final class testDocumentPreview extends TestCase
 
     public function tearDown()
     {
-        //exec('rm -r ' . $this->workDir);
+        exec('rm -r ' . $this->workDir);
         parent::tearDown();
     }
 
@@ -87,7 +87,10 @@ final class testDocumentPreview extends TestCase
 
     public function testCheckConfig(){
         $this->assertEquals(true, docCon::_checkConfig(['Key' => ['filetype' => 'jpg', 'firstPage' => false, 'x' => 50, 'y' => 70, 'color' => 'blue'], 'Yek' => ['filetype' => 'gif', 'firstPage' => true, 'x' => 100, 'y' => 190, 'color' => false]]));
+        $this->assertEquals(false, docCon::_checkConfig(['Key' => ['filetype' => 'jpg', 'firstpage' => false, 'x' => 50, 'y' => 70, 'color' => 'blue'], 'Yek' => ['filetype' => 'gif', 'firstPage' => true, 'x' => 100, 'y' => 190, 'color' => false]]));
         $this->assertEquals(false, docCon::_checkConfig([]));
+
+
     }
 
     /**

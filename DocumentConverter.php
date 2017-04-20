@@ -183,20 +183,20 @@ class DocumentConverter
             return false;
         }
         foreach ($conf as $key => $cnf){
-            if( false === isset($key) &&
-                false === isset($cnf['firstPage']) &&
-                false === isset($cnf['filetype']) &&
-                false === isset($cnf['x']) &&
-                false === isset($cnf['y']) &&
+            if( false === isset($key) ||
+                false === isset($cnf['firstPage']) ||
+                false === isset($cnf['filetype']) ||
+                false === isset($cnf['x']) ||
+                false === isset($cnf['y']) ||
                 false === isset($cnf['color'])
             ){
                 return false;
             }
-            if( false === is_bool($cnf['firstPage']) &&
-                false === is_string($cnf['filetype']) &&
-                false === is_int($cnf['x']) &&
-                false === is_int($cnf['y']) &&
-                false === is_string($cnf['color'])
+            if( false === is_bool($cnf['firstPage']) ||
+                false === is_string($cnf['filetype']) ||
+                false === is_int($cnf['x']) ||
+                false === is_int($cnf['y']) ||
+                false === (is_string($cnf['color']) || is_bool($cnf['color']))
             ){
                 return false;
             }

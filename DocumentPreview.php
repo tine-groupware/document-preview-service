@@ -9,6 +9,7 @@ class DocumentPreview
     protected $semTimeOut;
     protected $maxProc;
 
+    /** @codeCoverageIgnore */
     public function __construct($configFile)
     {
         if('' === $configFile){
@@ -28,6 +29,7 @@ class DocumentPreview
         $this->maxProc = $this->config->get('maxProc', 4);
     }
 
+    /** @codeCoverageIgnore */
     public function __invoke()
     {
         // setup
@@ -125,6 +127,7 @@ class DocumentPreview
         return in_array($ext, $exts);
     }
 
+    /** @codeCoverageIgnore */
     protected function moveFile(){
         if (UPLOAD_ERR_OK !== $_FILES["file"]["error"]) {
             $this->logger->err("[ERROR] File upload error");
@@ -158,6 +161,7 @@ class DocumentPreview
         return $semAcq;
     }
 
+    /** @codeCoverageIgnore */
     protected function magic($path, $conf){
         $uid = uniqid();
         $docConverter = new DocumentConverter($this->tempDir, $this->downDir, $this->downUrl, $this->logger, $this->config);
@@ -173,7 +177,9 @@ class DocumentPreview
             return false;
         }
         if (true === $extended) {
+            /** @codeCoverageIgnoreStart */
             return DocumentConverter::checkConfig($conf);
+            /** @codeCoverageIgnoreEnd */
         }
         return true;
     }
