@@ -131,7 +131,7 @@ class DocumentConverter
         $err = 0;
         exec($cmd, $rtn, $err);
         if (0 !== $err){
-            $this->logger->err(__METHOD__ . ' ' . __LINE__ . ': ' . join(PHP_EOL, $rtn));
+            $this->logger->err(__METHOD__ . ' ' . __LINE__ . ': ' . $cmd . ' failed with ' . $err . ' ' . join(PHP_EOL, $rtn));
             return false;
         }
 
@@ -155,7 +155,7 @@ class DocumentConverter
             $err = 0;
             exec($cmd, $rtn, $err);
             if (0 !== $err){
-                $this->logger->err(__METHOD__ . ' ' . __LINE__ . ': ' . join(PHP_EOL, $rtn));
+                $this->logger->err(__METHOD__ . ' ' . __LINE__ . ': ' . $cmd . ' failed with ' . $err . ' ' . join(PHP_EOL, $rtn));
                 return false;
             }
         }
