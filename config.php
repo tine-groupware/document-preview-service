@@ -3,7 +3,7 @@ return array(
     // Directory to store uploaded files temporarily.
     "tempDir" => "../temp/",
     // Directory to store finished files
-    "downDir" => "../download/",
+    "downDir" => "download/",
     // URL from downDir
     "downUrl" => "http://nsa.cloud/",
     // Maximum concurrent processes

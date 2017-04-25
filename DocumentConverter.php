@@ -59,7 +59,7 @@ class DocumentConverter
             $err = 0;
             exec($cmd, $rtn, $err);
             if (0 !== $err){
-                $this->logger->err(join(PHP_EOL, $rtn));
+                $this->logger->err(__METHOD__ . ' ' . __LINE__ . ': ' . join(PHP_EOL, $rtn));
                 return -1;
             }
             $inputFileType = $ext;
@@ -96,7 +96,7 @@ class DocumentConverter
         $err = 0;
         exec($cmd, $rtn, $err);
         if (0 !== $err){
-            $this->logger->err(join(PHP_EOL, $rtn));
+            $this->logger->err(__METHOD__ . ' ' . __LINE__ . ': ' . join(PHP_EOL, $rtn));
             return -1;
         }
     }
@@ -104,7 +104,6 @@ class DocumentConverter
     // converts pdf/ps to png for further prothessing
     protected function covertToPNG($uid, $conf, $name)
     {
-        echo $this->onlySingelPage($conf);
         if (true === $this->onlySingelPage($conf)) {
             $cmd = 'gs -dNOPAUSE -sDEVICE=png16m -sOutputFile=' . $this->tempDir . $uid . '/' . $name . '.png ' . $this->tempDir . $uid . '/' . $name . '.pdf -c quit'; //to png $tempDir/$uid/$filename.png   from $tempDir/$uid/$filename.pdf
         } else {
@@ -114,7 +113,7 @@ class DocumentConverter
         $err = 0;
         exec($cmd, $rtn, $err);
         if (0 !== $err){
-            $this->logger->err(join(PHP_EOL, $rtn));
+            $this->logger->err(__METHOD__ . ' ' . __LINE__ . ': ' . join(PHP_EOL, $rtn));
             return -1;
         }
     }
@@ -136,7 +135,7 @@ class DocumentConverter
             $err = 0;
             exec($cmd, $rtn, $err);
             if (0 !== $err){
-                $this->logger->err(join(PHP_EOL, $rtn));
+                $this->logger->err(__METHOD__ . ' ' . __LINE__ . ': ' . join(PHP_EOL, $rtn));
                 return -1;
             }
         }
@@ -149,7 +148,7 @@ class DocumentConverter
         $err = 0;
         exec($cmd, $rtn, $err);
         if (0 !== $err){
-            $this->logger->err(join(PHP_EOL, $rtn));
+            $this->logger->err(__METHOD__ . ' ' . __LINE__ . ': ' . join(PHP_EOL, $rtn));
             return -1;
         }
     }

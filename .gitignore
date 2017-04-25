@@ -1,6 +1,7 @@
 temp/
 vendor/
 download/
+public/download/
 .idea/
 log
 testing/

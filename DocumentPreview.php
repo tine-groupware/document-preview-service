@@ -42,7 +42,7 @@ class DocumentPreview
 
         // check post
         if (false === isset($_POST["config"])) {
-            $this->logger->info("[INFO][$rhost]Missing arguments");
+            $this->logger->info(__METHOD__ . ' ' . __LINE__ . ': ' . "[INFO][$rhost]Missing arguments");
             header($_SERVER["SERVER_PROTOCOL"]." 400 Bad request missing arguments");
             return;
         }
@@ -50,7 +50,7 @@ class DocumentPreview
 
         $conf = json_decode($json, true);
         if ( false === $this->checkConfig($conf, true)) {
-            $this->logger->info("[INFO][$rhost] JSON error");
+            $this->logger->info(__METHOD__ . ' ' . __LINE__ . ': ' . "[INFO][$rhost] JSON error");
             header($_SERVER["SERVER_PROTOCOL"]." 400 Bad request JSON error");
             return;
         }
@@ -59,14 +59,14 @@ class DocumentPreview
         // magic setup
         $path = $this->moveFile();
         if ( -1 === $path) {
-            $this->logger->err("[ERROR][$rhost] Failed to move uploaded File");
+            $this->logger->err(__METHOD__ . ' ' . __LINE__ . ': ' . "[ERROR][$rhost] Failed to move uploaded File");
             header($_SERVER["SERVER_PROTOCOL"]." 500 Internal server error");
             return;
         }
 
         //file check
         if (false === $this->checkExtension($path, $exts)) {
-            $this->logger->info("[INFO][$rhost] Invalid Extension");
+            $this->logger->info(__METHOD__ . ' ' . __LINE__ . ': ' . "[INFO][$rhost] Invalid Extension");
             header($_SERVER["SERVER_PROTOCOL"]." 400 Bad request Invalid Extension");
             return;
         }
@@ -74,14 +74,14 @@ class DocumentPreview
         //magic
         $ipcId = ftok(__FILE__, 'g');
         if (-1 === $ipcId) {
-            $this->logger->err("[ERROR][$rhost] Could not generate ftok");
+            $this->logger->err(__METHOD__ . ' ' . __LINE__ . ': ' . "[ERROR][$rhost] Could not generate ftok");
             header($_SERVER["SERVER_PROTOCOL"]." 500 Internal server error");
             return;
         }
 
         $semaphore = sem_get($ipcId, $this->maxProc);
         if (false === $semaphore) {
-            $this->logger->err("[ERROR][$rhost]Failed not get semaphore");
+            $this->logger->err(__METHOD__ . ' ' . __LINE__ . ': ' . "[ERROR][$rhost]Failed not get semaphore");
             header($_SERVER["SERVER_PROTOCOL"]." 500 Internal server error");
             return;
         }
@@ -91,14 +91,14 @@ class DocumentPreview
         try {
             $semAcq = $this->semAcquire($semaphore);
             if (false === $semAcq) {
-                $this->logger->info("[INFO][$rhost] Service occupied");
+                $this->logger->info(__METHOD__ . ' ' . __LINE__ . ': ' . "[INFO][$rhost] Service occupied");
                 echo '';//todo
                 return;
             }
 
             $rtn = $this->magic($path, $conf);
             if (false === $rtn) {
-                $this->logger->err("[ERROR][$rhost] Failed to generate Images");
+                $this->logger->err(__METHOD__ . ' ' . __LINE__ . ': ' . "[ERROR][$rhost] Failed to generate Images");
                 header($_SERVER["SERVER_PROTOCOL"] . " 500 Internal server error");
                 return;
             }
@@ -106,7 +106,7 @@ class DocumentPreview
         } finally {
             if (null !== $semaphore && true === $semAcq) {
                 if (false === sem_release($semaphore)) {
-                    $this->logger->err("[ERROR][$rhost] Failed to release semaphore");
+                    $this->logger->err(__METHOD__ . ' ' . __LINE__ . ': ' . "[ERROR][$rhost] Failed to release semaphore");
                 }
             }
         }
@@ -116,7 +116,7 @@ class DocumentPreview
 
         // clean up
         if (false === unlink($path)) {
-            $this->logger->err("[ERROR][$rhost] Failed to unlink " . $path);
+            $this->logger->err(__METHOD__ . ' ' . __LINE__ . ': ' . "[ERROR][$rhost] Failed to unlink " . $path);
         }
     }
 
@@ -130,7 +130,7 @@ class DocumentPreview
     /** @codeCoverageIgnore */
     protected function moveFile(){
         if (UPLOAD_ERR_OK !== $_FILES["file"]["error"]) {
-            $this->logger->err("[ERROR] File upload error");
+            $this->logger->err(__METHOD__ . ' ' . __LINE__ . ': ' . "[ERROR] File upload error");
             return -1;
         }
 
@@ -139,12 +139,12 @@ class DocumentPreview
         $path = $this->tempDir.uniqid().basename($_FILES["file"]["name"]);
 
         if (false === move_uploaded_file($tmp_name, $path)){
-            $this->logger->err("[ERROR] Failed to move file");
+            $this->logger->err(__METHOD__ . ' ' . __LINE__ . ': ' . "[ERROR] Failed to move file");
             return -1;
         }
 
         if (false === is_file($path)){
-            $this->logger->err("[ERROR] File was not moved");
+            $this->logger->err(__METHOD__ . ' ' . __LINE__ . ': ' . "[ERROR] File was not moved");
             return -1;
         }
 
