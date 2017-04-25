@@ -36,6 +36,8 @@ class DocumentConverter
             if(false === mkdir($this->tempDir.$uid)) {
                 return false;
             }
+        } else {
+            return false;
         }
 
 
@@ -43,36 +45,50 @@ class DocumentConverter
             if(false === mkdir($this->downDir.$uid)) {
                 return false;
             }
-        }
-
-        $inputFileType = 'png';
-
-        if (true === in_array($ext, $docExt)) {
-            $this->convertToPDF($path, $uid);
-            $this->covertToPNG($uid, $conf, $name);
-        } else if ('pdf' === $ext) {
-            shell_exec('mv ' . $path . ' ' . $this->tempDir . $uid . '/');
-            $this->covertToPNG($uid, $conf, $name);
-        } else if ( true === in_array($ext, $imageExt)) {
-            $cmd = 'mv ' . $path . ' ' . $this->tempDir . $uid . '/';
-            $rtn = array();
-            $err = 0;
-            exec($cmd, $rtn, $err);
-            if (0 !== $err){
-                $this->logger->err(__METHOD__ . ' ' . __LINE__ . ': ' . join(PHP_EOL, $rtn));
-                return -1;
-            }
-            $inputFileType = $ext;
         } else {
             return false;
         }
 
-        // ... imagemagick
-        $this->convertToSize($uid, $conf, $inputFileType, $name);
+        $rtn = array();
+        try {
+            $inputFileType = 'png';
 
-        $rtn = $this->getReturn($uid, $inputFileType, $conf);
+            if (true === in_array($ext, $docExt)) {
+                if (false === $this->convertToPDF($path, $uid)) {
+                    return false;
+                }
+                if (false === $this->covertToPNG($uid, $conf, $name)) {
+                    return false;
+                }
+            } else if ('pdf' === $ext) {
+                shell_exec('mv ' . $path . ' ' . $this->tempDir . $uid . '/');
+                if (false === $this->covertToPNG($uid, $conf, $name)) {
+                    return false;
+                }
+            } else if (true === in_array($ext, $imageExt)) {
+                $cmd = 'mv ' . $path . ' ' . $this->tempDir . $uid . '/';
+                $rtn = array();
+                $err = 0;
+                exec($cmd, $rtn, $err);
+                if (0 !== $err) {
+                    $this->logger->err(__METHOD__ . ' ' . __LINE__ . ': ' . join(PHP_EOL, $rtn));
+                    return false;
+                }
+                $inputFileType = $ext;
+            } else {
+                return false;
+            }
 
-        $this->cleanUp($uid);
+            // ... imagemagick
+            if (false === $this->convertToSize($uid, $conf, $inputFileType, $name)) {
+                return false;
+            }
+
+            $rtn = $this->getReturn($uid, $inputFileType, $conf);
+
+        } finally {
+            $this->cleanUp($uid);
+        }
 
         return $rtn;
     }
@@ -97,8 +113,10 @@ class DocumentConverter
         exec($cmd, $rtn, $err);
         if (0 !== $err){
             $this->logger->err(__METHOD__ . ' ' . __LINE__ . ': ' . join(PHP_EOL, $rtn));
-            return -1;
+            return false;
         }
+
+        return true;
     }
 
     // converts pdf/ps to png for further prothessing
@@ -114,8 +132,10 @@ class DocumentConverter
         exec($cmd, $rtn, $err);
         if (0 !== $err){
             $this->logger->err(__METHOD__ . ' ' . __LINE__ . ': ' . join(PHP_EOL, $rtn));
-            return -1;
+            return false;
         }
+
+        return true;
     }
 
     //converts to size and typ
@@ -136,9 +156,10 @@ class DocumentConverter
             exec($cmd, $rtn, $err);
             if (0 !== $err){
                 $this->logger->err(__METHOD__ . ' ' . __LINE__ . ': ' . join(PHP_EOL, $rtn));
-                return -1;
+                return false;
             }
         }
+        return true;
     }
 
     protected function cleanUp($uid)
@@ -149,7 +170,6 @@ class DocumentConverter
         exec($cmd, $rtn, $err);
         if (0 !== $err){
             $this->logger->err(__METHOD__ . ' ' . __LINE__ . ': ' . join(PHP_EOL, $rtn));
-            return -1;
         }
     }
 
