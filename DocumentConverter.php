@@ -143,7 +143,7 @@ class DocumentConverter
     {
         foreach ($conf as $key => $cnf) {
             if (true === $cnf['firstPage']) {
-                $cmd = 'convert ' . $this->tempDir . $uid . '/' . $name . '001.' . $inputFileType . ' -resize ' . escapeshellarg($cnf['x']) . 'x' . escapeshellarg($cnf['y']);
+                $cmd = 'convert ' . $this->tempDir . $uid . '/' . $name . '.' . $inputFileType . ' -resize ' . escapeshellarg($cnf['x']) . 'x' . escapeshellarg($cnf['y']);
             } else {
                 $cmd = 'convert ' . $this->tempDir . $uid . '/*.' . $inputFileType . ' -resize ' . escapeshellarg($cnf['x']) . 'x' . escapeshellarg($cnf['y']);
             }
