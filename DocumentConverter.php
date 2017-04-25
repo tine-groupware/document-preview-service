@@ -123,7 +123,7 @@ class DocumentConverter
     protected function covertToPNG($uid, $conf, $name)
     {
         if (true === $this->onlySingelPage($conf)) {
-            $cmd = 'gs -dNOPAUSE -sDEVICE=png16m -sOutputFile=' . $this->tempDir . $uid . '/' . $name . '.png ' . $this->tempDir . $uid . '/' . $name . '.pdf -c quit'; //to png $tempDir/$uid/$filename.png   from $tempDir/$uid/$filename.pdf
+            $cmd = 'gs -dNOPAUSE -sDEVICE=png16m -sOutputFile=' . $this->tempDir . $uid . '/' . $name . '001.png ' . $this->tempDir . $uid . '/' . $name . '.pdf -c quit'; //to png $tempDir/$uid/$filename.png   from $tempDir/$uid/$filename.pdf
         } else {
             $cmd = 'gs -dNOPAUSE -sDEVICE=png16m -sOutputFile=' . $this->tempDir . $uid . '/' . $name . '%03d.png ' . $this->tempDir . $uid . '/' . $name . '.pdf -c quit'; //to png $tempDir/$uid/filenameXXX.png   from $tempDir/$uid/$filename.pdf
         }
@@ -143,7 +143,7 @@ class DocumentConverter
     {
         foreach ($conf as $key => $cnf) {
             if (true === $cnf['firstPage']) {
-                $cmd = 'convert ' . $this->tempDir . $uid . '/' . $name . '.' . $inputFileType . ' -resize ' . escapeshellarg($cnf['x']) . 'x' . escapeshellarg($cnf['y']);
+                $cmd = 'convert ' . $this->tempDir . $uid . '/' . $name . '001.' . $inputFileType . ' -resize ' . escapeshellarg($cnf['x']) . 'x' . escapeshellarg($cnf['y']);
             } else {
                 $cmd = 'convert ' . $this->tempDir . $uid . '/*.' . $inputFileType . ' -resize ' . escapeshellarg($cnf['x']) . 'x' . escapeshellarg($cnf['y']);
             }
