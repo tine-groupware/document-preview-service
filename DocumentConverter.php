@@ -183,10 +183,11 @@ class DocumentConverter
             if (false === $cnf['firstPage']) {
                 $links = array();
                 for ($i = 0; $i < $count; $i++) {
-                    $file = $uid . '/' . $key . '-' . $i . '.' . $cnf['filetype'];
+                    $file = $uid . '/' . $key . '-' . sprintf('%03d', $i) . '.' . $cnf['filetype'];
                     if (true === is_file($this->downDir.$file)){
                         array_push($links, $this->downUrl . $file);
                     } else {
+                        $this->logger->err(__METHOD__ . ' ' . __LINE__ . ': did not find file: ' . $this->downDir . $file);
                         return false;
                     }
                 }
