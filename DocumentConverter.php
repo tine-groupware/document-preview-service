@@ -123,9 +123,9 @@ class DocumentConverter
     protected function covertToPNG($uid, $conf, $name)
     {
         if (true === $this->onlySingelPage($conf)) {
-            $cmd = 'gs -dNOPAUSE -sDEVICE=png16m -sOutputFile=' . $this->tempDir . $uid . '/' . $name . '001.png ' . $this->tempDir . $uid . '/' . $name . '.pdf -c quit'; //to png $tempDir/$uid/$filename.png   from $tempDir/$uid/$filename.pdf
+            $cmd = 'gs -q -dQUIET -dSAFER -dBATCH -dNOPAUSE -dNOPROMPT -dMaxBitmap=500000000 -dAlignToPixels=0 -dGridFitTT=2 "-sDEVICE=pngalpha" -dTextAlphaBits=4 -dGraphicsAlphaBits=4 "-r150x150" -sOutputFile=' . $this->tempDir . $uid . '/' . $name . '001.png ' . $this->tempDir . $uid . '/' . $name . '.pdf -c quit'; //to png $tempDir/$uid/$filename.png   from $tempDir/$uid/$filename.pdf
         } else {
-            $cmd = 'gs -dNOPAUSE -sDEVICE=png16m -sOutputFile=' . $this->tempDir . $uid . '/' . $name . '%03d.png ' . $this->tempDir . $uid . '/' . $name . '.pdf -c quit'; //to png $tempDir/$uid/filenameXXX.png   from $tempDir/$uid/$filename.pdf
+            $cmd = 'gs -q -dQUIET -dSAFER -dBATCH -dNOPAUSE -dNOPROMPT -dMaxBitmap=500000000 -dAlignToPixels=0 -dGridFitTT=2 "-sDEVICE=pngalpha" -dTextAlphaBits=4 -dGraphicsAlphaBits=4 "-r150x150" -sOutputFile=' . $this->tempDir . $uid . '/' . $name . '%03d.png ' . $this->tempDir . $uid . '/' . $name . '.pdf -c quit'; //to png $tempDir/$uid/filenameXXX.png   from $tempDir/$uid/$filename.pdf
         }
         $rtn = array();
         $err = 0;
@@ -143,14 +143,16 @@ class DocumentConverter
     {
         foreach ($conf as $key => $cnf) {
             if (true === $cnf['firstPage']) {
-                $cmd = 'convert ' . $this->tempDir . $uid . '/' . $name . '001.' . $inputFileType . ' -resize ' . escapeshellarg($cnf['x']) . 'x' . escapeshellarg($cnf['y']);
+                $nameAppend = '';
+                $cmd = 'gm convert ' . $this->tempDir . $uid . '/' . $name . '001.' . $inputFileType . ' -resize ' . escapeshellarg($cnf['x']) . 'x' . escapeshellarg($cnf['y']);
             } else {
-                $cmd = 'convert ' . $this->tempDir . $uid . '/*.' . $inputFileType . ' -resize ' . escapeshellarg($cnf['x']) . 'x' . escapeshellarg($cnf['y']);
+                $nameAppend = '-%03d';
+                $cmd = 'gm convert ' . $this->tempDir . $uid . '/*.' . $inputFileType . ' +adjoin -resize ' . escapeshellarg($cnf['x']) . 'x' . escapeshellarg($cnf['y']);
             }
             if (!(false === $cnf['color'])) {
-                $cmd = $cmd . ' -gravity center -background ' . escapeshellarg($cnf['color']) . ' -extent ' . escapeshellarg($cnf['x']) . 'x' . escapeshellarg($cnf['y']);
+                $cmd .= ' -gravity center -background ' . escapeshellarg($cnf['color']) . ' -extent ' . escapeshellarg($cnf['x']) . 'x' . escapeshellarg($cnf['y']);
             }
-            $cmd = $cmd . ' ' . $this->downDir . $uid . '/' . escapeshellarg($key) . '.' . escapeshellarg($cnf['filetype']);
+            $cmd .= ' ' . $this->downDir . $uid . '/' . escapeshellarg($key) . $nameAppend . '.' . escapeshellarg($cnf['filetype']);
             $rtn = array();
             $err = 0;
             exec($cmd, $rtn, $err);

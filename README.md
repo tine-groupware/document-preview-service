@@ -1,6 +1,6 @@
 HowTo install:
 
-apt-get install apache2 libapache2-mod-php7.0 composer php7.0-xml php7.0-cli php7.0-mbstring ghostscript imagemagick unzip git libreoffice
+apt-get install graphicsmagick apache2 libapache2-mod-php7.0 composer php7.0-xml php7.0-cli php7.0-mbstring ghostscript unzip git libreoffice 
 
 (soffice needs to be able to create its config directories in the users home/.config; www-data has /var/www/ as home directory)
 mkdir /var/www/.config
