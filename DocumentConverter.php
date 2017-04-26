@@ -185,7 +185,7 @@ class DocumentConverter
                 for ($i = 0; $i < $count; $i++) {
                     $file = $uid . '/' . $key . '-' . sprintf('%03d', $i) . '.' . $cnf['filetype'];
                     if (true === is_file($this->downDir.$file)){
-                        array_push($links, $this->downUrl . $file);
+                        $links[] = $this->downUrl . $file;
                     } else {
                         $this->logger->err(__METHOD__ . ' ' . __LINE__ . ': did not find file: ' . $this->downDir . $file);
                         return false;
@@ -193,8 +193,7 @@ class DocumentConverter
                 }
                 $rtn[$key] = $links;
             } else {
-                $rtn[$key] = $this->downUrl . $uid . '/' . $key . '.' . $cnf['filetype'];
-                // ? solle es ein String in einem Array oder nur eine String
+                $rtn[$key] = array($this->downUrl . $uid . '/' . $key . '.' . $cnf['filetype']);
             }
         }
         return $rtn;
