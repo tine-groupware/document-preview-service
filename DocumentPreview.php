@@ -50,7 +50,7 @@ class DocumentPreview
 
         $conf = json_decode($json, true);
         if ( false === $this->checkConfig($conf, true)) {
-            $this->logger->info(__METHOD__ . ' ' . __LINE__ . ': ' . "[INFO][$rhost] JSON error");
+            $this->logger->info(__METHOD__ . ' ' . __LINE__ . ': ' . "[INFO][$rhost] JSON error: " . print_r($conf, true));
             header($_SERVER["SERVER_PROTOCOL"]." 400 Bad request JSON error");
             return;
         }
