@@ -20,7 +20,7 @@ class DocumentConverter
     public function __invoke($path, $uid,array $conf)
     {
         $name = pathinfo($path, PATHINFO_FILENAME);
-        $ext = pathinfo($path, PATHINFO_EXTENSION);
+        $ext = mb_strtolower(pathinfo($path, PATHINFO_EXTENSION));
 
         $imageExt = $this->config->get('imgExt', array('png'));
         if (false === is_array($imageExt)){

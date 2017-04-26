@@ -123,7 +123,7 @@ class DocumentPreview
     // check config
 
     protected function checkExtension($path, $exts){
-        $ext = pathinfo($path, PATHINFO_EXTENSION);
+        $ext = mb_strtolower(pathinfo($path, PATHINFO_EXTENSION));
         return in_array($ext, $exts);
     }
 

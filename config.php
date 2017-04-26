@@ -12,8 +12,14 @@ return array(
     "logFile" => "../log",
     // Allowed extension
     "ext" => array(
+        "jpg",
+        "png",
+        "gif",
+        "jpeg",
+        "doc",
         "odt",
-        "ods"
+        "ods",
+        "pdf"
     ),
     "docExt" => array(
         "doc",
