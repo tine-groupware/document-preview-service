@@ -144,7 +144,13 @@ class DocumentConverter
         foreach ($conf as $key => $cnf) {
             if (true === $cnf['firstPage']) {
                 $nameAppend = '';
-                $cmd = 'gm convert ' . $this->tempDir . $uid . '/' . $name . '001.' . $inputFileType . ' -resize ' . escapeshellarg($cnf['x']) . 'x' . escapeshellarg($cnf['y']);
+                $file = $this->tempDir;
+                if (is_file($this->tempDir . $uid . '/' . $name . '001.' . $inputFileType)) {
+                    $file .= $uid . '/' . $name . '001.' . $inputFileType;
+                } else {
+                    $file .= $uid . '/' . $name . '.' . $inputFileType;
+                }
+                $cmd = 'gm convert ' . $file . ' -resize ' . escapeshellarg($cnf['x']) . 'x' . escapeshellarg($cnf['y']);
             } else {
                 $nameAppend = '-%03d';
                 $cmd = 'gm convert ' . $this->tempDir . $uid . '/*.' . $inputFileType . ' +adjoin -resize ' . escapeshellarg($cnf['x']) . 'x' . escapeshellarg($cnf['y']);
