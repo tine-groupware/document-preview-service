@@ -17,12 +17,18 @@ return array(
         "gif",
         "jpeg",
         "doc",
+        "docx",
+        "xls",
+        "xlsx",
         "odt",
         "ods",
         "pdf"
     ),
     "docExt" => array(
         "doc",
+        "docx",
+        "xls",
+        "xlsx",
         "odt",
         "ods",
     ),

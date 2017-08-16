@@ -114,8 +114,9 @@ class DocumentPreview
         // retrun
         $this->returnImage($rtn);
 
-        // clean up
-        if (false === unlink($path)) {
+        // clean up, if file is a pdf, it was moved away, so check first!
+        clearstatcache();
+        if (true === is_file($path) && false === unlink($path)) {
             $this->logger->err(__METHOD__ . ' ' . __LINE__ . ': ' . "[ERROR][$rhost] Failed to unlink " . $path);
         }
     }
