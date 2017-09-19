@@ -17,7 +17,7 @@ class DocumentConverter
         $this->config = $config;
     }
 
-    public function __invoke($path, $uid,array $conf)
+    public function __invoke($path, $uid, array $conf)
     {
         $name = pathinfo($path, PATHINFO_FILENAME);
         $ext = mb_strtolower(pathinfo($path, PATHINFO_EXTENSION));
@@ -57,7 +57,15 @@ class DocumentConverter
                 if (false === $this->convertToPDF($path, $uid)) {
                     return false;
                 }
-                if (false === $this->covertToPNG($uid, $conf, $name)) {
+                if (isset($conf['onlyPdf'])) {
+                    $rtn = array();
+                    $err = 0;
+                    exec('mv ' . $this->tempDir . $uid . '/' . escapeshellarg($name) . '.pdf ' . $this->downDir . $uid . '/', $rtn, $err);
+                    if (0 !== $err){
+                        $this->logger->err(__METHOD__ . ' ' . __LINE__ . ': failed to move pdf to download dir with ' . $err . ' ' . join(PHP_EOL, $rtn));
+                        return false;
+                    }
+                } elseif (false === $this->covertToPNG($uid, $conf, $name)) {
                     return false;
                 }
             } else if ('pdf' === $ext) {
@@ -80,11 +88,15 @@ class DocumentConverter
             }
 
             // ... imagemagick
-            if (false === $this->convertToSize($uid, $conf, $inputFileType, $name)) {
+            if (!isset($conf['onlyPdf']) && false === $this->convertToSize($uid, $conf, $inputFileType, $name)) {
                 return false;
             }
 
-            $rtn = $this->getReturn($uid, $inputFileType, $conf);
+            if (isset($conf['onlyPdf'])) {
+                $rtn = [[$this->downUrl . $uid . '/' . $name . '.pdf']];
+            } else {
+                $rtn = $this->getReturn($uid, $inputFileType, $conf);
+            }
 
         } finally {
             $this->cleanUp($uid);
@@ -123,9 +135,9 @@ class DocumentConverter
     protected function covertToPNG($uid, $conf, $name)
     {
         if (true === $this->onlySingelPage($conf)) {
-            $cmd = 'gs -q -dQUIET -dSAFER -dBATCH -dNOPAUSE -dNOPROMPT -dMaxBitmap=500000000 -dAlignToPixels=0 -dGridFitTT=2 "-sDEVICE=pngalpha" -dTextAlphaBits=4 -dGraphicsAlphaBits=4 "-r150x150" -sOutputFile=' . $this->tempDir . $uid . '/' . $name . '001.png ' . $this->tempDir . $uid . '/' . $name . '.pdf -c quit'; //to png $tempDir/$uid/$filename.png   from $tempDir/$uid/$filename.pdf
+            $cmd = 'gs -q -dQUIET -dSAFER -dBATCH -dNOPAUSE -dNOPROMPT -dMaxBitmap=500000000 -dAlignToPixels=0 -dGridFitTT=2 "-sDEVICE=pngalpha" -dTextAlphaBits=4 -dGraphicsAlphaBits=4 "-r150x150" -sOutputFile=' . $this->tempDir . $uid . '/' . escapeshellarg($name) . '001.png ' . $this->tempDir . $uid . '/' . escapeshellarg($name) . '.pdf -c quit'; //to png $tempDir/$uid/$filename.png   from $tempDir/$uid/$filename.pdf
         } else {
-            $cmd = 'gs -q -dQUIET -dSAFER -dBATCH -dNOPAUSE -dNOPROMPT -dMaxBitmap=500000000 -dAlignToPixels=0 -dGridFitTT=2 "-sDEVICE=pngalpha" -dTextAlphaBits=4 -dGraphicsAlphaBits=4 "-r150x150" -sOutputFile=' . $this->tempDir . $uid . '/' . $name . '%03d.png ' . $this->tempDir . $uid . '/' . $name . '.pdf -c quit'; //to png $tempDir/$uid/filenameXXX.png   from $tempDir/$uid/$filename.pdf
+            $cmd = 'gs -q -dQUIET -dSAFER -dBATCH -dNOPAUSE -dNOPROMPT -dMaxBitmap=500000000 -dAlignToPixels=0 -dGridFitTT=2 "-sDEVICE=pngalpha" -dTextAlphaBits=4 -dGraphicsAlphaBits=4 "-r150x150" -sOutputFile=' . $this->tempDir . $uid . '/' . escapeshellarg($name) . '%03d.png ' . $this->tempDir . $uid . '/' . escapeshellarg($name) . '.pdf -c quit'; //to png $tempDir/$uid/filenameXXX.png   from $tempDir/$uid/$filename.pdf
         }
         $rtn = array();
         $err = 0;
@@ -146,9 +158,9 @@ class DocumentConverter
                 $nameAppend = '';
                 $file = $this->tempDir;
                 if (is_file($this->tempDir . $uid . '/' . $name . '001.' . $inputFileType)) {
-                    $file .= $uid . '/' . $name . '001.' . $inputFileType;
+                    $file .= $uid . '/' . escapeshellarg($name) . '001.' . $inputFileType;
                 } else {
-                    $file .= $uid . '/' . $name . '.' . $inputFileType;
+                    $file .= $uid . '/' . escapeshellarg($name) . '.' . $inputFileType;
                 }
                 $cmd = 'gm convert ' . $file . ' -resize ' . escapeshellarg($cnf['x']) . 'x' . escapeshellarg($cnf['y']);
             } else {
@@ -209,9 +221,11 @@ class DocumentConverter
         if( 0 === count($conf)){
             return false;
         }
+        if (isset($conf['onlyPdf'])) {
+            return true;
+        }
         foreach ($conf as $key => $cnf){
-            if( false === isset($key) ||
-                false === isset($cnf['firstPage']) ||
+            if( false === isset($cnf['firstPage']) ||
                 false === isset($cnf['filetype']) ||
                 false === isset($cnf['x']) ||
                 false === isset($cnf['y']) ||
