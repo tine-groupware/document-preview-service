@@ -12,31 +12,13 @@ return array(
     "logFile" => "../log",
     // Allowed extension
     "ext" => array(
-        "jpg",
-        "png",
-        "gif",
-        "jpeg",
-        "doc",
-        "docx",
-        "xls",
-        "xlsx",
-        "odt",
-        "ods",
-        "pdf"
+        'txt', 'rtf', 'odt', 'ods', 'odp', 'doc', 'xls', 'xlsx', 'doc', 'docx', 'ppt', 'pptx', 'pdf', 'jpg', 'jpeg', 'gif', 'tiff', 'png'
     ),
     "docExt" => array(
-        "doc",
-        "docx",
-        "xls",
-        "xlsx",
-        "odt",
-        "ods",
+        'txt', 'rtf', 'odt', 'ods', 'odp', 'doc', 'xls', 'xlsx', 'doc', 'docx', 'ppt', 'pptx'
     ),
     "imgExt" => array(
-        "jpg",
-        "png",
-        "gif",
-        "jpeg",
+        'jpg', 'jpeg', 'gif', 'tiff', 'png'
         //RAW requires UFraw
     )
 );
