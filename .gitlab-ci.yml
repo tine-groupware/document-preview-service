@@ -14,8 +14,9 @@ before_script:
 #- sudo docker-php-ext-install mbstring mcrypt pdo_pgsql curl json intl gd xml zip bz2 opcache
 # Install and run Composer
 #- pwd
-- curl -sS https://getcomposer.org/installer | php
-- php composer.phar install
+#- curl -sS https://getcomposer.org/installer | php
+#- php composer.phar install
+ - composer install
 
 # Bring in any services we need http://docs.gitlab.com/ee/ci/docker/using_docker_images.html#what-is-a-service
 # See http://docs.gitlab.com/ce/ci/services/README.html for examples.
