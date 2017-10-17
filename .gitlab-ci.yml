@@ -1,6 +1,6 @@
 # This file is a template, and might need editing before it works on your project.
 # Select image from https://hub.docker.com/_/php/
-image: php:7.1.1
+#image: php:7.1.1
 
 # Select what we should cache between builds
 cache:
@@ -23,10 +23,10 @@ before_script:
 #  - mysql:5.7
 
 # Set any variables we need
-variables:
+#variables:
   # Configure mysql environment variables (https://hub.docker.com/r/_/mysql/)
-  MYSQL_DATABASE: mysql_database
-  MYSQL_ROOT_PASSWORD: mysql_strong_password
+ # MYSQL_DATABASE: mysql_database
+  #MYSQL_ROOT_PASSWORD: mysql_strong_password
 
 # Run our tests
 # If Xdebug was installed you can generate a coverage report and see code coverage metrics.
