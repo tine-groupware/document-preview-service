@@ -85,7 +85,7 @@ final class testDocumentConverter extends TestCase
     public function testConvertToSize(){
         $docCon = new docCon($this->workDir.'test3/temp/', $this->workDir.'test3/download/', 'test.com', $this->logger, $this->config);
         $docCon->_convertToSize('1248', ['Key' => ['filetype' => 'jpg', 'firstPage' => false, 'x' => 50, 'y' => 70, 'color' => 'blue'], 'Yek' => ['filetype' => 'gif', 'firstPage' => true, 'x' => 100, 'y' => 190, 'color' => false]], 'png', 'imATestFile');
-        $this->assertTrue(is_file($this->workDir.'test3/download/1248/Key-0.jpg') && is_file($this->workDir.'test3/download/1248/Key-1.jpg') && is_file($this->workDir.'test3/download/1248/Key-2.jpg') && is_file($this->workDir.'test3/download/1248/Key-3.jpg') && is_file($this->workDir.'test3/download/1248/Key-4.jpg') && is_file($this->workDir.'test3/download/1248/Yek.gif'));
+        $this->assertTrue(is_file($this->workDir.'test3/download/1248/Key-000.jpg') && is_file($this->workDir.'test3/download/1248/Key-001.jpg') && is_file($this->workDir.'test3/download/1248/Key-002.jpg') && is_file($this->workDir.'test3/download/1248/Key-003.jpg') && is_file($this->workDir.'test3/download/1248/Key-004.jpg') && is_file($this->workDir.'test3/download/1248/Yek.gif'));
     }
 
     public function testCheckConfig(){
