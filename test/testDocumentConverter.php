@@ -15,9 +15,6 @@ final class testDocumentConverter extends TestCase
 
     public function setup(){
         $this->config = new Zend\Config\Config(array());
-        $writer = new Zend\Log\Writer\Stream($this->config->get('logFile', '/dev/zero'));
-        $this->logger = new Zend\Log\Logger();
-        $this->logger->addWriter($writer);
 
         $this->fileDir = dirname(__FILE__).'/testFiles/';
 
@@ -42,6 +39,10 @@ final class testDocumentConverter extends TestCase
 
         exec('cp '.$this->fileDir.'imATestFile.pdf '.$this->workDir.'test2/temp/1248/');
         exec('cp '.$this->fileDir.'*.png '.$this->workDir.'test3/temp/1248/');
+
+        $writer = new Zend\Log\Writer\Stream($this->workDir . 'log');
+        $this->logger = new Zend\Log\Logger();
+        $this->logger->addWriter($writer);
     }
 
     public function tearDown()
@@ -114,49 +115,49 @@ final class testDocumentConverter extends TestCase
             [   'imATestFile.odt',
                 '{"Key":{"filetype":"jpg","firstPage":false,"x":50,"y":70,"color":"blue"}}',
                 'U1',
-                [   $this->workDir.'test4/download/U1/Key-0.jpg',
-                    $this->workDir.'test4/download/U1/Key-1.jpg',
-                    $this->workDir.'test4/download/U1/Key-2.jpg',
-                    $this->workDir.'test4/download/U1/Key-3.jpg',
-                    $this->workDir.'test4/download/U1/Key-4.jpg'
+                [   $this->workDir.'test4/download/U1/Key-000.jpg',
+                    $this->workDir.'test4/download/U1/Key-001.jpg',
+                    $this->workDir.'test4/download/U1/Key-002.jpg',
+                    $this->workDir.'test4/download/U1/Key-003.jpg',
+                    $this->workDir.'test4/download/U1/Key-004.jpg'
                 ]
             ],
             [   'imATestFile.odt',
                 '{"Key":{"filetype":"jpg","firstPage":false,"x":50,"y":70,"color":"blue"},"Yek":{"filetype":"png","firstPage":true,"x":100,"y":190,"color":false}}',
                 'U2',
-                [   $this->workDir.'test4/download/U2/Key-0.jpg',
-                    $this->workDir.'test4/download/U2/Key-1.jpg',
-                    $this->workDir.'test4/download/U2/Key-2.jpg',
-                    $this->workDir.'test4/download/U2/Key-3.jpg',
-                    $this->workDir.'test4/download/U2/Key-4.jpg',
+                [   $this->workDir.'test4/download/U2/Key-000.jpg',
+                    $this->workDir.'test4/download/U2/Key-001.jpg',
+                    $this->workDir.'test4/download/U2/Key-002.jpg',
+                    $this->workDir.'test4/download/U2/Key-003.jpg',
+                    $this->workDir.'test4/download/U2/Key-004.jpg',
                     $this->workDir.'test4/download/U2/Yek.png'
                 ]
             ],
             [   'imATestFile.pdf',
                 '{"Key":{"filetype":"jpg","firstPage":false,"x":50,"y":70,"color":"blue"}}',
                 'U3',
-                [   $this->workDir.'test4/download/U3/Key-0.jpg',
-                    $this->workDir.'test4/download/U3/Key-1.jpg',
-                    $this->workDir.'test4/download/U3/Key-2.jpg',
-                    $this->workDir.'test4/download/U3/Key-3.jpg',
-                    $this->workDir.'test4/download/U3/Key-4.jpg'
+                [   $this->workDir.'test4/download/U3/Key-000.jpg',
+                    $this->workDir.'test4/download/U3/Key-001.jpg',
+                    $this->workDir.'test4/download/U3/Key-002.jpg',
+                    $this->workDir.'test4/download/U3/Key-003.jpg',
+                    $this->workDir.'test4/download/U3/Key-004.jpg'
                 ]
             ],
             [   'imATestFile.pdf',
                 '{"Key":{"filetype":"jpg","firstPage":false,"x":50,"y":70,"color":"blue"},"Yek":{"filetype":"png","firstPage":true,"x":100,"y":190,"color":false}}',
                 'U4',
-                [   $this->workDir.'test4/download/U4/Key-0.jpg',
-                    $this->workDir.'test4/download/U4/Key-1.jpg',
-                    $this->workDir.'test4/download/U4/Key-2.jpg',
-                    $this->workDir.'test4/download/U4/Key-3.jpg',
-                    $this->workDir.'test4/download/U4/Key-4.jpg',
+                [   $this->workDir.'test4/download/U4/Key-000.jpg',
+                    $this->workDir.'test4/download/U4/Key-001.jpg',
+                    $this->workDir.'test4/download/U4/Key-002.jpg',
+                    $this->workDir.'test4/download/U4/Key-003.jpg',
+                    $this->workDir.'test4/download/U4/Key-004.jpg',
                     $this->workDir.'test4/download/U4/Yek.png'
                 ]
             ],
             [   'imATestFile001.png',
                 '{"Key":{"filetype":"jpg","firstPage":false,"x":50,"y":70,"color":"blue"}}',
                 'U5',
-                [   $this->workDir.'test4/download/U5/Key.jpg',
+                [   $this->workDir.'test4/download/U5/Key-000.jpg',
                 ]
             ],
         ];
