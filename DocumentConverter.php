@@ -60,7 +60,7 @@ class DocumentConverter
                 if (isset($conf['onlyPdf'])) {
                     $rtn = array();
                     $err = 0;
-                    exec('mv ' . $this->tempDir . $uid . '/' . escapeshellarg($name) . '.pdf ' . $this->downDir . $uid . '/', $rtn, $err);
+                    exec('mv ' . escapeshellarg($this->tempDir . $uid . '/' . $name . '.pdf') . ' ' . $this->downDir . $uid . '/', $rtn, $err);
                     if (0 !== $err){
                         $this->logger->err(__METHOD__ . ' ' . __LINE__ . ': failed to move pdf to download dir with ' . $err . ' ' . join(PHP_EOL, $rtn));
                         return false;
@@ -135,9 +135,9 @@ class DocumentConverter
     protected function covertToPNG($uid, $conf, $name)
     {
         if (true === $this->onlySingelPage($conf)) {
-            $cmd = 'gs -q -dQUIET -dSAFER -dBATCH -dNOPAUSE -dNOPROMPT -dMaxBitmap=500000000 -dAlignToPixels=0 -dGridFitTT=2 "-sDEVICE=pngalpha" -dTextAlphaBits=4 -dGraphicsAlphaBits=4 "-r150x150" -sOutputFile=' . $this->tempDir . $uid . '/' . escapeshellarg($name) . '001.png ' . $this->tempDir . $uid . '/' . escapeshellarg($name) . '.pdf -c quit'; //to png $tempDir/$uid/$filename.png   from $tempDir/$uid/$filename.pdf
+            $cmd = 'gs -q -dQUIET -dSAFER -dBATCH -dNOPAUSE -dNOPROMPT -dMaxBitmap=500000000 -dAlignToPixels=0 -dGridFitTT=2 "-sDEVICE=pngalpha" -dTextAlphaBits=4 -dGraphicsAlphaBits=4 "-r150x150" -sOutputFile=' . escapeshellarg($this->tempDir . $uid . '/' . $name . '001.png') . ' ' . escapeshellarg($this->tempDir . $uid . '/' . $name . '.pdf') . ' -c quit'; //to png $tempDir/$uid/$filename.png   from $tempDir/$uid/$filename.pdf
         } else {
-            $cmd = 'gs -q -dQUIET -dSAFER -dBATCH -dNOPAUSE -dNOPROMPT -dMaxBitmap=500000000 -dAlignToPixels=0 -dGridFitTT=2 "-sDEVICE=pngalpha" -dTextAlphaBits=4 -dGraphicsAlphaBits=4 "-r150x150" -sOutputFile=' . $this->tempDir . $uid . '/' . escapeshellarg($name) . '%03d.png ' . $this->tempDir . $uid . '/' . escapeshellarg($name) . '.pdf -c quit'; //to png $tempDir/$uid/filenameXXX.png   from $tempDir/$uid/$filename.pdf
+            $cmd = 'gs -q -dQUIET -dSAFER -dBATCH -dNOPAUSE -dNOPROMPT -dMaxBitmap=500000000 -dAlignToPixels=0 -dGridFitTT=2 "-sDEVICE=pngalpha" -dTextAlphaBits=4 -dGraphicsAlphaBits=4 "-r150x150" -sOutputFile=' . escapeshellarg($this->tempDir . $uid . '/' . $name . '%03d.png') . ' ' . escapeshellarg($this->tempDir . $uid . '/' . $name . '.pdf') . ' -c quit'; //to png $tempDir/$uid/filenameXXX.png   from $tempDir/$uid/$filename.pdf
         }
         $rtn = array();
         $err = 0;
@@ -158,19 +158,19 @@ class DocumentConverter
                 $nameAppend = '';
                 $file = $this->tempDir;
                 if (is_file($this->tempDir . $uid . '/' . $name . '001.' . $inputFileType)) {
-                    $file .= $uid . '/' . escapeshellarg($name) . '001.' . $inputFileType;
+                    $file .= escapeshellarg($uid . '/' . $name . '001.' . $inputFileType);
                 } else {
-                    $file .= $uid . '/' . escapeshellarg($name) . '.' . $inputFileType;
+                    $file .= escapeshellarg($uid . '/' . $name . '.' . $inputFileType);
                 }
-                $cmd = 'gm convert ' . $file . ' -resize ' . escapeshellarg($cnf['x']) . 'x' . escapeshellarg($cnf['y']);
+                $cmd = 'gm convert ' . $file . ' -resize ' . escapeshellarg($cnf['x'] . 'x' . $cnf['y']);
             } else {
                 $nameAppend = '-%03d';
-                $cmd = 'gm convert ' . $this->tempDir . $uid . '/*.' . $inputFileType . ' +adjoin -resize ' . escapeshellarg($cnf['x']) . 'x' . escapeshellarg($cnf['y']);
+                $cmd = 'gm convert ' . $this->tempDir . $uid . '/*.' . $inputFileType . ' +adjoin -resize ' . escapeshellarg($cnf['x'] . 'x' . $cnf['y']);
             }
             if (!(false === $cnf['color'])) {
-                $cmd .= ' -gravity center -background ' . escapeshellarg($cnf['color']) . ' -extent ' . escapeshellarg($cnf['x']) . 'x' . escapeshellarg($cnf['y']);
+                $cmd .= ' -gravity center -background ' . escapeshellarg($cnf['color']) . ' -extent ' . escapeshellarg($cnf['x'] . 'x' . $cnf['y']);
             }
-            $cmd .= ' ' . $this->downDir . $uid . '/' . escapeshellarg($key) . $nameAppend . '.' . escapeshellarg($cnf['filetype']);
+            $cmd .= ' ' . escapeshellarg($this->downDir . $uid . '/' . $key . $nameAppend . '.' . $cnf['filetype']);
             $rtn = array();
             $err = 0;
             exec($cmd, $rtn, $err);
