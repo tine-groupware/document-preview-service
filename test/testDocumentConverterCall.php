@@ -2,9 +2,9 @@
 
 use PHPUnit\Framework\TestCase;
 
-require '../vendor/autoload.php';
-require 'publicDocumentConverter.php';
-require 'publicDocumentPreview.php';
+require __DIR__ . '/../vendor/autoload.php';
+require __DIR__ . '/publicDocumentConverter.php';
+require __DIR__ . '/publicDocumentPreview.php';
 
 final class testDocumentPreview extends TestCase
 {

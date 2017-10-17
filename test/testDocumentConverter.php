@@ -2,11 +2,11 @@
 
 use PHPUnit\Framework\TestCase;
 
-require '../vendor/autoload.php';
-require 'publicDocumentConverter.php';
-require 'publicDocumentPreview.php';
+require_once __DIR__ . '/../vendor/autoload.php';
+require_once __DIR__ . '/publicDocumentConverter.php';
+require_once __DIR__ . '/publicDocumentPreview.php';
 
-final class testDocumentPreview extends TestCase
+final class testDocumentConverter extends TestCase
 {
     protected $workDir;
     protected $logger;

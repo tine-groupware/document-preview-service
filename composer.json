@@ -1,6 +1,6 @@
 {
-  "name": "tine20/server",
-  "description": "Tine 2.0 Server",
+  "name": "tine20/documentPreview",
+  "description": "Tine 2.0 document preview service",
   "type": "project",
   "license" : ["AGPL-3.0"],
 
