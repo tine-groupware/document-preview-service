@@ -1,5 +1,17 @@
 <?php
-class DocumentPreview
+namespace DocumentService\Action;
+
+use Interop\Http\ServerMiddleware\DelegateInterface;
+use Interop\Http\ServerMiddleware\MiddlewareInterface;
+use Psr\Http\Message\ServerRequestInterface;
+use Zend\Diactoros\Response\JsonResponse;
+use Zend\Diactoros\Response\TextResponse;
+use Zend\Log\Writer\Stream;
+use Zend\Log\Logger;
+use Zend\Config\Config;
+use DocumentService\DocumentConverter;
+
+class DocumentPreview implements MiddlewareInterface 
 {
     protected $config;
     protected $logger;
@@ -9,81 +21,59 @@ class DocumentPreview
     protected $semTimeOut;
     protected $maxProc;
 
-    /** @codeCoverageIgnore */
-    public function __construct($configFile)
-    {
-        if('' === $configFile){
-            $this->config = new Zend\Config\Config(array());
-        } else {
-            $this->config = new Zend\Config\Config(include($configFile));
-        }
-
-        $writer = new Zend\Log\Writer\Stream($this->config->get('logFile', '/dev/zero'));
-        $this->logger = new Zend\Log\Logger();
-        $this->logger->addWriter($writer);
-
-        $this->tempDir = $this->config->get('tempDir', 'temp/');
-        $this->downDir = $this->config->get('downDir', 'download/');
-        $this->downUrl = $this->config->get('downUrl', 'download/');
-        $this->semTimeOut = $this->config->get('timeOut', 30);
-        $this->maxProc = $this->config->get('maxProc', 4);
-    }
-
-    /** @codeCoverageIgnore */
-    public function __invoke()
+    public function process(ServerRequestInterface $request, DelegateInterface $delegate)
     {
         // setup
-        $rhost = $_SERVER['REMOTE_ADDR'];
+        $rhost = $request->getServerParams()['REMOTE_ADDR'];
 
         $exts = $this->config->get('ext', array());
-        if (false === is_array($exts)){
+        if (false === is_array($exts)) {
             $exts = $exts->toArray();
         }
 
         // check post
-        if (false === isset($_POST["config"])) {
+        if (false === isset($request->getParsedBody()["config"])) {
             $this->logger->info(__METHOD__ . ' ' . __LINE__ . ': ' . "[INFO][$rhost]Missing arguments");
-            header($_SERVER["SERVER_PROTOCOL"]." 400 Bad request missing arguments");
-            return;
+            //header($request->getServerParams()["SERVER_PROTOCOL"]." 400 Bad request missing arguments");
+            return new TextResponse(" 400 Bad request missing arguments     -0");
         }
-        $json = $_POST["config"];
+        $json = $request->getParsedBody()["config"];
 
         $conf = json_decode($json, true);
         if ( false === $this->checkConfig($conf, true)) {
             $this->logger->info(__METHOD__ . ' ' . __LINE__ . ': ' . "[INFO][$rhost] JSON error: " . print_r($conf, true));
-            header($_SERVER["SERVER_PROTOCOL"]." 400 Bad request JSON error");
-            return;
+            //header($request->getServerParams()["SERVER_PROTOCOL"]." 400 Bad request JSON error");
+            return new TextResponse(" 400 Bad request JSON error   -1");
         }
 
-
         // magic setup
-        $path = $this->moveFile();
+        $path = $this->moveFile($request);
         if ( -1 === $path) {
             $this->logger->err(__METHOD__ . ' ' . __LINE__ . ': ' . "[ERROR][$rhost] Failed to move uploaded File");
-            header($_SERVER["SERVER_PROTOCOL"]." 500 Internal server error");
-            return;
+            header($request->getServerParams()["SERVER_PROTOCOL"]." 500 Internal server error");
+            return new TextResponse(" 500 Internal server error    -2");
         }
 
         //file check
         if (false === $this->checkExtension($path, $exts)) {
             $this->logger->info(__METHOD__ . ' ' . __LINE__ . ': ' . "[INFO][$rhost] Invalid Extension");
-            header($_SERVER["SERVER_PROTOCOL"]." 400 Bad request Invalid Extension");
-            return;
+            //header($request->getServerParams()["SERVER_PROTOCOL"]." 400 Bad request Invalid Extension");
+            return new TextResponse("400 Bad request Invalid Extension     -3");
         }
 
         //magic
         $ipcId = ftok(__FILE__, 'g');
         if (-1 === $ipcId) {
             $this->logger->err(__METHOD__ . ' ' . __LINE__ . ': ' . "[ERROR][$rhost] Could not generate ftok");
-            header($_SERVER["SERVER_PROTOCOL"]." 500 Internal server error");
-            return;
+            //header($request->getServerParams()["SERVER_PROTOCOL"]." 500 Internal server error");
+            return new TextResponse(" 500 Internal server error       -4");
         }
 
         $semaphore = sem_get($ipcId, $this->maxProc);
         if (false === $semaphore) {
             $this->logger->err(__METHOD__ . ' ' . __LINE__ . ': ' . "[ERROR][$rhost]Failed not get semaphore");
-            header($_SERVER["SERVER_PROTOCOL"]." 500 Internal server error");
-            return;
+            //header($request->getServerParams()["SERVER_PROTOCOL"]." 500 Internal server error");
+            return new TextResponse("500 Internal server error     -5");
         }
 
         $rtn = NULL;
@@ -93,16 +83,15 @@ class DocumentPreview
             if (false === $semAcq) {
                 $this->logger->info(__METHOD__ . ' ' . __LINE__ . ': ' . "[INFO][$rhost] Service occupied");
                 echo '';//todo
-                return;
+                return new TextResponse("-6");
             }
 
             $rtn = $this->magic($path, $conf);
             if (false === $rtn) {
                 $this->logger->err(__METHOD__ . ' ' . __LINE__ . ': ' . "[ERROR][$rhost] Failed to generate Images");
-                header($_SERVER["SERVER_PROTOCOL"] . " 500 Internal server error");
-                return;
+                //header($request->getServerParams()["SERVER_PROTOCOL"] . " 500 Internal server error");
+                return new TextResponse("500 Internal server error     -7");
             }
-
         } finally {
             if (null !== $semaphore && true === $semAcq) {
                 if (false === sem_release($semaphore)) {
@@ -111,14 +100,36 @@ class DocumentPreview
             }
         }
 
-        // retrun
-        $this->returnImage($rtn);
-
         // clean up, if file is a pdf, it was moved away, so check first!
         clearstatcache();
         if (true === is_file($path) && false === unlink($path)) {
             $this->logger->err(__METHOD__ . ' ' . __LINE__ . ': ' . "[ERROR][$rhost] Failed to unlink " . $path);
         }
+
+        return new JsonResponse($rtn);
+    }
+
+    public function __construct($configArray)
+    {
+        //@todo change config
+        $this->config = new Config($configArray);
+
+        $loggerOut = $this->config->get('loggerOut', '/dev/zero');
+
+        if ($loggerOut instanceof Logger){
+            $this->logger = $loggerOut;
+        }
+        else {
+            $writer = new Stream($loggerOut);
+            $this->logger = new Logger();
+            $this->logger->addWriter($writer);
+        }
+
+        $this->tempDir = $this->config->get('tempDir', 'temp/');
+        $this->downDir = $this->config->get('downDir', 'download/');
+        $this->downUrl = $this->config->get('downUrl', 'download/');
+        $this->semTimeOut = $this->config->get('timeOut', 30);
+        $this->maxProc = $this->config->get('maxProc', 4);
     }
 
     // check config
@@ -129,17 +140,18 @@ class DocumentPreview
     }
 
     /** @codeCoverageIgnore */
-    protected function moveFile(){
-        if (UPLOAD_ERR_OK !== $_FILES["file"]["error"]) {
+    protected function moveFile(ServerRequestInterface $request){
+
+        $file = $request->getUploadedFiles()['file'];
+
+        if (UPLOAD_ERR_OK !== $file->getError()) {
             $this->logger->err(__METHOD__ . ' ' . __LINE__ . ': ' . "[ERROR] File upload error");
             return -1;
         }
 
-        $tmp_name = $_FILES["file"]["tmp_name"];
+        $path = $this->tempDir.uniqid().basename($file->getClientFilename());
 
-        $path = $this->tempDir.uniqid().basename($_FILES["file"]["name"]);
-
-        if (false === move_uploaded_file($tmp_name, $path)){
+        if (false === $file->moveTo($path)){ // todo change to psr7file->moveUploaded file or some thing like that
             $this->logger->err(__METHOD__ . ' ' . __LINE__ . ': ' . "[ERROR] Failed to move file");
             return -1;
         }
@@ -164,13 +176,8 @@ class DocumentPreview
 
     /** @codeCoverageIgnore */
     protected function magic($path, $conf){
-        $uid = uniqid();
         $docConverter = new DocumentConverter($this->tempDir, $this->downDir, $this->downUrl, $this->logger, $this->config);
-        return $docConverter($path, $uid, $conf);
-    }
-
-    protected function returnImage($rtn){
-        echo json_encode($rtn);
+        return $docConverter($path, uniqid(), $conf);
     }
 
     protected function checkConfig($conf, $extended){
@@ -185,37 +192,3 @@ class DocumentPreview
         return true;
     }
 }
-
-/*
-POST
-+ file = fileToConvert;
-+ config = {
-    "Key(N)":[
-    'firstPage': (true||false),
-    'filetype' : '(image e.g. png||jpg)',
-    'x' : (size in px),
-    'y' : (size in px),
-    'color' : '(color e.g. white||blue)' || 'false',
-    ],
-    ...
-}
-
-JSON return {
-    "Key(N)":[
-    '(link to image)',
-    ...
-    ],
-
-    ||
-
-    "Key(N)": '(link to image)',
-    ...
-}
-*/
-
-/*
-DocumentConverter:
-__construct($tempDir, $downDir, $downUrl)
-__invoke($path, $uid, $conf)
-static checkConfig($conf)
- */

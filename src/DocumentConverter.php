@@ -1,5 +1,7 @@
 <?php
 
+namespace DocumentService;
+
 class DocumentConverter
 {
     protected $tempDir = '';
