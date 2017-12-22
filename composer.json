@@ -1,0 +1,31 @@
+{
+  "name":"document-preview",
+  "version":"0.9",
+  "repositories": [
+    {
+      "type": "vcs",
+      "url": "https://gitlab.metaways.net/tine20/auth-middleware.git"
+    }
+  ],
+  "require": {
+    "tine20/auth-middleware":{
+    }
+  },
+  "require-dev": {
+    "phpunit/phpunit": "^6.0.8 || ^5.7.15"
+  },
+  "autoload": {
+    "psr-4": {
+      "DocumentPreview\\":"src/",
+      "documentPreview\\": "test/"
+    }
+  },
+  "autoload-dev": {
+    "psr-4": {
+      "DocumentPreviewTest\\": "test/"
+    }
+  },
+  "scripts": {
+    "test":"phpunit"
+  }
+}

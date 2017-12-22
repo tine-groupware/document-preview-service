@@ -34,46 +34,40 @@ class DocumentPreview implements MiddlewareInterface
         // check post
         if (false === isset($request->getParsedBody()["config"])) {
             $this->logger->info(__METHOD__ . ' ' . __LINE__ . ': ' . "[INFO][$rhost]Missing arguments");
-            //header($request->getServerParams()["SERVER_PROTOCOL"]." 400 Bad request missing arguments");
-            return new TextResponse(" 400 Bad request missing arguments     -0");
+            return new TextResponse(" Bad request missing arguments", 400);
         }
         $json = $request->getParsedBody()["config"];
 
         $conf = json_decode($json, true);
         if ( false === $this->checkConfig($conf, true)) {
             $this->logger->info(__METHOD__ . ' ' . __LINE__ . ': ' . "[INFO][$rhost] JSON error: " . print_r($conf, true));
-            //header($request->getServerParams()["SERVER_PROTOCOL"]." 400 Bad request JSON error");
-            return new TextResponse(" 400 Bad request JSON error   -1");
+            return new TextResponse("Bad request JSON error", 400);
         }
 
         // magic setup
         $path = $this->moveFile($request);
         if ( -1 === $path) {
             $this->logger->err(__METHOD__ . ' ' . __LINE__ . ': ' . "[ERROR][$rhost] Failed to move uploaded File");
-            header($request->getServerParams()["SERVER_PROTOCOL"]." 500 Internal server error");
-            return new TextResponse(" 500 Internal server error    -2");
+            return new TextResponse("Internal server error", 500);
         }
 
         //file check
         if (false === $this->checkExtension($path, $exts)) {
             $this->logger->info(__METHOD__ . ' ' . __LINE__ . ': ' . "[INFO][$rhost] Invalid Extension");
-            //header($request->getServerParams()["SERVER_PROTOCOL"]." 400 Bad request Invalid Extension");
-            return new TextResponse("400 Bad request Invalid Extension     -3");
+            return new TextResponse("Bad request Invalid Extension", 400);
         }
 
         //magic
         $ipcId = ftok(__FILE__, 'g');
         if (-1 === $ipcId) {
             $this->logger->err(__METHOD__ . ' ' . __LINE__ . ': ' . "[ERROR][$rhost] Could not generate ftok");
-            //header($request->getServerParams()["SERVER_PROTOCOL"]." 500 Internal server error");
-            return new TextResponse(" 500 Internal server error       -4");
+            return new TextResponse("Internal server error", 500);
         }
 
         $semaphore = sem_get($ipcId, $this->maxProc);
         if (false === $semaphore) {
             $this->logger->err(__METHOD__ . ' ' . __LINE__ . ': ' . "[ERROR][$rhost]Failed not get semaphore");
-            //header($request->getServerParams()["SERVER_PROTOCOL"]." 500 Internal server error");
-            return new TextResponse("500 Internal server error     -5");
+            return new TextResponse("Internal server error", 500);
         }
 
         $rtn = NULL;
@@ -82,15 +76,12 @@ class DocumentPreview implements MiddlewareInterface
             $semAcq = $this->semAcquire($semaphore);
             if (false === $semAcq) {
                 $this->logger->info(__METHOD__ . ' ' . __LINE__ . ': ' . "[INFO][$rhost] Service occupied");
-                echo '';//todo
-                return new TextResponse("-6");
             }
 
             $rtn = $this->magic($path, $conf);
             if (false === $rtn) {
                 $this->logger->err(__METHOD__ . ' ' . __LINE__ . ': ' . "[ERROR][$rhost] Failed to generate Images");
-                //header($request->getServerParams()["SERVER_PROTOCOL"] . " 500 Internal server error");
-                return new TextResponse("500 Internal server error     -7");
+                return new TextResponse("Internal server error", 500);
             }
         } finally {
             if (null !== $semaphore && true === $semAcq) {
@@ -111,7 +102,6 @@ class DocumentPreview implements MiddlewareInterface
 
     public function __construct($configArray)
     {
-        //@todo change config
         $this->config = new Config($configArray);
 
         $loggerOut = $this->config->get('loggerOut', '/dev/zero');
