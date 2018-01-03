@@ -1,6 +1,8 @@
 <?php
 
-require_once __DIR__ . '/../vendor/autoload.php';
+namespace DocumentServiceTest;
+
+use DocumentService\Action\DocumentPreview;
 
 class docPre extends DocumentPreview
 {
@@ -48,10 +50,6 @@ class docPre extends DocumentPreview
 
     public function _magic($path, $conf){//don't test
         return $this->magic($path, $conf);
-    }
-
-    public function _returnImage($rtn){ //-
-        $this->returnImage($rtn);
     }
 
     public function _checkConfig($conf){//-

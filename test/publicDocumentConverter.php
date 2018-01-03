@@ -1,6 +1,8 @@
 <?php
 
-require_once __DIR__ . '/../vendor/autoload.php';
+namespace DocumentServiceTest;
+
+use DocumentService\DocumentConverter;
 
 class docCon extends DocumentConverter
 {
@@ -48,7 +50,7 @@ class docCon extends DocumentConverter
 
     public function _cleanUp($uid)
     {
-        return $this->cleanUp($uid);
+        $this->cleanUp($uid);
     }
 
     public function _getReturn($uid, $inputFileType, $conf)

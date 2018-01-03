@@ -1,10 +1,13 @@
 <?php
 
-use PHPUnit\Framework\TestCase;
+namespace DocumentServiceTest;
 
-require_once __DIR__ . '/../vendor/autoload.php';
-require_once __DIR__ . '/publicDocumentConverter.php';
-require_once __DIR__ . '/publicDocumentPreview.php';
+require_once __DIR__.'/publicDocumentConverter.php';
+
+use PHPUnit\Framework\TestCase;
+use DocumentService\DocumentConverter;
+use DocumentServiceTest\docCon;
+use Zend;
 
 final class testDocumentConverter extends TestCase
 {

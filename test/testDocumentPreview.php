@@ -1,19 +1,23 @@
 <?php
 
-use PHPUnit\Framework\TestCase;
+namespace DocumentServiceTest;
 
-require_once __DIR__ . '/../vendor/autoload.php';
-require_once __DIR__ . '/publicDocumentConverter.php';
-require_once __DIR__ . '/publicDocumentPreview.php';
+require_once __DIR__.'/publicDocumentPreview.php';
+
+use DocumentServiceTest\docPre;
+use PHPUnit\Framework\TestCase;
 
 final class testDocumentPreview extends TestCase
 {
+
+    //todo process test
+
     /**
      * @dataProvider dataCheckExtension
      */
     public function testCheckExtension($path, $exts, $expected)
     {
-        $docPre = new docPre('');
+        $docPre = new docPre([]);
         $this->assertEquals($expected, $docPre->_checkExtension($path, $exts));
     }
 
@@ -33,7 +37,7 @@ final class testDocumentPreview extends TestCase
      */
     public function testSemAcquireBlock($maxProc, $expected)
     {
-        $docPre = new docPre('');
+        $docPre = new docPre([]);
 
         $docPre->setSemTimeOut(1);
 
@@ -62,7 +66,7 @@ final class testDocumentPreview extends TestCase
      */
     public function testSemAcquireTimeOut($timeOut)
     {
-        $docPre = new docPre('');
+        $docPre = new docPre([]);
 
         $docPre->setSemTimeOut($timeOut);
 
@@ -87,27 +91,10 @@ final class testDocumentPreview extends TestCase
     }
 
     /**
-     * @dataProvider dataReturnImage
-     */
-    public function testReturnImage($data){
-        $docPre = new docPre('');
-        $docPre->_returnImage($data);
-        $this->assertJson($this->getActualOutput());
-        $this->setOutputCallback(function(){return '';});
-    }
-
-    public function dataReturnImage(){
-        return[
-            ["test1","test12","test123"],
-            [["test",1],["test" => 3],["go" => "ttt", "cs" => false],],
-        ];
-    }
-
-    /**
      * @dataProvider dataCheckConfig
      */
     public function testCheckConfig($data, $expected){
-        $docPre = new docPre('');
+        $docPre = new docPre([]);
         $this->assertEquals($expected, $docPre->_checkConfig($data));
     }
 
