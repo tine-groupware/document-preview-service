@@ -1,4 +1,5 @@
 before_script:
+ - whoami
  - wget https://shopwarelabs.github.io/psh/psh.phar
 
 after_script:
