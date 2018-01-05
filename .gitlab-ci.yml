@@ -11,18 +11,10 @@ stages:
 
 build:
  stage: build
-  cache:
-  key: "$CI_COMMIT_REF_NAME"
-  path:
-   - build/
  script:
   - php psh.phar build
 
 test:
  stage: test
- cache:
-  key: "$CI_COMMIT_REF_NAME"
-  path:
-   - build/
  script:
   - php psh.phar test
