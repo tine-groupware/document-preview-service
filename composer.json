@@ -1,10 +1,14 @@
 {
   "name":"document-preview",
   "version":"0.9",
-
+  "repositories": [
+    {
+      "type": "vcs",
+      "url": "https://gitlab.metaways.net/tine20/auth-middleware.git"
+    }
+  ],
   "require": {
-    "zendframework/zend-expressive":"^2.0.5",
-    "zendframework/zend-log":"2.*",
+    "tine20/auth-middleware":"dev-develop",
     "zendframework/zend-config": "2.*",
     "zendframework/zend-config-aggregator": "^1.0",
     "zendframework/zend-expressive-helpers": "^4.0",
