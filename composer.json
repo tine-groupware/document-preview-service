@@ -3,7 +3,8 @@
   "version":"0.9",
 
   "require": {
-
+    "zendframework/zend-expressive":"^2.0.5",
+    "zendframework/zend-log":"2.*"
     "zendframework/zend-config": "2.*",
     "zendframework/zend-config-aggregator": "^1.0",
     "zendframework/zend-expressive-helpers": "^4.0",
