@@ -1,0 +1,17 @@
+before_script:
+ - wget https://shopwarelabs.github.io/psh/psh.phar
+
+after_script:
+
+stages:
+ - build
+ - test
+
+build:
+ stage: build
+ script:
+  - php psh.phar build
+
+test:
+ stage: test
+  - php psh.phar build
