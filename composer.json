@@ -4,7 +4,7 @@
   "repositories": [
     {
       "type": "vcs",
-      "url": "https://gitlab.metaways.net/tine20/auth-middleware.git"
+      "url": "git@gitlab.metaways.net:tine20/documentPreview.git"
     }
   ],
   "require": {
