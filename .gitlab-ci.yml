@@ -5,14 +5,8 @@ after_script:
  - php psh.phar clear
 
 stages:
- - eg
  - build
  - test
-
-helloWorld:
- stage: eg
- script:
-  - echo "Hello World"
 
 build:
  stage: build
