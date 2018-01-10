@@ -1,6 +1,8 @@
 stages:
  - build
  - test
+ - deploy
+ -clean
  
 cache:
  key: build
@@ -17,4 +19,8 @@ test:
  script:
   - php psh.phar test
   
+clean:
+ stage: clean
+ script:
+  - php psh.phar clear
   
