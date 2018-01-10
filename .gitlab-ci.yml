@@ -2,7 +2,7 @@ stages:
  - build
  - test
  - deploy
- -clean
+ - clean
  
 cache:
  key: build
