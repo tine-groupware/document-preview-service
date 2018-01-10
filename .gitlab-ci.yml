@@ -7,19 +7,14 @@ stages:
 
 build:
  stage: build
- cache:
-   key: build
-   paths:
-    - build/
+  cache:
+   untracked: true
  script:
   - php psh.phar build
 
 test:
  stage: test
  cache:
-  key: build
-  paths:
-   - build/
-  policy: pull
+  untracked: true
  script:
   - php psh.phar test
