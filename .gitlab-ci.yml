@@ -16,10 +16,10 @@ build:
 
 test:
  stage: test
-  cache:
-   key: build
-   paths:
-    - build/
-   policy: pull
+ cache:
+  key: build
+  paths:
+   - build/
+  policy: pull
  script:
   - php psh.phar test
