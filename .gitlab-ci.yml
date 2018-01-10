@@ -6,7 +6,7 @@ build:
  stage: build
  cache:
   key: build
-  path:
+  paths:
    - build
  script:
   - php psh.phar build
@@ -15,7 +15,7 @@ test:
  stage: test
  cache:
   key: build
-  path:
+  paths:
    - build
   policy: pull
  script:
