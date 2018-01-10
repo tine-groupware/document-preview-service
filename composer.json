@@ -4,7 +4,7 @@
   "repositories": [
     {
       "type": "vcs",
-      "url": "git@gitlab.metaways.net:tine20/documentPreview.git"
+      "url": "gitlab.metaways.net:tine20/documentPreview.git"
     }
   ],
   "require": {
