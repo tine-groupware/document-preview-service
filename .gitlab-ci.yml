@@ -7,8 +7,8 @@ stages:
 
 build:
  stage: build
-  cache:
-   untracked: true
+ cache:
+  untracked: true
  script:
   - php psh.phar build
 
