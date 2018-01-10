@@ -5,13 +5,18 @@ stages:
 build:
  stage: build
  cache:
-  untracked: true
+  key: build
+  path:
+   - build
  script:
   - php psh.phar build
 
 test:
  stage: test
  cache:
-  untracked: true
+  key: build
+  path:
+   - build
+  policy: pull
  script:
   - php psh.phar test
