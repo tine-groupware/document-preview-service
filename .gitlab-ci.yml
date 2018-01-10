@@ -19,6 +19,12 @@ test:
  script:
   - php psh.phar test
   
+deploy:
+ stage: deploy
+ artifacts:
+  paths:
+   - documentPreview.tar.gz
+  
 clean:
  stage: clean
  script:
