@@ -13,4 +13,5 @@ build:
 test:
  stage: test
  script:
+  - php psh.phar build
   - php psh.phar test
