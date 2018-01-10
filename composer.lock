@@ -237,13 +237,13 @@
             "version": "1.0.1",
             "source": {
                 "type": "git",
-                "url": "https://github.com/php-fig/http-message.git",
-                "reference": "f6561bf28d520154e4b0ec72be95418abe6d9363"
+                "url": "https://github.com/zendframework/zend-expressive-router.git",
+                "reference": "88d711aee740ac8fbd684472469e16b85435cc79"
             },
             "dist": {
                 "type": "zip",
-                "url": "https://api.github.com/repos/php-fig/http-message/zipball/f6561bf28d520154e4b0ec72be95418abe6d9363",
-                "reference": "f6561bf28d520154e4b0ec72be95418abe6d9363",
+                "url": "https://api.github.com/repos/zendframework/zend-expressive-router/zipball/88d711aee740ac8fbd684472469e16b85435cc79",
+                "reference": "88d711aee740ac8fbd684472469e16b85435cc79",
                 "shasum": ""
             },
             "require": {
@@ -287,13 +287,13 @@
             "version": "1.0.2",
             "source": {
                 "type": "git",
-                "url": "https://github.com/php-fig/log.git",
-                "reference": "4ebe3a8bf773a19edfe0a84b6585ba3d401b724d"
+                "url": "https://github.com/zendframework/zend-expressive.git",
+                "reference": "0fd9218b0b7b6877ebd9b0fa1fff59b7632946c8"
             },
             "dist": {
                 "type": "zip",
-                "url": "https://api.github.com/repos/php-fig/log/zipball/4ebe3a8bf773a19edfe0a84b6585ba3d401b724d",
-                "reference": "4ebe3a8bf773a19edfe0a84b6585ba3d401b724d",
+                "url": "https://api.github.com/repos/zendframework/zend-expressive/zipball/0fd9218b0b7b6877ebd9b0fa1fff59b7632946c8",
+                "reference": "0fd9218b0b7b6877ebd9b0fa1fff59b7632946c8",
                 "shasum": ""
             },
             "require": {
@@ -334,8 +334,8 @@
             "version": "dev-develop",
             "source": {
                 "type": "git",
-                "url": "https://gitlab.metaways.net/tine20/auth-middleware.git",
-                "reference": "01ce9fb1ceadae75c3884657e9493abb5b723be0"
+                "url": "https://github.com/zendframework/zend-component-installer.git",
+                "reference": "d50dd1b4d793a741db4ac48903777b222c8014e5"
             },
             "require": {
                 "zendframework/zend-expressive": "^2.0.5",
@@ -622,13 +622,13 @@
             "version": "1.7.0",
             "source": {
                 "type": "git",
-                "url": "https://github.com/zendframework/zend-diactoros.git",
-                "reference": "ed6ce7e2105c400ca10277643a8327957c0384b7"
+                "url": "https://github.com/zendframework/zend-escaper.git",
+                "reference": "13f468ff824f3c83018b90aff892a1b3201383a9"
             },
             "dist": {
                 "type": "zip",
-                "url": "https://api.github.com/repos/zendframework/zend-diactoros/zipball/ed6ce7e2105c400ca10277643a8327957c0384b7",
-                "reference": "ed6ce7e2105c400ca10277643a8327957c0384b7",
+                "url": "https://api.github.com/repos/zendframework/zend-escaper/zipball/13f468ff824f3c83018b90aff892a1b3201383a9",
+                "reference": "13f468ff824f3c83018b90aff892a1b3201383a9",
                 "shasum": ""
             },
             "require": {
@@ -918,13 +918,13 @@
             "version": "2.2.0",
             "source": {
                 "type": "git",
-                "url": "https://github.com/zendframework/zend-expressive-router.git",
-                "reference": "f6eac53d39cdbf7b6db11b3e6bb3565896633de4"
+                "url": "https://github.com/zendframework/zend-config.git",
+                "reference": "ca4256fe477882d0519dacd50f5872bb1d6105be"
             },
             "dist": {
                 "type": "zip",
-                "url": "https://api.github.com/repos/zendframework/zend-expressive-router/zipball/f6eac53d39cdbf7b6db11b3e6bb3565896633de4",
-                "reference": "f6eac53d39cdbf7b6db11b3e6bb3565896633de4",
+                "url": "https://api.github.com/repos/zendframework/zend-config/zipball/ca4256fe477882d0519dacd50f5872bb1d6105be",
+                "reference": "ca4256fe477882d0519dacd50f5872bb1d6105be",
                 "shasum": ""
             },
             "require": {
@@ -974,13 +974,13 @@
             "version": "1.0.4",
             "source": {
                 "type": "git",
-                "url": "https://github.com/zendframework/zend-expressive-template.git",
-                "reference": "23922f96b32ab6e64fc551ec06b81fd047828765"
+                "url": "https://github.com/zendframework/zend-config.git",
+                "reference": "f60bdbea7469c71207d708b6a6354ac807adc345"
             },
             "dist": {
                 "type": "zip",
-                "url": "https://api.github.com/repos/zendframework/zend-expressive-template/zipball/23922f96b32ab6e64fc551ec06b81fd047828765",
-                "reference": "23922f96b32ab6e64fc551ec06b81fd047828765",
+                "url": "https://api.github.com/repos/zendframework/zend-config/zipball/f60bdbea7469c71207d708b6a6354ac807adc345",
+                "reference": "f60bdbea7469c71207d708b6a6354ac807adc345",
                 "shasum": ""
             },
             "require": {
@@ -1202,13 +1202,13 @@
             "version": "2.1.2",
             "source": {
                 "type": "git",
-                "url": "https://github.com/zendframework/zend-stratigility.git",
-                "reference": "7dfec8dee92dad0d01e68365015f2848c250fe9f"
+                "url": "https://github.com/zendframework/zend-config.git",
+                "reference": "af95a57a75265f23f4fc0a9d9e193e29a3e75457"
             },
             "dist": {
                 "type": "zip",
-                "url": "https://api.github.com/repos/zendframework/zend-stratigility/zipball/7dfec8dee92dad0d01e68365015f2848c250fe9f",
-                "reference": "7dfec8dee92dad0d01e68365015f2848c250fe9f",
+                "url": "https://api.github.com/repos/zendframework/zend-config/zipball/af95a57a75265f23f4fc0a9d9e193e29a3e75457",
+                "reference": "af95a57a75265f23f4fc0a9d9e193e29a3e75457",
                 "shasum": ""
             },
             "require": {
@@ -2004,16 +2004,16 @@
         },
         {
             "name": "phpunit/phpunit-mock-objects",
-            "version": "5.0.5",
+            "version": "5.0.6",
             "source": {
                 "type": "git",
                 "url": "https://github.com/sebastianbergmann/phpunit-mock-objects.git",
-                "reference": "283b9f4f670e3a6fd6c4ff95c51a952eb5c75933"
+                "reference": "33fd41a76e746b8fa96d00b49a23dadfa8334cdf"
             },
             "dist": {
                 "type": "zip",
-                "url": "https://api.github.com/repos/sebastianbergmann/phpunit-mock-objects/zipball/283b9f4f670e3a6fd6c4ff95c51a952eb5c75933",
-                "reference": "283b9f4f670e3a6fd6c4ff95c51a952eb5c75933",
+                "url": "https://api.github.com/repos/sebastianbergmann/phpunit-mock-objects/zipball/33fd41a76e746b8fa96d00b49a23dadfa8334cdf",
+                "reference": "33fd41a76e746b8fa96d00b49a23dadfa8334cdf",
                 "shasum": ""
             },
             "require": {
@@ -2059,7 +2059,7 @@
                 "mock",
                 "xunit"
             ],
-            "time": "2017-12-10T08:01:53+00:00"
+            "time": "2018-01-06T05:45:45+00:00"
         },
         {
             "name": "sebastian/code-unit-reverse-lookup",

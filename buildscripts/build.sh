@@ -15,6 +15,4 @@ cd build && composer development-disable
 cd build && rm composer.json
 cd build && rm composer.lock
 
-ls
-
-tar -zcf documentPreview.tar.gz build
+tar -zcf documentPreview.tar.gz build/*

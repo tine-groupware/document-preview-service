@@ -8,12 +8,10 @@ cache:
  key: build
  paths:
   - build
+  - documentPreview.tar.gz
 
 build:
  stage: build
- artifacts:
-  paths:
-   - documentPreview.tar.gz
  script:
   - php psh.phar build
 
@@ -24,6 +22,9 @@ test:
   
 deploy:
  stage: deploy
+ artifacts:
+  paths:
+   - documentPreview.tar.gz
  script:
  - echo 1
   
