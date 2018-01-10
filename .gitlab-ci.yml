@@ -24,6 +24,8 @@ deploy:
  artifacts:
   paths:
    - documentPreview.tar.gz
+ script:
+  - echo "Dploy"
   
 clean:
  stage: clean
