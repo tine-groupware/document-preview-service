@@ -24,7 +24,7 @@ deploy:
  stage: deploy
  artifacts:
   paths:
-   - documentPreview.tar.gz
+   - documentPreview-$CI_COMMIT_REF_NAME.tar.gz
  script:
  - echo 1
   

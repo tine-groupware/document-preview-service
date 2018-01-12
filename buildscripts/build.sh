@@ -15,4 +15,4 @@ cd build && composer development-disable
 cd build && rm composer.json
 cd build && rm composer.lock
 
-tar -zcf documentPreview.tar.gz build/*
+tar -zcf documentPreview-$CI_COMMIT_REF_NAME.tar.gz build/*
