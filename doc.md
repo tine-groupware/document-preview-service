@@ -40,19 +40,10 @@ sample testing apache2 configure
   SSLEngine on
   # HTTPS Setup
   SSLCertificateFile      /path/to/server.cert.pem
-  SSLCertificateKeyFile /path/to//server.key.pem
-  SSLCertificateChainFile /path/to//ca.chain.pem
+  SSLCertificateKeyFile /path/to/server.key.pem
+  SSLCertificateChainFile /path/to/ca.chain.pem
   # SSL certificate to check client certificates
-  SSLCACertific
-
-    public function getDependencies()
-    {
-        return [
-            'factories'  => [
-                Action\DocumentPreview::class => Factory\DocumentPreviewFactory::class,
-            ],
-        ];
-    }ateFile /path/to/ca.cert.pem
+  SSLCACertificateFile /path/to/ca.cert.pem
   # Should be optional to allow other auth methodes
   SSLVerifyClient optional
   # Export Certificate and validation information to php
