@@ -3,33 +3,24 @@ stages:
  - test
  - deploy
  
+cache:
+ key: "buildFolder$CI_COMMIT_SHA"
+ paths:
+  - build
+  - "documentPreview-$CI_COMMIT_REF_NAME.tar.gz"
+ 
 build:
  stage: build
- cache:
-  key: "buildFolder$CI_COMMIT_SHA"
-  paths:
-   - build
-  key: "build$CI_COMMIT_SHA"
-  paths:
-   - "documentPreview-$CI_COMMIT_REF_NAME.tar.gz"
  script:
   - php psh.phar build
 
 test:
  stage: test
- cache:
-  key: "buildFolder$CI_COMMIT_SHA"
-  paths:
-   - build
  script:
   - php psh.phar test
   
 deploy:
  stage: deploy
- cache:
-  key: "build$CI_COMMIT_SHA"
-  paths:
-   - "documentPreview-$CI_COMMIT_REF_NAME.tar.gz"
  artifacts:
   paths:
    - "documentPreview-$CI_COMMIT_REF_NAME.tar.gz"
