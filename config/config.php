@@ -17,6 +17,8 @@ $aggregator = new ConfigAggregator([
 
     DocumentService\ConfigProvider::class,
 
+    new PhpFileProvider('/etc/documentPreview/config.php'),
+
     new PhpFileProvider(realpath(__DIR__) . '/autoload/{{,*.}global,{,*.}local}.php'),
 
     new PhpFileProvider(realpath(__DIR__) . '/development.config.php'),
