@@ -64,7 +64,7 @@ sample testing apache2 configure
 ## config
 config for documentPreview, auth config see [auth-middleware](https://gitlab.metaways.net/tine20/auth-middleware)
 `/etc/documentPreview/config.php`
-``` c
+``` js
 class ConfigProvider
 {
     public function __invoke()
