@@ -34,5 +34,5 @@ deploy:
   paths:
    - "documentPreview-$CI_COMMIT_REF_NAME.tar.gz"
  script:
- - echo 1
+ - echo "this job is not empty"
   
