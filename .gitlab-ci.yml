@@ -5,9 +5,13 @@ stages:
  - clean
  
 cache:
- key: build
+ key: "buildFolder$CI_COMMIT_SHA"
  paths:
   - build
+  
+cache:
+ key: "build$CI_COMMIT_SHA"
+ paths:
   - "documentPreview-$CI_COMMIT_REF_NAME.tar.gz"
 
 build:
