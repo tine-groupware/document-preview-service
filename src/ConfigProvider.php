@@ -2,7 +2,6 @@
 
 namespace DocumentService;
 
-
 class ConfigProvider
 {
     public function __invoke()
@@ -12,9 +11,9 @@ class ConfigProvider
             'documentService' => [
                 "tempDir" => "temp/",
                 "downDir" => "download/",
-                "downUrl" => "http://nsa.cloud/",
+                "downUrl" => "https://download.invalid",
                 "maxProc" => 4,
-                "loggerOut" => "log", //file or zendLogger
+                "loggerOut" => "doc.log",
                 "ext" => [
                     'txt', 'rtf', 'odt', 'ott', 'ods', 'ots', 'odp', 'otp', 'xls', 'xlt', 'xlsx', 'xltx', 'doc', 'dot', 'docx', 'dotx', 'ppt', 'pot', 'pptx', 'potx', 'pdf', 'jpg', 'jpeg', 'gif', 'tiff', 'png'
                 ],
@@ -25,6 +24,27 @@ class ConfigProvider
                     'jpg', 'jpeg', 'gif', 'tiff', 'png'
                 ],
             ],
+            'routes' => [
+                [
+                    'name' => 'routeName',
+                    'path' => '/tine20/documentPreview',
+                    'middleware' => [
+                        Auth\Action\NeedsAuth::class,
+                        Auth\Action\AuthSSL::class,
+                        Auth\Action\AuthCheck::class,
+                        DocumentService\Action\DocumentPreview::class,
+                    ],
+                    'allowed_methods' => ['POST'],
+                    'auth' =>[
+                        'required' => true,
+                        'permission' => '(1=1)'
+                    ]
+                ],
+            ],
+            'auth' => [
+                'default' => ['name' => 'default', 'permission' => "false",]
+            ],
+            'authLogger' => 'auth.log',
         ];
     }
 
