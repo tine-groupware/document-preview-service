@@ -1,5 +1,7 @@
 <?php
 return array(
+    // open office binary
+    'ooBinary' => 'soffice',
     // Directory to store uploaded files temporarily.
     "tempDir" => "../temp/",
     // Directory to store finished files
