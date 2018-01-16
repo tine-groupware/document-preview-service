@@ -5,3 +5,4 @@ public/download/
 .idea/
 log
 testing/
+config.php
