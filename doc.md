@@ -54,7 +54,8 @@ sample testing apache2 configure
 
 ## config
 config for documentPreview, auth config see [auth-middleware](https://gitlab.metaways.net/tine20/auth-middleware)
-`/etc/documentPreview/config.php`
+
+`/etc/documentPreview/config.php` <=: to specify add `documentpreviewconfig=/path/to/config.php` to your environment variables
 ``` js
 class ConfigProvider
 {

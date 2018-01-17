@@ -17,7 +17,7 @@ $aggregator = new ConfigAggregator([
 
     DocumentService\ConfigProvider::class,
 
-    new PhpFileProvider('/etc/documentPreview/config.php'),
+    new PhpFileProvider(getConfigPath()),
 
     new PhpFileProvider(realpath(__DIR__) . '/autoload/{{,*.}global,{,*.}local}.php'),
 
@@ -25,3 +25,10 @@ $aggregator = new ConfigAggregator([
 ], $cacheConfig['config_cache_path']);
 
 return $aggregator->getMergedConfig();
+
+
+function getConfigPath(){
+    $conf = getenv('documentpreviewconfig');
+    if (!($conf == false || $conf == '' || is_file($conf))) return $conf;
+    return '/etc/documentPreview/config.php';
+}
