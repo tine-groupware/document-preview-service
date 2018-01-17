@@ -80,6 +80,8 @@ class ConfigProvider
                 "imgExt" => [
                     'jpg', 'jpeg', 'gif', 'tiff', 'png'
                 ],
+                // libre office binary
+                "ooBinary"=>'soffice'
             ],
 
             // routing and authentication setup
