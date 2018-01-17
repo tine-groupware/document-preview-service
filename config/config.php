@@ -29,6 +29,10 @@ return $aggregator->getMergedConfig();
 
 function getConfigPath(){
     $conf = getenv('documentpreviewconfig');
-    if (!($conf == false || $conf == '' || is_file($conf))) return $conf;
+    if (!($conf == false || $conf == '')){
+        if (is_file($conf)) return $conf;
+        $conf .= 'config.php';
+        if (is_file($conf)) return $conf;
+    }
     return '/etc/documentPreview/config.php';
 }
