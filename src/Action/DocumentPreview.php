@@ -33,40 +33,40 @@ class DocumentPreview implements MiddlewareInterface
 
         // check post
         if (false === isset($request->getParsedBody()["config"])) {
-            $this->logger->info(__METHOD__ . ' ' . __LINE__ . ': ' . "[INFO][$rhost]Missing arguments");
+            $this->logger->info("[DocumentPreview] ".__METHOD__ . ' ' . __LINE__ . ': ' . "[INFO][$rhost]Missing arguments");
             return new TextResponse(" Bad request missing arguments", 400);
         }
         $json = $request->getParsedBody()["config"];
 
         $conf = json_decode($json, true);
         if ( false === $this->checkConfig($conf, true)) {
-            $this->logger->info(__METHOD__ . ' ' . __LINE__ . ': ' . "[INFO][$rhost] JSON error: " . print_r($conf, true));
+            $this->logger->info("[DocumentPreview] ".__METHOD__ . ' ' . __LINE__ . ': ' . "[INFO][$rhost] JSON error: " . print_r($conf, true));
             return new TextResponse("Bad request JSON error", 400);
         }
 
         // magic setup
         $path = $this->moveFile($request);
         if ( -1 === $path) {
-            $this->logger->err(__METHOD__ . ' ' . __LINE__ . ': ' . "[ERROR][$rhost] Failed to move uploaded File");
+            $this->logger->err("[DocumentPreview] ".__METHOD__ . ' ' . __LINE__ . ': ' . "[ERROR][$rhost] Failed to move uploaded File");
             return new TextResponse("Internal server error", 500);
         }
 
         //file check
         if (false === $this->checkExtension($path, $exts)) {
-            $this->logger->info(__METHOD__ . ' ' . __LINE__ . ': ' . "[INFO][$rhost] Invalid Extension");
+            $this->logger->info("[DocumentPreview] ".__METHOD__ . ' ' . __LINE__ . ': ' . "[INFO][$rhost] Invalid Extension");
             return new TextResponse("Bad request Invalid Extension", 400);
         }
 
         //magic
         $ipcId = ftok(__FILE__, 'g');
         if (-1 === $ipcId) {
-            $this->logger->err(__METHOD__ . ' ' . __LINE__ . ': ' . "[ERROR][$rhost] Could not generate ftok");
+            $this->logger->err("[DocumentPreview] ".__METHOD__ . ' ' . __LINE__ . ': ' . "[ERROR][$rhost] Could not generate ftok");
             return new TextResponse("Internal server error", 500);
         }
 
         $semaphore = sem_get($ipcId, $this->maxProc);
         if (false === $semaphore) {
-            $this->logger->err(__METHOD__ . ' ' . __LINE__ . ': ' . "[ERROR][$rhost]Failed not get semaphore");
+            $this->logger->err("[DocumentPreview] ".__METHOD__ . ' ' . __LINE__ . ': ' . "[ERROR][$rhost]Failed not get semaphore");
             return new TextResponse("Internal server error", 500);
         }
 
@@ -75,18 +75,18 @@ class DocumentPreview implements MiddlewareInterface
         try {
             $semAcq = $this->semAcquire($semaphore);
             if (false === $semAcq) {
-                $this->logger->info(__METHOD__ . ' ' . __LINE__ . ': ' . "[INFO][$rhost] Service occupied");
+                $this->logger->info("[DocumentPreview] ".__METHOD__ . ' ' . __LINE__ . ': ' . "[INFO][$rhost] Service occupied");
             }
 
             $rtn = $this->magic($path, $conf);
             if (false === $rtn) {
-                $this->logger->err(__METHOD__ . ' ' . __LINE__ . ': ' . "[ERROR][$rhost] Failed to generate Images");
+                $this->logger->err("[DocumentPreview] ".__METHOD__ . ' ' . __LINE__ . ': ' . "[ERROR][$rhost] Failed to generate Images");
                 return new TextResponse("Internal server error", 500);
             }
         } finally {
             if (null !== $semaphore && true === $semAcq) {
                 if (false === sem_release($semaphore)) {
-                    $this->logger->err(__METHOD__ . ' ' . __LINE__ . ': ' . "[ERROR][$rhost] Failed to release semaphore");
+                    $this->logger->err("[DocumentPreview] ".__METHOD__ . ' ' . __LINE__ . ': ' . "[ERROR][$rhost] Failed to release semaphore");
                 }
             }
         }
@@ -94,7 +94,7 @@ class DocumentPreview implements MiddlewareInterface
         // clean up, if file is a pdf, it was moved away, so check first!
         clearstatcache();
         if (true === is_file($path) && false === unlink($path)) {
-            $this->logger->err(__METHOD__ . ' ' . __LINE__ . ': ' . "[ERROR][$rhost] Failed to unlink " . $path);
+            $this->logger->err("[DocumentPreview] ".__METHOD__ . ' ' . __LINE__ . ': ' . "[ERROR][$rhost] Failed to unlink " . $path);
         }
 
         return new JsonResponse($rtn);
@@ -135,19 +135,19 @@ class DocumentPreview implements MiddlewareInterface
         $file = $request->getUploadedFiles()['file'];
 
         if (UPLOAD_ERR_OK !== $file->getError()) {
-            $this->logger->err(__METHOD__ . ' ' . __LINE__ . ': ' . "[ERROR] File upload error");
+            $this->logger->err("[DocumentPreview] ".__METHOD__ . ' ' . __LINE__ . ': ' . "[ERROR] File upload error");
             return -1;
         }
 
         $path = $this->tempDir.uniqid().basename($file->getClientFilename());
 
         if (false === $file->moveTo($path)){ // todo change to psr7file->moveUploaded file or some thing like that
-            $this->logger->err(__METHOD__ . ' ' . __LINE__ . ': ' . "[ERROR] Failed to move file");
+            $this->logger->err("[DocumentPreview] ".__METHOD__ . ' ' . __LINE__ . ': ' . "[ERROR] Failed to move file");
             return -1;
         }
 
         if (false === is_file($path)){
-            $this->logger->err(__METHOD__ . ' ' . __LINE__ . ': ' . "[ERROR] File was not moved");
+            $this->logger->err("[DocumentPreview] ".__METHOD__ . ' ' . __LINE__ . ': ' . "[ERROR] File was not moved");
             return -1;
         }
 
