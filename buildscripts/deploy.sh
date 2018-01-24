@@ -1,0 +1,1 @@
+curl -v --user "$nexususer:$nexuspass" --upload-file ./documentPreview-$CI_COMMIT_REF_NAME.tar.gz https://nexus.metaways.net/repository/documentPreview/$CI_JOB_ID/documentPreview-$CI_COMMIT_REF_NAME.tar.gz
