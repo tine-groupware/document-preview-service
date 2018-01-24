@@ -92,7 +92,7 @@ class DocumentPreview
             $semAcq = $this->semAcquire($semaphore);
             if (false === $semAcq) {
                 $this->logger->info(__METHOD__ . ' ' . __LINE__ . ': ' . "[INFO][$rhost] Service occupied");
-                echo '';//todo
+                header($_SERVER["SERVER_PROTOCOL"] . " 503 Service Unavailable");
                 return;
             }
 
