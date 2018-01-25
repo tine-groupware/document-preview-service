@@ -89,6 +89,9 @@ class DocumentPreview
         $rtn = NULL;
 
         try {
+            if (isset($conf['synchronRequest']) && $conf['synchronRequest']) {
+                $this->semTimeOut = 3;
+            }
             $semAcq = $this->semAcquire($semaphore);
             if (false === $semAcq) {
                 $this->logger->info(__METHOD__ . ' ' . __LINE__ . ': ' . "[INFO][$rhost] Service occupied");
