@@ -69,7 +69,11 @@ class DocumentConverter
                     return false;
                 }
             } else if ('pdf' === $ext) {
-                shell_exec('mv ' . $path . ' ' . $this->tempDir . $uid . '/');
+                exec('mv ' . escapeshellarg($path) . ' ' . $this->tempDir . $uid . '/', $rtn, $err);
+                if (0 !== $err){
+                    $this->logger->err(__METHOD__ . ' ' . __LINE__ . ': failed to move pdf to tmp dir with ' . $err . ' ' . join(PHP_EOL, $rtn));
+                    return false;
+                }
                 if (false === $this->covertToPNG($uid, $conf, $name)) {
                     return false;
                 }
@@ -131,9 +135,14 @@ class DocumentConverter
         return true;
     }
 
-    // converts pdf/ps to png for further prothessing
+    // converts pdf/ps to png for further processing
     protected function covertToPNG($uid, $conf, $name)
     {
+        if (!is_readable($this->tempDir . $uid . '/' . $name . '.pdf')) {
+            $this->logger->err(__METHOD__ . ' ' . __LINE__ . ': file is not readable: ' . $this->tempDir . $uid . '/'
+                . $name . '.pdf');
+            return false;
+        }
         if (true === $this->onlySingelPage($conf)) {
             $cmd = 'gs -q -dQUIET -dSAFER -dBATCH -dNOPAUSE -dNOPROMPT -dMaxBitmap=500000000 -dAlignToPixels=0 -dGridFitTT=2 "-sDEVICE=pngalpha" -dTextAlphaBits=4 -dGraphicsAlphaBits=4 "-r150x150" -sOutputFile=' . escapeshellarg($this->tempDir . $uid . '/' . $name . '001.png') . ' ' . escapeshellarg($this->tempDir . $uid . '/' . $name . '.pdf') . ' -c quit'; //to png $tempDir/$uid/$filename.png   from $tempDir/$uid/$filename.pdf
         } else {
