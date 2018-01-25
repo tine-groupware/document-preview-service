@@ -72,7 +72,7 @@ class DocumentPreview
         }
 
         //magic
-        $ipcId = ftok(__FILE__, 'g');
+        $ipcId = ftok(__FILE__, isset($conf['synchronRequest']) && $conf['synchronRequest'] ? 'h' : 'g');
         if (-1 === $ipcId) {
             $this->logger->err(__METHOD__ . ' ' . __LINE__ . ': ' . "[ERROR][$rhost] Could not generate ftok");
             header($_SERVER["SERVER_PROTOCOL"]." 500 Internal server error");
