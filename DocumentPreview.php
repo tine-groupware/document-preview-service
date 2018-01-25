@@ -71,17 +71,29 @@ class DocumentPreview
             return;
         }
 
+        //magic
+        $ipcId = ftok(__FILE__, isset($conf['synchronRequest']) && $conf['synchronRequest'] ? 'h' : 'g');
+        if (-1 === $ipcId) {
+            $this->logger->err(__METHOD__ . ' ' . __LINE__ . ': ' . "[ERROR][$rhost] Could not generate ftok");
+            header($_SERVER["SERVER_PROTOCOL"]." 500 Internal server error");
+            return;
+        }
+
+        $semaphore = sem_get($ipcId, $this->maxProc);
+        if (false === $semaphore) {
+            $this->logger->err(__METHOD__ . ' ' . __LINE__ . ': ' . "[ERROR][$rhost]Failed not get semaphore");
+            header($_SERVER["SERVER_PROTOCOL"]." 500 Internal server error");
+            return;
+        }
+
         $rtn = NULL;
 
         try {
-            $prefix = 'a';
             if (isset($conf['synchronRequest']) && $conf['synchronRequest']) {
                 $this->semTimeOut = 3;
-                $prefix = 'b';
             }
-            $locker = new DocumentLocker($this->tempDir, $this->maxProc, $this->semTimeOut, $prefix);
-
-            if (false === $locker->acquire()) {
+            $semAcq = $this->semAcquire($semaphore);
+            if (false === $semAcq) {
                 $this->logger->info(__METHOD__ . ' ' . __LINE__ . ': ' . "[INFO][$rhost] Service occupied");
                 header($_SERVER["SERVER_PROTOCOL"] . " 503 Service Unavailable");
                 return;
@@ -94,13 +106,13 @@ class DocumentPreview
                 return;
             }
 
-        } catch (DocumentLockerException $e) {
-            $this->logger->err(__METHOD__ . ' ' . __LINE__ . ': ' . "[ERROR][$rhost] Failed to get a lock: "
-                . $e->getMessage());
-            header($_SERVER["SERVER_PROTOCOL"] . " 500 Internal server error");
-            return;
+        } finally {
+            if (null !== $semaphore && true === $semAcq) {
+                if (false === sem_release($semaphore)) {
+                    $this->logger->err(__METHOD__ . ' ' . __LINE__ . ': ' . "[ERROR][$rhost] Failed to release semaphore");
+                }
+            }
         }
-
 
         // retrun
         $this->returnImage($rtn);
