@@ -167,11 +167,11 @@ class DocumentConverter
                 $nameAppend = '';
                 $file = $this->tempDir;
                 if (is_file($this->tempDir . $uid . '/' . $name . '001.' . $inputFileType)) {
-                    $file .= escapeshellarg($uid . '/' . $name . '001.' . $inputFileType);
+                    $file .= $uid . '/' . $name . '001.' . $inputFileType;
                 } else {
-                    $file .= escapeshellarg($uid . '/' . $name . '.' . $inputFileType);
+                    $file .= $uid . '/' . $name . '.' . $inputFileType;
                 }
-                $cmd = 'gm convert ' . $file . ' -resize ' . escapeshellarg($cnf['x'] . 'x' . $cnf['y']);
+                $cmd = 'gm convert ' . escapeshellarg($file) . ' -resize ' . escapeshellarg($cnf['x'] . 'x' . $cnf['y']);
             } else {
                 $nameAppend = '-%03d';
                 $cmd = 'gm convert ' . $this->tempDir . $uid . '/*.' . $inputFileType . ' +adjoin -resize ' . escapeshellarg($cnf['x'] . 'x' . $cnf['y']);
