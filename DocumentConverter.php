@@ -20,7 +20,7 @@ class DocumentConverter
     public function __invoke($path, $uid, array $conf)
     {
         $name = pathinfo($path, PATHINFO_FILENAME);
-        $ext = mb_strtolower(pathinfo($path, PATHINFO_EXTENSION));
+        $ext = pathinfo($path, PATHINFO_EXTENSION);
 
         $imageExt = $this->config->get('imgExt', array('png'));
         if (false === is_array($imageExt)){
@@ -53,7 +53,7 @@ class DocumentConverter
         try {
             $inputFileType = 'png';
 
-            if (true === in_array($ext, $docExt)) {
+            if (true === in_array(mb_strtolower($ext), $docExt)) {
                 if (false === $this->convertToPDF($path, $uid)) {
                     return false;
                 }
@@ -68,7 +68,7 @@ class DocumentConverter
                 } elseif (false === $this->covertToPNG($uid, $conf, $name)) {
                     return false;
                 }
-            } else if ('pdf' === $ext) {
+            } else if ('pdf' === mb_strtolower($ext)) {
                 exec('mv ' . escapeshellarg($path) . ' ' . $this->tempDir . $uid . '/', $rtn, $err);
                 if (0 !== $err){
                     $this->logger->err(__METHOD__ . ' ' . __LINE__ . ': failed to move pdf to tmp dir with ' . $err . ' ' . join(PHP_EOL, $rtn));
@@ -77,7 +77,7 @@ class DocumentConverter
                 if (false === $this->covertToPNG($uid, $conf, $name)) {
                     return false;
                 }
-            } else if (true === in_array($ext, $imageExt)) {
+            } else if (true === in_array(mb_strtolower($ext), $imageExt)) {
                 $cmd = 'mv ' . $path . ' ' . $this->tempDir . $uid . '/';
                 $rtn = array();
                 $err = 0;
