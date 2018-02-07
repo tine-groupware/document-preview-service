@@ -123,7 +123,7 @@ class DocumentConverter
     // converts documents to pdf with soffice headless
     protected function convertToPDF($path, $uid)
     {
-        $cmd = $this->config->get('ooBinary', 'soffice') . ' --convert-to pdf ' . $path . ' --outdir ' . $this->tempDir . $uid . ' --headless';
+        $cmd = $this->config->get('ooBinary', 'soffice') .' -env:SingleAppInstance=false -env:UserInstallation=file:///'.$this->tempDir.'/soffice'.$uid.' --convert-to pdf ' . $path . ' --outdir ' . $this->tempDir . $uid . ' --headless --norestore';
         $rtn = array();
         $err = 0;
         exec($cmd, $rtn, $err);
