@@ -47,7 +47,7 @@ final class testDocumentConverter extends TestCase
 
     public function tearDown()
     {
-        exec('rm -r ' . $this->workDir);
+        //exec('rm -r ' . $this->workDir);
         parent::tearDown();
     }
 
@@ -95,8 +95,8 @@ final class testDocumentConverter extends TestCase
     }
 
     /**
-     * @dataProvider dataInvoke
-     */
+    * @dataProvider dataInvoke
+    */
     public function testInvoke($name, $conf, $uid, $expected)
     {
         exec('cp '.$this->fileDir.$name.' '.$this->workDir.'test4/temp/');
@@ -158,7 +158,7 @@ final class testDocumentConverter extends TestCase
                 [   $this->workDir.'test4/download/U5/Key-000.jpg',
                 ]
             ],
-            [   'imATestFile001.PNG',
+            [   'imATestImage.PNG',
                 '{"Key":{"filetype":"jpg","firstPage":false,"x":50,"y":70,"color":"blue"}}',
                 'U6',
                 [   $this->workDir.'test4/download/U6/Key-000.jpg',
