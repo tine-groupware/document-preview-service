@@ -74,7 +74,7 @@ class DocumentConverter
                     $this->logger->err(__METHOD__ . ' ' . __LINE__ . ': failed to move pdf to tmp dir with ' . $err . ' ' . join(PHP_EOL, $rtn));
                     return false;
                 }
-                if (false === $this->covertToPNG($uid, $conf, $name)) {
+                if (false === $this->covertToPNG($uid, $conf, $name, $ext)) {
                     return false;
                 }
             } else if (true === in_array(mb_strtolower($ext), $imageExt)) {
@@ -136,7 +136,7 @@ class DocumentConverter
     }
 
     // converts pdf/ps to png for further processing
-    protected function covertToPNG($uid, $conf, $name)
+    protected function covertToPNG($uid, $conf, $name, $ext)
     {
         if (!is_readable($this->tempDir . $uid . '/' . $name . '.pdf')) {
             $this->logger->err(__METHOD__ . ' ' . __LINE__ . ': file is not readable: ' . $this->tempDir . $uid . '/'
@@ -144,9 +144,9 @@ class DocumentConverter
             return false;
         }
         if (true === $this->onlySingelPage($conf)) {
-            $cmd = 'gs -q -dQUIET -dSAFER -dBATCH -dNOPAUSE -dNOPROMPT -dMaxBitmap=500000000 -dAlignToPixels=0 -dGridFitTT=2 "-sDEVICE=pngalpha" -dTextAlphaBits=4 -dGraphicsAlphaBits=4 "-r150x150" -sOutputFile=' . escapeshellarg($this->tempDir . $uid . '/' . $name . '001.png') . ' ' . escapeshellarg($this->tempDir . $uid . '/' . $name . '.pdf') . ' -c quit'; //to png $tempDir/$uid/$filename.png   from $tempDir/$uid/$filename.pdf
+            $cmd = 'gs -q -dQUIET -dSAFER -dBATCH -dNOPAUSE -dNOPROMPT -dMaxBitmap=500000000 -dAlignToPixels=0 -dGridFitTT=2 "-sDEVICE=pngalpha" -dTextAlphaBits=4 -dGraphicsAlphaBits=4 "-r150x150" -sOutputFile=' . escapeshellarg($this->tempDir . $uid . '/' . $name . '001.png') . ' ' . escapeshellarg($this->tempDir . $uid . '/' . $name . '.' . $ext) . ' -c quit'; //to png $tempDir/$uid/$filename.png   from $tempDir/$uid/$filename.pdf
         } else {
-            $cmd = 'gs -q -dQUIET -dSAFER -dBATCH -dNOPAUSE -dNOPROMPT -dMaxBitmap=500000000 -dAlignToPixels=0 -dGridFitTT=2 "-sDEVICE=pngalpha" -dTextAlphaBits=4 -dGraphicsAlphaBits=4 "-r150x150" -sOutputFile=' . escapeshellarg($this->tempDir . $uid . '/' . $name . '%03d.png') . ' ' . escapeshellarg($this->tempDir . $uid . '/' . $name . '.pdf') . ' -c quit'; //to png $tempDir/$uid/filenameXXX.png   from $tempDir/$uid/$filename.pdf
+            $cmd = 'gs -q -dQUIET -dSAFER -dBATCH -dNOPAUSE -dNOPROMPT -dMaxBitmap=500000000 -dAlignToPixels=0 -dGridFitTT=2 "-sDEVICE=pngalpha" -dTextAlphaBits=4 -dGraphicsAlphaBits=4 "-r150x150" -sOutputFile=' . escapeshellarg($this->tempDir . $uid . '/' . $name . '%03d.png') . ' ' . escapeshellarg($this->tempDir . $uid . '/' . $name . '.' . $ext) . ' -c quit'; //to png $tempDir/$uid/filenameXXX.png   from $tempDir/$uid/$filename.pdf
         }
         $rtn = array();
         $err = 0;
