@@ -92,8 +92,6 @@ final class testDocumentConverter extends TestCase
         $this->assertEquals(true, docCon::_checkConfig(['Key' => ['filetype' => 'jpg', 'firstPage' => false, 'x' => 50, 'y' => 70, 'color' => 'blue'], 'Yek' => ['filetype' => 'gif', 'firstPage' => true, 'x' => 100, 'y' => 190, 'color' => false]]));
         $this->assertEquals(false, docCon::_checkConfig(['Key' => ['filetype' => 'jpg', 'firstpage' => false, 'x' => 50, 'y' => 70, 'color' => 'blue'], 'Yek' => ['filetype' => 'gif', 'firstPage' => true, 'x' => 100, 'y' => 190, 'color' => false]]));
         $this->assertEquals(false, docCon::_checkConfig([]));
-
-
     }
 
     /**
@@ -158,6 +156,22 @@ final class testDocumentConverter extends TestCase
                 '{"Key":{"filetype":"jpg","firstPage":false,"x":50,"y":70,"color":"blue"}}',
                 'U5',
                 [   $this->workDir.'test4/download/U5/Key-000.jpg',
+                ]
+            ],
+            [   'imATestFile001.PNG',
+                '{"Key":{"filetype":"jpg","firstPage":false,"x":50,"y":70,"color":"blue"}}',
+                'U6',
+                [   $this->workDir.'test4/download/U6/Key-000.jpg',
+                ]
+            ],
+            [   'imATestFile.Pdf',
+                '{"Key":{"filetype":"jpg","firstPage":false,"x":50,"y":70,"color":"blue"}}',
+                'U7',
+                [   $this->workDir.'test4/download/U7/Key-000.jpg',
+                    $this->workDir.'test4/download/U7/Key-001.jpg',
+                    $this->workDir.'test4/download/U7/Key-002.jpg',
+                    $this->workDir.'test4/download/U7/Key-003.jpg',
+                    $this->workDir.'test4/download/U7/Key-004.jpg'
                 ]
             ],
         ];
