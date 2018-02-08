@@ -34,5 +34,5 @@ function getConfigPath(){
         $conf .= 'config.php';
         if (is_file($conf)) return $conf;
     }
-    return '/etc/documentPreview/config.php';
+    return '/etc/documentPreviewService/config.php';
 }
