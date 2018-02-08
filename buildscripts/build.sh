@@ -33,7 +33,7 @@ touch build/var/log/documentPreviewService/auth.log
 touch build/var/log/documentPreviewService/doc.log
 
 mkdir build/DEBIAN
-cp packageinfo /DEBIAN/control
+cp packageinfo build/DEBIAN/control
 
 tar -zcf documentPreview-$CI_COMMIT_REF_NAME.tar.gz build/var/www/documentPreviewService*
 
