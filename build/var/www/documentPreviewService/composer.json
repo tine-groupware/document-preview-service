@@ -1,0 +1,42 @@
+{
+  "name":"document-preview",
+  "version":"0.9",
+  "repositories": [
+    {
+      "type": "vcs",
+      "url": "git@gitlab.metaways.net:tine20/auth-middleware.git"
+    }
+  ],
+  "require": {
+    "tine20/auth-middleware":"dev-develop",
+    "zendframework/zend-config": "2.*",
+    "zendframework/zend-config-aggregator": "^1.0",
+    "zendframework/zend-expressive-helpers": "^4.0",
+    "zendframework/zend-component-installer": "^1.0",
+    "zendframework/zend-stdlib": "^3.1",
+    "zendframework/zend-servicemanager": "^3.3",
+    "zendframework/zend-expressive-fastroute": "^2.0",
+    "sentry/sentry": "^1.8"
+  },
+  "require-dev": {
+    "phpunit/phpunit": "^6.0.8 || ^5.7.15",
+    "zfcampus/zf-development-mode": "^3.1"
+  },
+  "autoload": {
+    "psr-4": {
+      "DocumentService\\":"src/",
+      "DocumentServiceTest\\": "test/"
+    }
+  },
+  "autoload-dev": {
+    "psr-4": {
+      "DocumentServiceTest\\": "test/"
+    }
+  },
+  "scripts": {
+    "test":"phpunit",
+    "development-disable": "zf-development-mode disable",
+    "development-enable": "zf-development-mode enable",
+    "development-status": "zf-development-mode status"
+  }
+}
