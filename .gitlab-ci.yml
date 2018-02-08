@@ -11,6 +11,9 @@ cache:
  
 build:
  stage: build
+ artifacts:
+   paths:
+    - "documentPreviewService.deb"
  script:
   - php psh.phar build
 
