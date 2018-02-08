@@ -1,0 +1,10 @@
+Package: documentPreviewService
+Version: 0.0.1-0
+Section: misc
+Priority: extra
+Architecture: all
+Depends: graphicsmagick, apache2, libapache2-mod-php7.0, composer, php7.0-xml, php7.0-cli, php7.0-mbstring, ghostscript, unzip, git, libreoffice
+Installed-Size: 34300
+Maintainer: Metaways <info@metaways.de>
+Homepage: metaways.de
+Description: Document converting service

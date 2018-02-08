@@ -1,18 +1,42 @@
 I: rm -r build
 mkdir build
+mkdir build/var
+mkdir build/var/www
+mkdir build/var/www/documentPreviewService
 
-cp -r config build/
-cp -r public build/
-cp -r src build/
-cp composer.json build/
-cp README.md build/
+cp -r config build/var/www/documentPreviewService
+cp -r public build/var/www/documentPreviewService
+cp -r src build/var/www/documentPreviewService
+cp composer.json build/var/www/documentPreviewService
+cp README.md build/var/www/documentPreviewService
 
-cd build && mkdir data
-cd build/data && mkdir cache
+mkdir build/var/www/documentPreviewService/data
+mkdir build/var/www/documentPreviewService/data/cache
 
-cd build && composer install
-cd build && composer development-disable
-cd build && rm composer.json
-cd build && rm composer.lock
+cd build/var/www/documentPreviewService && composer install
+cd build/var/www/documentPreviewService && composer development-disable
+cd build/var/www/documentPreviewService && rm composer.json
+cd build/var/www/documentPreviewService && rm composer.lock
 
-tar -zcf documentPreview-$CI_COMMIT_REF_NAME.tar.gz build/*
+mkdir build/etc
+mkdir build/etc/documentPreviewService
+cp sampel_config.php build/etc/documentPreviewService/config.php
+
+mkdir build/etc/apache2
+mkdir build/etc/apache2/sites-available
+mkdir build/etc/apache2/keys
+cp sampel_apache2.conf build/etc/apache2/sites-available/documentPreviewService.conf
+
+mkdir build/var/log
+mkdir build/var/log/documentPreviewService
+touch build/var/log/documentPreviewService/auth.log
+touch build/var/log/documentPreviewService/doc.log
+
+mkdir build/DEBIAN
+cp packageinfo /DEBIAN/control
+
+tar -zcf documentPreview-$CI_COMMIT_REF_NAME.tar.gz build/var/www/documentPreviewService*
+
+mkdir build/var/www/documentPreviewService/public/download
+
+dpkg -b ./build documentPreviewService.deb
