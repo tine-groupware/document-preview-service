@@ -22,7 +22,7 @@ class DocumentConverter
     public function __invoke($path, $uid, array $conf)
     {
         $name = pathinfo($path, PATHINFO_FILENAME);
-        $ext = mb_strtolower(pathinfo($path, PATHINFO_EXTENSION));
+        $ext = pathinfo($path, PATHINFO_EXTENSION);
 
         $imageExt = $this->config->get('imgExt', array('png'));
         if (false === is_array($imageExt)){
@@ -55,7 +55,7 @@ class DocumentConverter
         try {
             $inputFileType = 'png';
 
-            if (true === in_array($ext, $docExt)) {
+            if (true === in_array(mb_strtolower($ext), $docExt)) {
                 if (false === $this->convertToPDF($path, $uid)) {
                     return false;
                 }
@@ -67,15 +67,15 @@ class DocumentConverter
                         $this->logger->err(__METHOD__ . ' ' . __LINE__ . ': failed to move pdf to download dir with ' . $err . ' ' . join(PHP_EOL, $rtn));
                         return false;
                     }
-                } elseif (false === $this->covertToPNG($uid, $conf, $name)) {
+                } elseif (false === $this->covertToPNG($uid, $conf, $name, 'pdf')) {
                     return false;
                 }
-            } else if ('pdf' === $ext) {
+            } else if ('pdf' === mb_strtolower($ext)) {
                 shell_exec('mv ' . $path . ' ' . $this->tempDir . $uid . '/');
-                if (false === $this->covertToPNG($uid, $conf, $name)) {
+                if (false === $this->covertToPNG($uid, $conf, $name, $ext)) {
                     return false;
                 }
-            } else if (true === in_array($ext, $imageExt)) {
+            } else if (true === in_array(mb_strtolower($ext), $imageExt)) {
                 $cmd = 'mv ' . $path . ' ' . $this->tempDir . $uid . '/';
                 $rtn = array();
                 $err = 0;
@@ -121,7 +121,7 @@ class DocumentConverter
     // converts documents to pdf with soffice headless
     protected function convertToPDF($path, $uid)
     {
-        $cmd = $this->config->get('ooBinary', 'soffice').' --convert-to pdf ' . $path . ' --outdir ' . $this->tempDir . $uid . ' --headless';
+        $cmd = $this->config->get('ooBinary', 'soffice').' -env:SingleAppInstance=false -env:UserInstallation=file:///'.$this->tempDir.'/soffice'.$uid.' --convert-to pdf ' . $path . ' --outdir ' . $this->tempDir . $uid . ' --headless --norestore';
         $rtn = array();
         $err = 0;
         exec($cmd, $rtn, $err);
@@ -134,12 +134,18 @@ class DocumentConverter
     }
 
     // converts pdf/ps to png for further prothessing
-    protected function covertToPNG($uid, $conf, $name)
+    protected function covertToPNG($uid, $conf, $name, $ext)
     {
+        if (!is_readable($this->tempDir . $uid . '/' . $name . '.' . $ext)) {
+            $this->logger->err(__METHOD__ . ' ' . __LINE__ . ': file is not readable: ' . $this->tempDir . $uid . '/'
+                . $name . '.' . $ext);
+            return false;
+        }
+
         if (true === $this->onlySingelPage($conf)) {
-            $cmd = 'gs -q -dQUIET -dSAFER -dBATCH -dNOPAUSE -dNOPROMPT -dMaxBitmap=500000000 -dAlignToPixels=0 -dGridFitTT=2 "-sDEVICE=pngalpha" -dTextAlphaBits=4 -dGraphicsAlphaBits=4 "-r150x150" -sOutputFile=' . escapeshellarg($this->tempDir . $uid . '/' . $name . '001.png') . ' ' . escapeshellarg($this->tempDir . $uid . '/' . $name . '.pdf') . ' -c quit'; //to png $tempDir/$uid/$filename.png   from $tempDir/$uid/$filename.pdf
+            $cmd = 'gs -q -dQUIET -dSAFER -dBATCH -dNOPAUSE -dNOPROMPT -dMaxBitmap=500000000 -dAlignToPixels=0 -dGridFitTT=2 "-sDEVICE=pngalpha" -dTextAlphaBits=4 -dGraphicsAlphaBits=4 "-r150x150" -sOutputFile=' . escapeshellarg($this->tempDir . $uid . '/' . $name . '001.png') . ' ' . escapeshellarg($this->tempDir . $uid . '/' . $name . '.' . $ext) . ' -c quit'; //to png $tempDir/$uid/$filename.png   from $tempDir/$uid/$filename.pdf
         } else {
-            $cmd = 'gs -q -dQUIET -dSAFER -dBATCH -dNOPAUSE -dNOPROMPT -dMaxBitmap=500000000 -dAlignToPixels=0 -dGridFitTT=2 "-sDEVICE=pngalpha" -dTextAlphaBits=4 -dGraphicsAlphaBits=4 "-r150x150" -sOutputFile=' . escapeshellarg($this->tempDir . $uid . '/' . $name . '%03d.png') . ' ' . escapeshellarg($this->tempDir . $uid . '/' . $name . '.pdf') . ' -c quit'; //to png $tempDir/$uid/filenameXXX.png   from $tempDir/$uid/$filename.pdf
+            $cmd = 'gs -q -dQUIET -dSAFER -dBATCH -dNOPAUSE -dNOPROMPT -dMaxBitmap=500000000 -dAlignToPixels=0 -dGridFitTT=2 "-sDEVICE=pngalpha" -dTextAlphaBits=4 -dGraphicsAlphaBits=4 "-r150x150" -sOutputFile=' . escapeshellarg($this->tempDir . $uid . '/' . $name . '%03d.png') . ' ' . escapeshellarg($this->tempDir . $uid . '/' . $name . '.' . $ext) . ' -c quit'; //to png $tempDir/$uid/filenameXXX.png   from $tempDir/$uid/$filename.pdf
         }
         $rtn = array();
         $err = 0;
