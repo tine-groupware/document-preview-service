@@ -20,12 +20,12 @@ cd build/var/www/documentPreviewService && rm composer.lock
 
 mkdir build/etc
 mkdir build/etc/documentPreviewService
-cp sampel_config.php build/etc/documentPreviewService/config.php
+cp sample_config.php build/etc/documentPreviewService/config.php
 
 mkdir build/etc/apache2
 mkdir build/etc/apache2/sites-available
 mkdir build/etc/apache2/keys
-cp sampel_apache2.conf build/etc/apache2/sites-available/documentPreviewService.conf
+cp sample_apache2.conf build/etc/apache2/sites-available/documentPreviewService.conf
 
 mkdir build/var/log
 mkdir build/var/log/documentPreviewService
