@@ -81,7 +81,7 @@ final class testDocumentConverter extends TestCase
 
     public function testCovertToPNG(){
         $docCon = new docCon($this->workDir.'test2/temp/', $this->workDir.'test2/download/', 'test.com', $this->logger, $this->config);
-        $docCon->_covertToPNG('1248', ['t1' => ['firstPage' => false]], 'imATestFile');
+        $docCon->_covertToPNG('1248', ['t1' => ['firstPage' => false]], 'imATestFile', 'pdf');
         $this->assertTrue(is_file($this->workDir.'test2/temp/1248/imATestFile001.png') && is_file($this->workDir.'test2/temp/1248/imATestFile002.png') && is_file($this->workDir.'test2/temp/1248/imATestFile003.png') && is_file($this->workDir.'test2/temp/1248/imATestFile004.png') && is_file($this->workDir.'test2/temp/1248/imATestFile005.png'));
     }
 
@@ -95,8 +95,6 @@ final class testDocumentConverter extends TestCase
         $this->assertEquals(true, docCon::_checkConfig(['Key' => ['filetype' => 'jpg', 'firstPage' => false, 'x' => 50, 'y' => 70, 'color' => 'blue'], 'Yek' => ['filetype' => 'gif', 'firstPage' => true, 'x' => 100, 'y' => 190, 'color' => false]]));
         $this->assertEquals(false, docCon::_checkConfig(['Key' => ['filetype' => 'jpg', 'firstpage' => false, 'x' => 50, 'y' => 70, 'color' => 'blue'], 'Yek' => ['filetype' => 'gif', 'firstPage' => true, 'x' => 100, 'y' => 190, 'color' => false]]));
         $this->assertEquals(false, docCon::_checkConfig([]));
-
-
     }
 
     /**
@@ -163,6 +161,23 @@ final class testDocumentConverter extends TestCase
                 [   $this->workDir.'test4/download/U5/Key-000.jpg',
                 ]
             ],
+            [   'imATestImage.PNG',
+                '{"Key":{"filetype":"jpg","firstPage":false,"x":50,"y":70,"color":"blue"}}',
+                'U6',
+                [   $this->workDir.'test4/download/U6/Key-000.jpg',
+                ]
+            ],
+            [   'imATestFile.Pdf',
+                '{"Key":{"filetype":"jpg","firstPage":false,"x":50,"y":70,"color":"blue"}}',
+                'U7',
+                [   $this->workDir.'test4/download/U7/Key-000.jpg',
+                    $this->workDir.'test4/download/U7/Key-001.jpg',
+                    $this->workDir.'test4/download/U7/Key-002.jpg',
+                    $this->workDir.'test4/download/U7/Key-003.jpg',
+                    $this->workDir.'test4/download/U7/Key-004.jpg'
+                ]
+            ],
+
         ];
     }
 }

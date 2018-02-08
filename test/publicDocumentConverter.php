@@ -38,9 +38,9 @@ class docCon extends DocumentConverter
         return $this->convertToPDF($path, $uid);
     }
 
-    public function _covertToPNG($uid, $conf, $name)
+    public function _covertToPNG($uid, $conf, $name, $ext)
     {
-        return $this->covertToPNG($uid, $conf, $name);
+        return $this->covertToPNG($uid, $conf, $name, $ext);
     }
     
     public function _convertToSize($uid, $conf, $inputFileType, $name)
