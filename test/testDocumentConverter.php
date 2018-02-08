@@ -78,7 +78,7 @@ final class testDocumentConverter extends TestCase
 
     public function testCovertToPNG(){
         $docCon = new docCon($this->workDir.'test2/temp/', $this->workDir.'test2/download/', 'test.com', $this->logger, $this->config);
-        $docCon->_covertToPNG('1248', ['t1' => ['firstPage' => false]], 'imATestFile');
+        $docCon->_covertToPNG('1248', ['t1' => ['firstPage' => false]], 'imATestFile', 'pdf');
         $this->assertTrue(is_file($this->workDir.'test2/temp/1248/imATestFile001.png') && is_file($this->workDir.'test2/temp/1248/imATestFile002.png') && is_file($this->workDir.'test2/temp/1248/imATestFile003.png') && is_file($this->workDir.'test2/temp/1248/imATestFile004.png') && is_file($this->workDir.'test2/temp/1248/imATestFile005.png'));
     }
 

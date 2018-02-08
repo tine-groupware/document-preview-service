@@ -65,7 +65,7 @@ class DocumentConverter
                         $this->logger->err(__METHOD__ . ' ' . __LINE__ . ': failed to move pdf to download dir with ' . $err . ' ' . join(PHP_EOL, $rtn));
                         return false;
                     }
-                } elseif (false === $this->covertToPNG($uid, $conf, $name)) {
+                } elseif (false === $this->covertToPNG($uid, $conf, $name, 'pdf')) {
                     return false;
                 }
             } else if ('pdf' === mb_strtolower($ext)) {
@@ -138,9 +138,9 @@ class DocumentConverter
     // converts pdf/ps to png for further processing
     protected function covertToPNG($uid, $conf, $name, $ext)
     {
-        if (!is_readable($this->tempDir . $uid . '/' . $name . '.pdf')) {
+        if (!is_readable($this->tempDir . $uid . '/' . $name . '.' . $ext)) {
             $this->logger->err(__METHOD__ . ' ' . __LINE__ . ': file is not readable: ' . $this->tempDir . $uid . '/'
-                . $name . '.pdf');
+                . $name . '.' . $ext);
             return false;
         }
         if (true === $this->onlySingelPage($conf)) {
