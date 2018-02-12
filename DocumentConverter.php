@@ -54,8 +54,8 @@ class DocumentConverter
             $inputFileType = 'png';
 
             if (true === in_array(mb_strtolower($ext), $docExt)) {
-                if (false === $this->convertToPDF($path, $uid)) {
-                    return false;
+                if (true !== ($result = $this->convertToPDF($path, $uid))) {
+                    return $result;
                 }
                 if (isset($conf['onlyPdf'])) {
                     $rtn = array();
@@ -65,19 +65,19 @@ class DocumentConverter
                         $this->logger->err(__METHOD__ . ' ' . __LINE__ . ': failed to move pdf to download dir with ' . $err . ' ' . join(PHP_EOL, $rtn));
                         return false;
                     }
-                } elseif (false === $this->covertToPNG($uid, $conf, $name, 'pdf')) {
-                    return false;
+                } elseif (true !== ($result = $this->covertToPNG($uid, $conf, $name, 'pdf'))) {
+                    return $result;
                 }
-            } else if ('pdf' === mb_strtolower($ext)) {
+            } elseif ('pdf' === mb_strtolower($ext)) {
                 exec('mv ' . escapeshellarg($path) . ' ' . $this->tempDir . $uid . '/', $rtn, $err);
                 if (0 !== $err){
                     $this->logger->err(__METHOD__ . ' ' . __LINE__ . ': failed to move pdf to tmp dir with ' . $err . ' ' . join(PHP_EOL, $rtn));
                     return false;
                 }
-                if (false === $this->covertToPNG($uid, $conf, $name, $ext)) {
-                    return false;
+                if (true !== ($result = $this->covertToPNG($uid, $conf, $name, $ext))) {
+                    return $result;
                 }
-            } else if (true === in_array(mb_strtolower($ext), $imageExt)) {
+            } elseif (true === in_array(mb_strtolower($ext), $imageExt)) {
                 $cmd = 'mv ' . $path . ' ' . $this->tempDir . $uid . '/';
                 $rtn = array();
                 $err = 0;
@@ -92,8 +92,9 @@ class DocumentConverter
             }
 
             // ... imagemagick
-            if (!isset($conf['onlyPdf']) && false === $this->convertToSize($uid, $conf, $inputFileType, $name)) {
-                return false;
+            if (!isset($conf['onlyPdf']) &&
+                    true !== ($result = $this->convertToSize($uid, $conf, $inputFileType, $name))) {
+                return $result;
             }
 
             if (isset($conf['onlyPdf'])) {
@@ -129,7 +130,7 @@ class DocumentConverter
         exec($cmd, $rtn, $err);
         if (0 !== $err){
             $this->logger->err(__METHOD__ . ' ' . __LINE__ . ': ' . $cmd . ' failed with ' . $err . ' ' . join(PHP_EOL, $rtn));
-            return false;
+            return '571 open office converting to pdf failed';
         }
 
         return true;
@@ -153,7 +154,7 @@ class DocumentConverter
         exec($cmd, $rtn, $err);
         if (0 !== $err){
             $this->logger->err(__METHOD__ . ' ' . __LINE__ . ': ' . $cmd . ' failed with ' . $err . ' ' . join(PHP_EOL, $rtn));
-            return false;
+            return '572 gs converting to png failed';
         }
 
         return true;
@@ -185,7 +186,7 @@ class DocumentConverter
             exec($cmd, $rtn, $err);
             if (0 !== $err){
                 $this->logger->err(__METHOD__ . ' ' . __LINE__ . ': ' . $cmd . ' failed with ' . $err . ' ' . join(PHP_EOL, $rtn));
-                return false;
+                return '573 gm converting size failed';
             }
         }
         return true;
