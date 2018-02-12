@@ -104,7 +104,7 @@ class DocumentPreview
                 $this->logger->err(__METHOD__ . ' ' . __LINE__ . ': ' . "[ERROR][$rhost] Failed to generate Images");
                 header($_SERVER["SERVER_PROTOCOL"] . " 500 Internal server error");
                 return;
-            } elseif (is_array($rtn)) {
+            } elseif (!is_array($rtn)) {
                 $this->logger->err(__METHOD__ . ' ' . __LINE__ . ': ' . "[ERROR][$rhost] Failed to generate Images: "
                     . $rtn);
                 header($_SERVER["SERVER_PROTOCOL"] . ' ' . $rtn);
