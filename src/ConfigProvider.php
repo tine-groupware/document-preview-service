@@ -24,27 +24,6 @@ class ConfigProvider
                     'jpg', 'jpeg', 'gif', 'tiff', 'png'
                 ],
             ],
-            'routes' => [
-                [
-                    'name' => 'routeName',
-                    'path' => '/tine20/documentPreview',
-                    'middleware' => [
-                        Auth\Action\NeedsAuth::class,
-                        Auth\Action\AuthSSL::class,
-                        Auth\Action\AuthCheck::class,
-                        DocumentService\Action\DocumentPreview::class,
-                    ],
-                    'allowed_methods' => ['POST'],
-                    'auth' =>[
-                        'required' => true,
-                        'permission' => '(1=1)'
-                    ]
-                ],
-            ],
-            'auth' => [
-                'default' => ['name' => 'default', 'permission' => "false",]
-            ],
-            'authLogger' => 'auth.log',
         ];
     }
 
