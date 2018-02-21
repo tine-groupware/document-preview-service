@@ -10,9 +10,16 @@ use Raven_ErrorHandler;
 
 class SentryIO implements MiddlewareInterface
 {
+    private $sentryURL;
+
+    public function __construct(string $sentryURL)
+    {
+        $this->sentryURL = $sentryURL;
+    }
+
     public function process(ServerRequestInterface $request, DelegateInterface $delegate)
     {
-        $client = new Raven_Client();
+        $client = new Raven_Client($this->sentryURL);
         $error_handler = new Raven_ErrorHandler($client);
         $error_handler->registerExceptionHandler();
         $error_handler->registerErrorHandler();

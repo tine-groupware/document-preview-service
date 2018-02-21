@@ -31,6 +31,7 @@ class ConfigProvider
     {
         return [
             'factories'  => [
+                Action\SentryIO::class => Factory\SentryIOFactory::class,
                 Action\DocumentPreview::class => Factory\DocumentPreviewFactory::class,
             ],
         ];

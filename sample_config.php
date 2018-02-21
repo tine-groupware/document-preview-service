@@ -23,6 +23,8 @@ return [
         "ooBinary"=>'soffice'
     ],
 
+
+
     // routing and authentication setup
     // for authentication documentation see tine20/auth-middleware
     'routes' => [
@@ -50,4 +52,5 @@ return [
         'default' => ['name' => 'default', 'permission' => "false",] // default authentication, if no auth is configured auth will fail
     ],
     'authLogger' => '/var/log/documentPreviewService/auth.log', // auth logger, can be a file or a zend logger
+    'sentryio' => 'https://<key>:<secret>@sentry.io/<project>' //sentry uri
 ];
