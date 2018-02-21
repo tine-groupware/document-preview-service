@@ -29,4 +29,4 @@ deploy:
    - "documentPreview-$CI_COMMIT_REF_NAME.tar.gz"
  script:
  - echo "this job is not empty"
-  
+ - php psh.phar deploy
