@@ -12,8 +12,8 @@ class DocumentConverter
 
     public function __construct($tempDir, $downDir, $downUrl, $logger, $config)
     {
-        $this->tempDir = $tempDir;
-        $this->downDir = $downDir;
+        $this->tempDir = $tempDir.'/';
+        $this->downDir = $downDir.'/';
         $this->downUrl = $downUrl;
         $this->logger = $logger;
         $this->config = $config;
