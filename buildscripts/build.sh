@@ -32,10 +32,12 @@ mkdir build/var/log/documentPreviewService
 touch build/var/log/documentPreviewService/auth.log
 touch build/var/log/documentPreviewService/doc.log
 
+echo "$CI_COMMIT_REF_NAME - $CI_PIPELINE_ID - $CI_PROJECT_URL" > build/var/www/documentPreviewService buildnumber
+
 mkdir build/DEBIAN
 cp packageinfo build/DEBIAN/control
 
-tar -zcf documentPreview-$CI_COMMIT_REF_NAME.tar.gz build/var/www/documentPreviewService*
+tar -zcf documentPreview-$CI_COMMIT_REF_NAME.tar.gz build/var/www/documentPreviewService
 
 mkdir build/var/www/documentPreviewService/public/download
 
