@@ -37,7 +37,7 @@ echo "$CI_COMMIT_REF_NAME - $CI_PIPELINE_ID - $CI_PROJECT_URL" > build/var/www/d
 mkdir build/DEBIAN
 cp packageinfo build/DEBIAN/control
 
-tar -zcf documentPreview-$CI_COMMIT_REF_NAME.tar.gz build/var/www/documentPreviewService/*
+cd build/var/www/documentPreviewService/ && tar -zcf documentPreview-$CI_COMMIT_REF_NAME.tar.gz .
 
 mkdir build/var/www/documentPreviewService/public/download
 
