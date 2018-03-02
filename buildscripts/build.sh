@@ -39,6 +39,8 @@ sed "s/VERSION/$CI_PIPELINE_ID/g" packageinfo > build/DEBIAN/control
 
 sed "s/VERSION/$CI_PIPELINE_ID/g" postinst.sh > build/DEBIAN/postinst
 
+chmod 775 build/DEBIAN/postinst
+
 tar -zcf documentPreview-$CI_COMMIT_REF_NAME.tar.gz build/var/www/documentPreviewService$CI_PIPELINE_ID/
 
 mkdir build/var/www/documentPreviewService$CI_PIPELINE_ID/public/download
