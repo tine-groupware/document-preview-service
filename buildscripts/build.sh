@@ -20,7 +20,7 @@ cd build/var/www/documentPreviewService$CI_PIPELINE_ID && rm composer.lock
 
 mkdir build/etc
 mkdir build/etc/documentPreviewService
-mkdir build/etc/ducumentPreviewService/$CI_PIPELINE_ID
+mkdir build/etc/documentPreviewService/$CI_PIPELINE_ID
 cp sample_config.php build/etc/documentPreviewService/$CI_PIPELINE_ID/config.php
 
 mkdir build/etc/apache2
