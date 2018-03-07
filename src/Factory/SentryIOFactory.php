@@ -2,11 +2,14 @@
 namespace DocumentService\Factory;
 
 use Psr\Container\ContainerInterface;
+use DocumentService\Action;
 
 class SentryIOFactory
 {
-    public function __invoke(ContainerInterface $container) : DocumentService\Action\SentryIO
+    public function __invoke(ContainerInterface $container) : Action\SentryIO
     {
-        return new DocumentService\Action\SentryIO($container->get('config')['sentryio'], '');
+        $sentry_url = $container->get('config')['sentryio'];
+        if ($sentry_url == null) $sentry_url = '';
+        return new Action\SentryIO($sentry_url);
     }
 }
