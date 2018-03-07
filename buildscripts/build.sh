@@ -30,7 +30,7 @@ echo "$CI_COMMIT_REF_NAME - $CI_PIPELINE_ID - $CI_PROJECT_URL" > build/var/www/d
 
 mkdir build/DEBIAN
 
-sed -i "s/documentpreviewconfig/documentpreviewconfig$CI_PIPELINE_ID/g"
+sed -i "s/documentpreviewconfig/documentpreviewconfig$CI_PIPELINE_ID/g" build/var/www/documentPreviewService/config/config.php
 
 sed "s/VERSION/$CI_PIPELINE_ID/g" packageinfo > build/DEBIAN/control
 
