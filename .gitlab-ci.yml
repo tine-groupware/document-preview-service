@@ -8,6 +8,7 @@ cache:
  paths:
   - build
   - "documentPreview-$CI_COMMIT_REF_NAME.tar.gz"
+  - "documentPreviewService$CI_PIPELINE_ID.deb"
  
 build:
  stage: build
