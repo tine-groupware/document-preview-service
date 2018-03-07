@@ -4,34 +4,29 @@ mkdir build/var
 mkdir build/var/www
 mkdir build/var/www/documentPreviewService
 
-cp -r config build/var/www/documentPreviewService$CI_PIPELINE_ID
-cp -r public build/var/www/documentPreviewService$CI_PIPELINE_ID
-cp -r src build/var/www/documentPreviewService$CI_PIPELINE_ID
-cp composer.json build/var/www/documentPreviewService$CI_PIPELINE_ID
-cp README.md build/var/www/documentPreviewService$CI_PIPELINE_ID
+cp -r config build/var/www/documentPreviewService
+cp -r public build/var/www/documentPreviewService
+cp -r src build/var/www/documentPreviewService
+cp composer.json build/var/www/documentPreviewService
+cp README.md build/var/www/documentPreviewService
 
-mkdir build/var/www/documentPreviewService$CI_PIPELINE_ID/data
-mkdir build/var/www/documentPreviewService$CI_PIPELINE_ID/data/cache
+mkdir build/var/www/documentPreviewService/data
+mkdir build/var/www/documentPreviewService/data/cache
 
-cd build/var/www/documentPreviewService$CI_PIPELINE_ID && composer install
-cd build/var/www/documentPreviewService$CI_PIPELINE_ID && composer development-disable
-cd build/var/www/documentPreviewService$CI_PIPELINE_ID && rm composer.json
-cd build/var/www/documentPreviewService$CI_PIPELINE_ID && rm composer.lock
+cd build/var/www/documentPreviewService && composer install
+cd build/var/www/documentPreviewService && composer development-disable
+cd build/var/www/documentPreviewService && rm composer.json
+cd build/var/www/documentPreviewService && rm composer.lock
 
 mkdir build/etc
 mkdir build/etc/documentPreviewService
 mkdir build/etc/documentPreviewService/$CI_PIPELINE_ID
 cp sample_config.php build/etc/documentPreviewService/$CI_PIPELINE_ID/config.php
 
-mkdir build/etc/apache2
-mkdir build/etc/apache2/sites-available
-mkdir build/etc/apache2/keys
-cp sample_apache2.conf build/etc/apache2/sites-available/documentPreviewService.conf
-
 mkdir build/var/log
-mkdir build/var/log/documentPreviewService$CI_PIPELINE_ID
+mkdir build/var/log/documentPreviewService/
 
-echo "$CI_COMMIT_REF_NAME - $CI_PIPELINE_ID - $CI_PROJECT_URL" > build/var/www/documentPreviewService$CI_PIPELINE_ID/buildnumber
+echo "$CI_COMMIT_REF_NAME - $CI_PIPELINE_ID - $CI_PROJECT_URL" > build/var/www/documentPreviewService/buildnumber
 
 mkdir build/DEBIAN
 
@@ -41,8 +36,8 @@ sed "s/VERSION/$CI_PIPELINE_ID/g" postinst.sh > build/DEBIAN/postinst
 
 chmod 775 build/DEBIAN/postinst
 
-tar -zcf documentPreview-$CI_COMMIT_REF_NAME.tar.gz build/var/www/documentPreviewService$CI_PIPELINE_ID/
+tar -zcf documentPreview-$CI_COMMIT_REF_NAME.tar.gz build/var/www/documentPreviewService/
 
-mkdir build/var/www/documentPreviewService$CI_PIPELINE_ID/public/download
+mkdir build/var/www/documentPreviewService/public/download
 
 dpkg -b ./build documentPreviewService$CI_PIPELINE_ID.deb
