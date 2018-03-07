@@ -30,6 +30,8 @@ echo "$CI_COMMIT_REF_NAME - $CI_PIPELINE_ID - $CI_PROJECT_URL" > build/var/www/d
 
 mkdir build/DEBIAN
 
+sed -i "s/documentpreviewconfig/documentpreviewconfig$CI_PIPELINE_ID/g"
+
 sed "s/VERSION/$CI_PIPELINE_ID/g" packageinfo > build/DEBIAN/control
 
 sed "s/VERSION/$CI_PIPELINE_ID/g" postinst.sh > build/DEBIAN/postinst
