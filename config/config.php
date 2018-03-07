@@ -28,11 +28,11 @@ return $aggregator->getMergedConfig();
 
 
 function getConfigPath(){
-    $conf = getenv('documentpreviewconfig');
+    $conf = getenv('documentpreviewconfigVERSION');
     if (!($conf == false || $conf == '')){
         if (is_file($conf)) return $conf;
         $conf .= 'config.php';
         if (is_file($conf)) return $conf;
     }
-    return '/etc/documentPreviewService/config.php';
+    return '/etc/documentPreviewService/VERSION/config.php';
 }
