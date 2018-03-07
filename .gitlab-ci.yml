@@ -12,9 +12,6 @@ cache:
  
 build:
  stage: build
- artifacts:
-   paths:
-    - "documentPreviewService.deb"
  script:
   - php psh.phar build
 
@@ -28,6 +25,7 @@ deploy:
  artifacts:
   paths:
    - "documentPreview-$CI_COMMIT_REF_NAME.tar.gz"
+   - "documentPreviewService$CI_PIPELINE_ID.deb"
  script:
  - echo "this job is not empty"
  - php psh.phar deploy
