@@ -5,4 +5,4 @@ HowTo install:
     
 Download:
     
-    [curren version](https://nexus.metaways.net/repository/documentPreview/develop/documentPreviewService.deb)
+[curren version](https://nexus.metaways.net/repository/documentPreview/develop/documentPreviewService.deb)
