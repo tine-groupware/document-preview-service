@@ -3,7 +3,7 @@ Version: VERSION
 Section: misc
 Priority: extra
 Architecture: all
-Depends: graphicsmagick, apache2, libapache2-mod-php7.2, php7.2-xml, php7.2-cli, php7.2-mbstring, ghostscript, unzip, libreoffice
+Depends: graphicsmagick, php7.2-xml, php7.2-cli, php7.2-mbstring, ghostscript, unzip, libreoffice
 Installed-Size: 34300
 Maintainer: Metaways <info@metaways.de>
 Homepage: metaways.de
