@@ -1,5 +1,0 @@
-curl -v --user "documentPreview:1cf129712ae98d92f085" -H "Content-Type: application/tar+gzip" --upload-file ./documentPreview-$CI_COMMIT_REF_NAME.tar.gz https://nexus.metaways.net/repository/documentPreview/$CI_COMMIT_REF_NAME/$CI_PIPELINE_ID/documentPreviewService.tar.gz
-curl -v --user "documentPreview:1cf129712ae98d92f085" -H "Content-Type: application/x-debian-package" --upload-file ./documentPreviewService$CI_PIPELINE_ID.deb https://nexus.metaways.net/repository/documentPreview/$CI_COMMIT_REF_NAME/$CI_PIPELINE_ID/documentPreviewService.deb
-
-
-curl -v --user "documentPreview:1cf129712ae98d92f085" -H "Content-Type: application/x-debian-package" --upload-file ./documentPreviewService$CI_PIPELINE_ID.deb https://nexus.metaways.net/repository/documentPreview/$CI_COMMIT_REF_NAME/documentPreviewService.deb

@@ -2,29 +2,39 @@ stages:
  - build
  - test
  - deploy
- 
+
 cache:
- key: "buildFolder$CI_COMMIT_SHA"
- paths:
-  - build
-  - "documentPreview-$CI_COMMIT_REF_NAME.tar.gz"
-  - "documentPreviewService$CI_PIPELINE_ID.deb"
- 
-build:
+ untracked: true
+
+build_tag:
  stage: build
+ only:
+  - tags
  script:
-  - php psh.phar build
+  - php psh.phar git-tags:build
+
+build_branch:
+ stage: build
+ only:
+  - branches
+ script:
+  - php psh.phar git-branches:build
 
 test:
  stage: test
  script:
-  - php psh.phar test
-  
-deploy:
+  - php psh.phar git:test
+
+deploy_tag:
  stage: deploy
- artifacts:
-  paths:
-   - "documentPreview-$CI_COMMIT_REF_NAME.tar.gz"
-   - "documentPreviewService$CI_PIPELINE_ID.deb"
+ only:
+  - tags
  script:
- - php psh.phar deploy
+  - php psh.phar git-tags:deploy
+
+deploy_branch:
+ stage: deploy
+ only:
+  - branches
+ script:
+  - php psh.phar git-branches:deploy
