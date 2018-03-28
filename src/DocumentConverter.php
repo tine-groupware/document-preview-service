@@ -211,7 +211,7 @@ class DocumentConverter
                 for ($i = 0; $i < $count; $i++) {
                     $file = $uid . '/' . $key . '-' . sprintf('%03d', $i) . '.' . $cnf['filetype'];
                     if (true === is_file($this->downDir.$file)){
-                        $links[] = $this->downUrl . $file;
+                        $links[] = base64_encode(file_get_contents($this->downDir . $file));
                     } else {
                         $this->logger->err(__METHOD__ . ' ' . __LINE__ . ': did not find file: ' . $this->downDir . $file);
                         return false;
@@ -219,7 +219,7 @@ class DocumentConverter
                 }
                 $rtn[$key] = $links;
             } else {
-                $rtn[$key] = array($this->downUrl . $uid . '/' . $key . '.' . $cnf['filetype']);
+                $rtn[$key] = array(base64_encode(file_get_contents($this->downDir . $uid . '/' . $key . '.' . $cnf['filetype'])));
             }
         }
         return $rtn;
