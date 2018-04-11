@@ -14,7 +14,7 @@ cp README.md build/var/www/documentPreviewService
 mkdir build/var/www/documentPreviewService/data
 mkdir build/var/www/documentPreviewService/data/cache
 
-cd build/var/www/documentPreviewService && php ../../../../composer install --no-dev
+cd build/var/www/documentPreviewService && php ../../../../composer.phar install --no-dev
 cd build/var/www/documentPreviewService && rm composer.json
 cd build/var/www/documentPreviewService && rm composer.lock
 
