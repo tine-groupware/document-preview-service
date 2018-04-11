@@ -1,8 +1,8 @@
 paths: []
 const: []
 dynamic:
-  VERSION_N_MM: composer show --self #echo 2.0 #$(composer show --self | sed '4q;d' | cut -c 14-)
-  VERSION_N_MMP: echo 2.0.$CI_PIPELINE_ID #$(composer show --self | sed '4q;d' | cut -c 14-).$CI_PIPELINE_ID
+  VERSION_N_MM: $(php composer.phar show --self | sed '4q;d' | cut -c 14-)
+  VERSION_N_MMP: $(php composer.phar show --self | sed '4q;d' | cut -c 14-).$CI_PIPELINE_ID
   REF_NAME: echo $CI_COMMIT_REF_NAME
   PROJECT_URL: echo $CI_PROJECT_URL
 environments:
