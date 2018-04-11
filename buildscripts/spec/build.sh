@@ -42,6 +42,4 @@ chmod 775 build/DEBIAN/postinst
 
 tar -zcf documentPreview-__VERSION_T__.tar.gz build/var/www/documentPreviewService/
 
-mkdir build/var/www/documentPreviewService/public/download
-
 dpkg -b ./build documentPreviewService-__VERSION_T__.deb
