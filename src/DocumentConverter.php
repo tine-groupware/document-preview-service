@@ -5,16 +5,12 @@ namespace DocumentService;
 class DocumentConverter
 {
     protected $tempDir = '';
-    protected $downDir = '';
-    protected $downUrl = '';
     protected $logger;
     protected $config;
 
-    public function __construct($tempDir, $downDir, $downUrl, $logger, $config)
+    public function __construct($tempDir, $logger, $config)
     {
         $this->tempDir = $tempDir.'/';
-        $this->downDir = $downDir.'/';
-        $this->downUrl = $downUrl;
         $this->logger = $logger;
         $this->config = $config;
     }
@@ -43,8 +39,8 @@ class DocumentConverter
         }
 
 
-        if(false === is_dir($this->downDir.$uid)){
-            if(false === mkdir($this->downDir.$uid)) {
+        if(false === is_dir($this->tempDir.$uid."/fin")){
+            if(false === mkdir($this->tempDir.$uid."/fin")) {
                 return false;
             }
         } else {
@@ -62,7 +58,7 @@ class DocumentConverter
                 if (isset($conf['onlyPdf'])) {
                     $rtn = array();
                     $err = 0;
-                    exec('mv ' . escapeshellarg($this->tempDir . $uid . '/' . $name . '.pdf') . ' ' . $this->downDir . $uid . '/', $rtn, $err);
+                    exec('mv ' . escapeshellarg($this->tempDir . $uid . '/' . $name . '.pdf') . ' ' . $this->tempDir . $uid . '/fin/', $rtn, $err);
                     if (0 !== $err){
                         $this->logger->err(__METHOD__ . ' ' . __LINE__ . ': failed to move pdf to download dir with ' . $err . ' ' . join(PHP_EOL, $rtn));
                         return false;
@@ -178,7 +174,7 @@ class DocumentConverter
             if (!(false === $cnf['color'])) {
                 $cmd .= ' -gravity center -background ' . escapeshellarg($cnf['color']) . ' -extent ' . escapeshellarg($cnf['x'] . 'x' . $cnf['y']);
             }
-            $cmd .= ' ' . escapeshellarg($this->downDir . $uid . '/' . $key . $nameAppend . '.' . $cnf['filetype']);
+            $cmd .= ' ' . escapeshellarg($this->tempDir . $uid . '/fin/' . $key . $nameAppend . '.' . $cnf['filetype']);
             $rtn = array();
             $err = 0;
             exec($cmd, $rtn, $err);
@@ -209,17 +205,17 @@ class DocumentConverter
             if (false === $cnf['firstPage']) {
                 $links = array();
                 for ($i = 0; $i < $count; $i++) {
-                    $file = $uid . '/' . $key . '-' . sprintf('%03d', $i) . '.' . $cnf['filetype'];
-                    if (true === is_file($this->downDir.$file)){
-                        $links[] = base64_encode(file_get_contents($this->downDir . $file));
+                    $file = $uid . '/fin/' . $key . '-' . sprintf('%03d', $i) . '.' . $cnf['filetype'];
+                    if (true === is_file($this->tempDir.$file)){
+                        $links[] = base64_encode(file_get_contents($this->tempDir . $file));
                     } else {
-                        $this->logger->err(__METHOD__ . ' ' . __LINE__ . ': did not find file: ' . $this->downDir . $file);
+                        $this->logger->err(__METHOD__ . ' ' . __LINE__ . ': did not find file: ' . $this->tempDir . $file);
                         return false;
                     }
                 }
                 $rtn[$key] = $links;
             } else {
-                $rtn[$key] = array(base64_encode(file_get_contents($this->downDir . $uid . '/' . $key . '.' . $cnf['filetype'])));
+                $rtn[$key] = array(base64_encode(file_get_contents($this->tempDir . $uid . '/fin/' . $key . '.' . $cnf['filetype'])));
             }
         }
         return $rtn;

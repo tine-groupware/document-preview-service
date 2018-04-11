@@ -166,7 +166,7 @@ class DocumentPreview implements MiddlewareInterface
 
     /** @codeCoverageIgnore */
     protected function magic($path, $conf){
-        $docConverter = new DocumentConverter($this->tempDir, $this->downDir, $this->downUrl, $this->logger, $this->config);
+        $docConverter = new DocumentConverter($this->tempDir, $this->logger, $this->config);
         return $docConverter($path, uniqid(), $conf);
     }
 
