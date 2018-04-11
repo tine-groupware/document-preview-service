@@ -115,9 +115,9 @@ class DocumentPreview implements MiddlewareInterface
             $this->logger->addWriter($writer);
         }
 
-        $this->tempDir = $this->config->get('tempDir', 'temp/');
-        $this->downDir = $this->config->get('downDir', 'download/');
-        $this->downUrl = $this->config->get('downUrl', 'download/');
+        $this->tempDir = $this->config->get('tempDir', 'temp/').'/';
+        $this->downDir = $this->config->get('downDir', 'download/').'/';
+        $this->downUrl = $this->config->get('downUrl', 'download/').'/';
         $this->semTimeOut = $this->config->get('timeOut', 30);
         $this->maxProc = $this->config->get('maxProc', 4);
     }
