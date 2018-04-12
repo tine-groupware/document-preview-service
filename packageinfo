@@ -2,7 +2,7 @@ Package: documentPreviewService
 Version: VERSION
 Section: misc
 Priority: extra
-Architecture: 
+Architecture: amd64
 Depends: graphicsmagick, php7.2-xml, php7.2-cli, php7.2-mbstring, php7.2-curl, ghostscript, unzip, libreoffice
 Installed-Size: 34300
 Maintainer: Metaways <info@metaways.de>
