@@ -97,7 +97,7 @@ class DocumentConverter
             }
 
         } finally {
-            $this->cleanUp($uid);
+            //$this->cleanUp($uid);
         }
 
         return $rtn;
