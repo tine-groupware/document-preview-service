@@ -1,0 +1,28 @@
+---
+######################################
+# pre_tasks include for removing sources.list entries
+#
+# authors:
+#   RJ <r.jerger@metaways.de>
+#   PS <p.schuele@metaways.de>
+#
+# copyright: Metaways Infosystems GmbH 2016
+######################################
+- name: remove apt backport entries
+  replace:
+    dest: /etc/apt/sources.list
+    regexp: '^(deb.*backports.*)$'
+    replace: '#\1'
+
+- name: remove apt multiverse entries
+  replace:
+    dest: /etc/apt/sources.list
+    regexp: '^(deb.*multiverse.*)$'
+    replace: '#\1'
+
+
+- name: remove apt deb-src entries
+  replace:
+    dest: /etc/apt/sources.list
+    regexp: '^(deb-src.*)$'
+    replace: '#\1'
