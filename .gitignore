@@ -5,3 +5,5 @@ public/download/
 .idea/
 log
 testing/
+.vagrant
+Vagrantfile
