@@ -6,7 +6,7 @@ use PSR\Container\ContainerInterface;
 
 class DocumentPreviewFactory
 {
-    public function __invoke(ContainerInterface $container) : DocumentPreview
+    public function __invoke(ContainerInterface $container)
     {
         return new DocumentPreview($container->get('config')['documentService']);
     }

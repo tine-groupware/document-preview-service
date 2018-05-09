@@ -6,7 +6,7 @@ use DocumentService\Action\SentryIO;
 
 class SentryIOFactory
 {
-    public function __invoke(ContainerInterface $container) : SentryIO
+    public function __invoke(ContainerInterface $container)
     {
         $sentry_url = $container->get('config')['sentryio'];
         if ($sentry_url == null) $sentry_url = '';
