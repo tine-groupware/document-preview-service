@@ -23,5 +23,5 @@ environments:
      - buildscripts/spec
     const: []
     dynamic:
-      VERSION_T: echo "2.0"$CI_COMMIT_REF_NAME #$(composer show --self | sed '4q;d' | cut -c 14-).$CI_PIPELINE_ID
-      VERSION_PATH: echo "2.0"/$CI_PIPELINE_ID #$(composer show --self | sed '4q;d' | cut -c 14-)/$CI_PIPELINE_ID
+      VERSION_T: echo $(php composer.phar show --self | sed '4q;d' | cut -c 14-).$CI_PIPELINE_ID
+      VERSION_PATH: echo $(php composer.phar show --self | sed '4q;d' | cut -c 14-)/$CI_PIPELINE_ID
