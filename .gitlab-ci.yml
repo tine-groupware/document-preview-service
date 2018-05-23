@@ -38,3 +38,10 @@ deploy_branch:
   - branches
  script:
   - php psh.phar git-branches:deploy
+
+deploy_to_repo:
+ stage: deploy
+ only:
+  - master
+ script:
+  - php psh.phar git-branches:deploytorepo
