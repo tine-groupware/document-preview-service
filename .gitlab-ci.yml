@@ -43,6 +43,5 @@ deploy_to_repo:
  stage: deploy
  only:
   - master
-  - branches
  script:
   - php psh.phar git-branches:deploytorepo
