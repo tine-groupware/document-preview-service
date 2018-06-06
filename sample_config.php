@@ -2,7 +2,7 @@
 return [
     // configure for documentPreview
     'documentService' => [
-        "tempDir" => "/tmp/", //temp folder
+        "tempDir" => "/var/lib/documentPreviewService/", //temp folder
         "maxProc" => 4, //maximum concurrent conversions
         "loggerOut" => "/var/log/documentPreviewService/doc.log", // log file documentPreview, can be a file or a zend logger
         "ooBinary"=>'soffice'
