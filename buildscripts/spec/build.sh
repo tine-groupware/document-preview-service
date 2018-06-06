@@ -23,6 +23,7 @@ mkdir build/etc/documentPreviewService
 mkdir build/etc/documentPreviewService/__VERSION_N_MM__
 cp sample_config.php build/etc/documentPreviewService/__VERSION_N_MM__/config.php
 
+mkdir build/var
 mkdir build/var/log
 mkdir build/var/log/documentPreviewService/
 
