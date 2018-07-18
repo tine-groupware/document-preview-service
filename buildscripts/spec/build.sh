@@ -21,7 +21,7 @@ cd build/usr/share/documentPreviewService && rm composer.lock
 mkdir build/etc
 mkdir build/etc/documentPreviewService
 mkdir build/etc/documentPreviewService/__VERSION_N_MM__
-cp sample_config.php build/etc/documentPreviewService/__VERSION_N_MM__/config.php
+cp sample_config.php build/etc/documentPreviewService/__VERSION_N_MM__/config.php.sample
 
 mkdir build/var
 mkdir build/var/log
