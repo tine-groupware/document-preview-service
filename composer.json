@@ -8,7 +8,7 @@
     }
   ],
   "require": {
-    "tine20/auth-middleware":"dev-develop",
+    "tine20/auth-middleware":"dev-master",
     "zendframework/zend-config": "2.*",
     "zendframework/zend-config-aggregator": "^1.0",
     "zendframework/zend-expressive-helpers": "^4.0",
