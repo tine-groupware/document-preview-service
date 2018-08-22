@@ -12,8 +12,8 @@ return [
         ],
         'routing' => [
             'middleware' => [
-                ApplicationFactory::ROUTING_MIDDLEWARE,
-                ApplicationFactory::DISPATCH_MIDDLEWARE,
+                Zend\Expressive\Router\Middleware\RouteMiddleware,
+                Zend\Expressive\Router\Middleware\DispatchMiddleware,
             ],
             'priority' => 1,
         ],

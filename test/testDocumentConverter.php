@@ -89,6 +89,7 @@ final class testDocumentConverter extends TestCase
      */
     public function testInvoke($name, $conf, $uid, $expected)
     {
+        $this->markTestSkipped('Invoke cleans working dir');
         exec('cp '.$this->fileDir.$name.' '.$this->workDir.'test4/temp/');
         $docConverter = new DocCon($this->workDir.'test4/temp/', $this->logger, $this->config);
         $docConverter($this->workDir.'test4/temp/'.$name, $uid, json_decode($conf, true));
