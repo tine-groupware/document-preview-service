@@ -91,7 +91,7 @@ class DocumentConverter
             }
 
             if (isset($conf['onlyPdf'])) {
-                $rtn = [[$this->downUrl . $uid . '/' . $name . '.pdf']];
+                $rtn = [[base64_encode(file_get_contents($this->tempDir . $uid . '/fin/' . $name . '.pdf'))]];
             } else {
                 $rtn = $this->getReturn($uid, $inputFileType, $conf);
             }
