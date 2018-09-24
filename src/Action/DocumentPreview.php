@@ -57,25 +57,33 @@ class DocumentPreview implements MiddlewareInterface
             return new TextResponse("Bad request Invalid Extension", 400);
         }
 
-        //magic
-        $ipcId = ftok(__FILE__, 'g');
-        if (-1 === $ipcId) {
-            $this->logger->err("[DocumentPreview] ".__METHOD__ . ' ' . __LINE__ . ': ' . "[ERROR][$rhost] Could not generate ftok");
-            return new TextResponse("Internal server error", 500);
-        }
+        $sysvsem_enabled = extension_loaded("sysvsem");
+        $semaphore = null;
 
-        $semaphore = sem_get($ipcId, $this->maxProc);
-        if (false === $semaphore) {
-            $this->logger->err("[DocumentPreview] ".__METHOD__ . ' ' . __LINE__ . ': ' . "[ERROR][$rhost]Failed not get semaphore");
-            return new TextResponse("Internal server error", 500);
+
+        if ($sysvsem_enabled) {
+            //magic
+            $ipcId = ftok(__FILE__, 'g');
+            if (-1 === $ipcId) {
+                $this->logger->err("[DocumentPreview] " . __METHOD__ . ' ' . __LINE__ . ': ' . "[ERROR][$rhost] Could not generate ftok");
+                return new TextResponse("Internal server error", 500);
+            }
+
+            $semaphore = sem_get($ipcId, $this->maxProc);
+            if (false === $semaphore) {
+                $this->logger->err("[DocumentPreview] " . __METHOD__ . ' ' . __LINE__ . ': ' . "[ERROR][$rhost]Failed not get semaphore");
+                return new TextResponse("Internal server error", 500);
+            }
         }
 
         $rtn = NULL;
 
         try {
-            $semAcq = $this->semAcquire($semaphore);
-            if (false === $semAcq) {
-                $this->logger->info("[DocumentPreview] ".__METHOD__ . ' ' . __LINE__ . ': ' . "[INFO][$rhost] Service occupied");
+            if ($sysvsem_enabled) {
+                $semAcq = $this->semAcquire($semaphore);
+                if (false === $semAcq) {
+                    $this->logger->info("[DocumentPreview] " . __METHOD__ . ' ' . __LINE__ . ': ' . "[INFO][$rhost] Service occupied");
+                }
             }
 
             $rtn = $this->magic($path, $conf);
@@ -134,7 +142,7 @@ class DocumentPreview implements MiddlewareInterface
 
         $file = $request->getUploadedFiles()['file'];
 
-        if (UPLOAD_ERR_OK !== $file->getError()) {
+        if ($file == null || UPLOAD_ERR_OK !== $file->getError()) {
             $this->logger->err("[DocumentPreview] ".__METHOD__ . ' ' . __LINE__ . ': ' . "[ERROR] File upload error");
             return -1;
         }
