@@ -63,7 +63,7 @@ class DocumentConverter
                         $this->logger->err(__METHOD__ . ' ' . __LINE__ . ': failed to move pdf to download dir with ' . $err . ' ' . join(PHP_EOL, $rtn));
                         return false;
                     }
-                } elseif (false === $this->covertToPNG($uid, $conf, $name, 'pdf')) {
+                } else if (false === $this->covertToPNG($uid, $conf, $name, 'pdf')) {
                     return false;
                 }
             } else if ('pdf' === mb_strtolower($ext)) {
