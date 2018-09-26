@@ -1,6 +1,7 @@
 <?php
 namespace DocumentService\Action;
 
+use Exception;
 use Interop\Http\ServerMiddleware\DelegateInterface;
 use Interop\Http\ServerMiddleware\MiddlewareInterface;
 use Psr\Http\Message\ServerRequestInterface;
@@ -48,7 +49,7 @@ class DocumentPreview implements MiddlewareInterface
         $path = $this->moveFile($request);
         if ( -1 === $path) {
             $this->logger->err("[DocumentPreview] ".__METHOD__ . ' ' . __LINE__ . ': ' . "[ERROR][$rhost] Failed to move uploaded File");
-            return new TextResponse("Internal server error", 500);
+            return new TextResponse("Internal server error - 50011", 500);
         }
 
         //file check
@@ -66,17 +67,17 @@ class DocumentPreview implements MiddlewareInterface
             $ipcId = ftok(__FILE__, 'g');
             if (-1 === $ipcId) {
                 $this->logger->err("[DocumentPreview] " . __METHOD__ . ' ' . __LINE__ . ': ' . "[ERROR][$rhost] Could not generate ftok");
-                return new TextResponse("Internal server error", 500);
+                return new TextResponse("Internal server error - 50012", 500);
             }
 
             $semaphore = sem_get($ipcId, $this->maxProc);
             if (false === $semaphore) {
                 $this->logger->err("[DocumentPreview] " . __METHOD__ . ' ' . __LINE__ . ': ' . "[ERROR][$rhost]Failed not get semaphore");
-                return new TextResponse("Internal server error", 500);
+                return new TextResponse("Internal server error - 50013", 500);
             }
         }
 
-        $rtn = NULL;
+        $rtn = null;
 
         try {
             if ($sysvsem_enabled) {
@@ -86,11 +87,15 @@ class DocumentPreview implements MiddlewareInterface
                 }
             }
 
-            $rtn = $this->magic($path, $conf);
-            if (false === $rtn) {
-                $this->logger->err("[DocumentPreview] ".__METHOD__ . ' ' . __LINE__ . ': ' . "[ERROR][$rhost] Failed to generate Images");
-                return new TextResponse("Internal server error", 500);
+            try {
+                $rtn = (new DocumentConverter($this->tempDir, $this->logger, $this->config))($path, $conf);
             }
+            catch (Exception $exception){
+                $uid = uniqid();
+                $this->logger->err("[DocumentPreview] ".__METHOD__ . ' ' . __LINE__ . ': ' . "[ERROR][$rhost][$uid] " . $exception->getMessage());
+                return new TextResponse("Internal server error - $uid - ". $exception->getCode(), 500);
+            }
+
         } finally {
             if (null !== $semaphore && true === $semAcq) {
                 if (false === sem_release($semaphore)) {
@@ -170,12 +175,6 @@ class DocumentPreview implements MiddlewareInterface
             usleep(10000);
         } while (false === $semAcq && time() - $timeStarted < $this->semTimeOut);
         return $semAcq;
-    }
-
-    /** @codeCoverageIgnore */
-    protected function magic($path, $conf){
-        $docConverter = new DocumentConverter($this->tempDir, $this->logger, $this->config);
-        return $docConverter($path, uniqid(), $conf);
     }
 
     protected function checkConfig($conf, $extended){
