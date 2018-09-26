@@ -9,29 +9,6 @@ use PHPUnit\Framework\TestCase;
 
 final class testDocumentPreview extends TestCase
 {
-
-    //todo process test
-
-    /**
-     * @dataProvider dataCheckExtension
-     */
-    public function testCheckExtension($path, $exts, $expected)
-    {
-        $docPre = new docPre([]);
-        $this->assertEquals($expected, $docPre->_checkExtension($path, $exts));
-    }
-
-    public function dataCheckExtension()
-    {
-        return [
-            ["/test/imAZip.zip", ["doc", "txt", "odt"], false],
-            ["/test/imAFile.doc", ["doc", "txt", "odt"], true],
-            ["/test/imAfile.doc", ["zip", "png", "jpg"], false],
-            ["/test/goto/units.xls", ["test", "xls", "go"], true],
-            ["imAFile.odt", ["odt", "ods", "pgt"], true],
-        ];
-    }
-
     /**
      * @dataProvider dataSemAcquireBlock
      */

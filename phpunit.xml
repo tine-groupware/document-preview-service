@@ -3,7 +3,6 @@
     <testsuites>
         <testsuite name="DocumentPreviewTest">
             <directory>./test</directory>
-            <file>./test/testDocumentConverter.php</file>
             <file>./test/testDocumentPreview.php</file>
         </testsuite>
     </testsuites>
