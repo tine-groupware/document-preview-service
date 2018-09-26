@@ -1,0 +1,16 @@
+version: '2'
+services:
+        document-preview:
+                image: document-preview:latest
+                container_name: document-preview
+                volumes:
+                        - /workspace/tine20/document-preview/:/document-preview/document-preview:ro
+                        - ./configs/nginx-site.conf:/etc/nginx/sites-enabled/default.conf:ro
+                        - ./configs/sample_config.php:/etc/documentPreviewService/VERSION/config.php:ro
+                
+                ports:
+                        - "80:80"
+                environment:
+                        PHP_IDE_CONFIG: "serverName=documentPreview"
+                        XDEBUG_CONFIG: "remote_host=192.168.33.1 remote_enable=on remote_port=9000"
+
