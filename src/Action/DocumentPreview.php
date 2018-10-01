@@ -88,7 +88,7 @@ class DocumentPreview implements MiddlewareInterface
             }
 
             try {
-                $rtn = (new DocumentConverter($this->tempDir, $this->logger, $this->config))($path, $conf);
+                $rtn = (new DocumentConverter($this->tempDir, $this->logger, $this->config))([$path], $conf);
             }
             catch (Exception $exception){
                 $uid = uniqid();

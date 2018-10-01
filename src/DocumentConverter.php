@@ -18,32 +18,33 @@ class DocumentConverter {
         Config::getInstance()->initialize($logger, $config);
     }
 
-    function __invoke(string $path, array $conf): array {
-        $ext = pathinfo($path)['extension'];
+    function __invoke(array $paths, array $conf): array {
+        $extType = $this->getExtType($paths);
 
         $conf = $this->cleanConf($conf);
 
         $rtn = [];
+        $files = [];
 
         //todo file move from docpre -> use files as referenc
 
-        if(in_array(mb_strtolower($ext), (Config::getInstance())->get('docExt'))) {
-            $file = new DocumentFile($path);
+        if($extType == 1) {
+            foreach($paths as $path) $files[] = new DocumentFile($path);
 
             foreach ($conf as $key => $cnf)
-                $rtn[$key] = File::toBase64Array($this->convertToDoc([$file], $cnf));
+                $rtn[$key] = File::toBase64Array($this->convertToDoc($files, $cnf));
 
-        } else if (in_array(mb_strtolower($ext), (Config::getInstance())->get('pdfExt'))) {
-            $file = new PdfFile($path);
-
-            foreach ($conf as $key => $cnf)
-                $rtn[$key] = File::toBase64Array($this->convertToPng([$file], $cnf));
-
-        } else if (in_array(mb_strtolower($ext), (Config::getInstance())->get('imgExt'))) {
-            $file = new ImageFile($path);
+        } else if ($extType == 2) {
+            foreach($paths as $path) $files[] = new PdfFile($path);
 
             foreach ($conf as $key => $cnf)
-                $rtn[$key] = File::toBase64Array($this->convertToImage([$file], $cnf));
+                $rtn[$key] = File::toBase64Array($this->convertToPng($files, $cnf));
+
+        } else if ($extType == 4) {
+            foreach($paths as $path) $files[] = new ImageFile($path);
+
+            foreach ($conf as $key => $cnf)
+                $rtn[$key] = File::toBase64Array($this->convertToImage($files, $cnf));
 
         } else {
             throw new Exception('file extension unknown', 40101);
@@ -134,5 +135,26 @@ class DocumentConverter {
 
     static function checkConfig(){
         return true;
+    }
+
+    private function getExtType(array $paths): string {
+        $extType = 7;
+        foreach ($paths as $path) {
+            $ext = pathinfo($path)['extension'];
+            if(in_array(mb_strtolower($ext), (Config::getInstance())->get('docExt'))) {
+               $extType &= 1;
+            } else if (in_array(mb_strtolower($ext), (Config::getInstance())->get('pdfExt'))) {
+               $extType &= 2;
+            } else if (in_array(mb_strtolower($ext), (Config::getInstance())->get('imgExt'))) {
+                $extType &= 4;
+            } else {
+                throw new Exception('file extension unknown', 40102);
+            }
+        }
+
+        if ($extType == 0)
+            throw new Exception('file types differ', 40103);
+
+        return $extType;
     }
 }
