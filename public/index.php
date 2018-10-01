@@ -1,9 +1,8 @@
 <?php
-xdebug_disable();
-
 // Disable Zend Deprecated Usage of the Zend\Expressive\Application::ROUTING_MIDDLEWARE
 // error_reporting(E_ALL ^ E_DEPRECATED);
-error_reporting(0);
+//error_reporting(0);
+//xdebug_disable();
 
 // Delegate static file requests back to the PHP built-in webserver
 if (PHP_SAPI === 'cli-server' && $_SERVER['SCRIPT_FILENAME'] !== __FILE__) {
