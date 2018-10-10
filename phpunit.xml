@@ -4,6 +4,10 @@
         <testsuite name="DocumentPreviewTest">
             <directory>./test</directory>
             <file>./test/testDocumentPreview.php</file>
+            <file>./test/DocumentConvertTest.php</file>
+            <file>./test/DocumentFileTest.php</file>
+            <file>./test/ImageFileTest.php</file>
+            <file>./test/PdfFileTest.php</file>
         </testsuite>
     </testsuites>
 </phpunit>
