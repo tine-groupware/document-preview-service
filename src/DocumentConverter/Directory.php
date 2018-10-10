@@ -3,6 +3,11 @@
 
 use Exception;
 
+/**
+ * Repesents an temp dir
+ * Deletes dir on destruction
+ * @package DocumentService\DocumentConverter
+ */
 class Directory {
     protected $_path;
 
@@ -16,6 +21,12 @@ class Directory {
         return $this->_path;
     }
 
+    /**
+     * Returns all files in dir as $class
+     * @param string $class Fully qualified class name
+     * @return array of files of type $class
+     * @throws Exception
+     */
     function getFiles(string $class): array {
         $rtn = [];
         $files = scandir($this->_path);

@@ -22,6 +22,7 @@ return [
     // for authentication documentation see tine20/auth-middleware
     'routes' => [
         // list of routes
+        // preview service
         [
             'name' => 'documentPreviewService', // used for identification
             'path' => '/v2/documentPreviewService', // uri prefix for route
@@ -38,7 +39,31 @@ return [
                 'required' => true,
                 'permission' => '(1=1)'
             ]
-        ],
+        ], [ // Ping api with check Authorisation
+            'name' => 'apiPingAuth', // used for identification
+            'path' => '/v2/ping/auth', // uri prefix for route
+            // sequential list of middelware
+            'middleware' => [
+                Auth\Action\NeedsAuth::class, // auth injector
+                Auth\Action\AuthSSL::class, // ssl auth
+                Auth\Action\AuthCheck::class, // auth check
+                DocumentService\Action\ApiPing::class // ping class
+            ],
+            'allowed_methods' => ['POST'],
+            // auth settings for this route
+            'auth' =>[
+                'required' => true,
+                'permission' => '(1=1)'
+            ]
+        ],[ // Ping api without
+            'name' => 'apiPing', // used for identification
+            'path' => '/v2/ping', // uri prefix for route
+            // sequential list of middelware
+            'middleware' => [
+                DocumentService\Action\ApiPing::class // ping class
+            ],
+            'allowed_methods' => ['POST','GET'],
+        ]
     ],
     // auth settings
     'auth' => [

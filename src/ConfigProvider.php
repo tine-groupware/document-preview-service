@@ -2,6 +2,8 @@
 
 namespace DocumentService;
 
+use Symfony\Component\Finder\Exception\AccessDeniedException;
+
 class ConfigProvider
 {
     public function __invoke()
@@ -30,6 +32,9 @@ class ConfigProvider
     public function getDependencies()
     {
         return [
+            'invokables' => [
+                Action\ApiPing::class => Action\ApiPing::class,
+            ],
             'factories'  => [
                 Action\SentryIO::class => Factory\SentryIOFactory::class,
                 Action\DocumentPreview::class => Factory\DocumentPreviewFactory::class,

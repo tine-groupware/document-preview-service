@@ -7,7 +7,11 @@ use DocumentService\DocumentConverter\ImageFile;
 use DocumentService\DocumentConverter\PdfFile;
 use Exception;
 
-
+/**
+ * Converts multible files to to specs
+ * Class DocumentConverter
+ * @package DocumentService
+ */
 class DocumentConverter {
 
     //todo add logging, test, exception
@@ -18,6 +22,13 @@ class DocumentConverter {
         Config::getInstance()->initialize($logger, $config);
     }
 
+    /**
+     * Converts multible files to to specs
+     * @param array $paths file paths to convert
+     * @param array $conf config
+     * @return array base64 encoded results
+     * @throws Exception
+     */
     function __invoke(array $paths, array $conf): array {
         $extType = $this->getExtType($paths);
 
@@ -28,19 +39,19 @@ class DocumentConverter {
 
         //todo file move from docpre -> use files as referenc
 
-        if($extType == 1) {
+        if(1 == $extType) {
             foreach($paths as $path) $files[] = new DocumentFile($path);
 
             foreach ($conf as $key => $cnf)
                 $rtn[$key] = File::toBase64Array($this->convertToDoc($files, $cnf));
 
-        } else if ($extType == 2) {
+        } else if (2 == $extType) {
             foreach($paths as $path) $files[] = new PdfFile($path);
 
             foreach ($conf as $key => $cnf)
-                $rtn[$key] = File::toBase64Array($this->convertToPng($files, $cnf));
+                $rtn[$key] = File::toBase64Array($this->mergePdf($files, $cnf));
 
-        } else if ($extType == 4) {
+        } else if (4 == $extType) {
             foreach($paths as $path) $files[] = new ImageFile($path);
 
             foreach ($conf as $key => $cnf)
@@ -53,14 +64,14 @@ class DocumentConverter {
         return $rtn;
     }
 
+    // conversion pipline functions convert files and pass them on or break if the specified filetype is reached
 
     function convertToDoc(array $files, array $conf): array {
-        if (in_array(mb_strtolower($conf['fileType']), (Config::getInstance())->get('docExt')))
+        if (in_array(mb_strtolower($conf['fileType']), (Config::getInstance())->get('docExt'))) //todo ?convert between doc formarts?
             return $files;
 
         return $this->convertToPdf($files, $conf);
     }
-
 
     function convertToPdf(array $files, array $conf): array {
         $pdfs = [];
@@ -73,8 +84,8 @@ class DocumentConverter {
 
 
     function mergePdf(array $files, array $conf): array {
-        if ($conf['merge'] === true && count($files) > 1)
-            $files = PdfFile::merge($files); //todo not tested
+        if (true === $conf['merge'] && count($files) > 1)
+            $files = [PdfFile::merge($files)]; //todo not tested
 
         if (in_array(mb_strtolower($conf['fileType']), (Config::getInstance())->get('pdfExt')))
             return $files;
@@ -87,7 +98,7 @@ class DocumentConverter {
         $images = [];
 
         foreach ($files as $file) {
-            if ($conf['firstPage'] == false)
+            if (false == $conf['firstPage'] )
                 foreach ($file->convertToPng() as $image)
                     $images[] = $image;
             else
@@ -107,6 +118,13 @@ class DocumentConverter {
         return $images;
     }
 
+    /**
+     * Creates a clean config
+     * @param array $config
+     * @return array
+     *
+     * todo find better solution
+     */
     function cleanConf(array $config): array {
         $configuration = [];
         foreach ($config as $key => $conf) {
@@ -116,7 +134,7 @@ class DocumentConverter {
                 'x' => 200,
                 'y' => 200,
                 'color' => false,
-                'merge' => false, //todo set to true when mergeing ist implemented
+                'merge' => true,
             ];
 
             if (array_key_exists('firstPage', $conf) && isset($conf['firstPage']) && ($conf['firstPage'] === 'true' || $conf['firstPage'] === true)) $cnf['firstPage'] = true;
@@ -126,7 +144,7 @@ class DocumentConverter {
             if (array_key_exists('x', $conf) && isset($conf['x'])) $cnf['x'] = $conf['x'];
             if (array_key_exists('y', $conf) && isset($conf['y'])) $cnf['y'] = $conf['y'];
             if (array_key_exists('color', $conf) && isset($conf['color']) && !($conf['color'] === 'false' || $conf['color'] === false)) $cnf['color'] = mb_strtolower($conf['color']);
-            if (array_key_exists('firstPage', $conf) && isset($conf['firstPage']) && ($conf['firstPage'] === 'false' || $conf['firstPage'] === false)) $cnf['firstPage'] = false;
+            if (array_key_exists('merge', $conf) && isset($conf['merge']) && ($conf['merge'] === 'false' || $conf['merge'] === false)) $cnf['merge'] = false;
 
             $configuration[$key] = $cnf;
         }
@@ -137,7 +155,13 @@ class DocumentConverter {
         return true;
     }
 
-    private function getExtType(array $paths): string {
+    /**
+     * Loops over all files and determined there extType
+     * @param array $paths
+     * @return int 1 := doc, 2 := pdf, 4:= img
+     * @throws Exception extType of files dosnt match
+     */
+    function getExtType(array $paths): int {
         $extType = 7;
         foreach ($paths as $path) {
             $ext = pathinfo($path)['extension'];
