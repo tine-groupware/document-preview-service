@@ -1,7 +1,5 @@
 <?php namespace DocumentServiceTest;
 
-require_once('../vendor/autoload.php');
-
 use DocumentService\DocumentConverter\Config;
 use DocumentService\DocumentConverter\DocumentFile;
 use PHPUnit\Framework\TestCase;

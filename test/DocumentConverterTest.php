@@ -1,7 +1,5 @@
 <?php namespace DocumentServiceTest;
 
-require_once('../vendor/autoload.php');
-
 use DocumentService\DocumentConverter;
 use PHPUnit\Framework\TestCase;
 use Zend\Log\Logger;
