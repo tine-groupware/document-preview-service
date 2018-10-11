@@ -27,12 +27,15 @@ class Config
     protected function __construct() {}
 
     function initialize($logger, $config){
-        // if (true === $this->_initialized) throw new Exception('Already initialize', 5111); reinit should be allowed
+        // if (true === $this->_initialized) throw new Exception('Already initialize', 5111); // reinit should be allowed?
         $this->_initialized = true;
         $this->_config = $config;
         $this->_logger = $logger;
     }
 
+    /**
+     * @returns array or string
+     */
     function get($arg) {
         if (true !== $this->_initialized) throw new Exception("Not initialized", 5112);
         switch ($arg) {

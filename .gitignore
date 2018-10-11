@@ -7,3 +7,4 @@ log
 testing/
 .vagrant
 Vagrantfile
+public/index.php

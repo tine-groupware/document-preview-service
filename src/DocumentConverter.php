@@ -14,10 +14,6 @@ use Exception;
  */
 class DocumentConverter {
 
-    //todo add logging, test, exception
-
-    //todo refractor DocPreAction useing zend expressive 3
-
     public function __construct($tempDir, $logger, $config) {
         Config::getInstance()->initialize($logger, $config);
     }
@@ -64,10 +60,10 @@ class DocumentConverter {
         return $rtn;
     }
 
-    // conversion pipline functions convert files and pass them on or break if the specified filetype is reached
+    /** conversion functions, convert files and pass them on or break if the specified filetype is reached */
 
     function convertToDoc(array $files, array $conf): array {
-        if (in_array(mb_strtolower($conf['fileType']), (Config::getInstance())->get('docExt'))) //todo ?convert between doc formarts?
+        if (in_array(mb_strtolower($conf['fileType']), (Config::getInstance())->get('docExt'))) //todo ?convert between doc formats?
             return $files;
 
         return $this->convertToPdf($files, $conf);
