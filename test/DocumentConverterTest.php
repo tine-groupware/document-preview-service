@@ -10,6 +10,7 @@ class DocumentConverterTest extends TestCase {
      * @dataProvider dataGetExtType
      */
     public function testGetExtType($paths, $extType) {
+        chdir('./test');
         mkdir('./tmp/');
         $result = (new DocumentConverter('', new Logger(), new \Zend\Config\Config(['tempDir' => './tmp/'])))->getExtType($paths);
         $this->assertEquals($extType, $result);
