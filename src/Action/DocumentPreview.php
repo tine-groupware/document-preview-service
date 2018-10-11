@@ -46,16 +46,15 @@ class DocumentPreview implements MiddlewareInterface
         }
 
         // magic setup
-        $path = $this->moveFile($request);
+
+        if (array_key_exists('file', $request->getUploadedFiles()))
+            $path = [$this->moveFile($request)];
+        else
+            $path = $this->moveFiles($request);
+
         if ( -1 === $path) {
             $this->logger->err("[DocumentPreview] ".__METHOD__ . ' ' . __LINE__ . ': ' . "[ERROR][$rhost] Failed to move uploaded File");
             return new TextResponse("Internal server error - 50011", 500);
-        }
-
-        //file check
-        if (false === $this->checkExtension($path, $exts)) {
-            $this->logger->info("[DocumentPreview] ".__METHOD__ . ' ' . __LINE__ . ': ' . "[INFO][$rhost] Invalid Extension");
-            return new TextResponse("Bad request Invalid Extension", 400);
         }
 
         $sysvsem_enabled = extension_loaded("sysvsem");
@@ -133,13 +132,8 @@ class DocumentPreview implements MiddlewareInterface
         $this->downUrl = $this->config->get('downUrl', 'download/').'/';
         $this->semTimeOut = $this->config->get('timeOut', 30);
         $this->maxProc = $this->config->get('maxProc', 4);
-    }
 
-    // check config
-
-    protected function checkExtension($path, $exts){
-        $ext = mb_strtolower(pathinfo($path, PATHINFO_EXTENSION));
-        return in_array($ext, $exts);
+        putenv("TMPDIR={$this->tempDir}");
     }
 
     /** @codeCoverageIgnore */
@@ -165,6 +159,33 @@ class DocumentPreview implements MiddlewareInterface
         }
 
         return $path;
+    }
+
+    /** @codeCoverageIgnore */
+    protected function moveFiles(ServerRequestInterface $request){
+        $files = $request->getUploadedFiles()['files'];
+        $paths = [];
+        foreach ($files as $file) {
+            if ($file == null || UPLOAD_ERR_OK !== $file->getError()) {
+                $this->logger->err("[DocumentPreview] " . __METHOD__ . ' ' . __LINE__ . ': ' . "[ERROR] File upload error");
+                return -1;
+            }
+
+            $path = $this->tempDir . uniqid() . basename($file->getClientFilename());
+
+            if (false === $file->moveTo($path)) { // todo change to psr7file->moveUploaded file or some thing like that
+                $this->logger->err("[DocumentPreview] " . __METHOD__ . ' ' . __LINE__ . ': ' . "[ERROR] Failed to move file");
+                return -1;
+            }
+
+            if (false === is_file($path)) {
+                $this->logger->err("[DocumentPreview] " . __METHOD__ . ' ' . __LINE__ . ': ' . "[ERROR] File was not moved");
+                return -1;
+            }
+
+            $paths[] = $path;
+        }
+        return $paths;
     }
 
     protected function semAcquire($semaphore){
