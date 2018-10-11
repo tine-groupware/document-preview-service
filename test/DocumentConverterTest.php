@@ -6,12 +6,16 @@ use Zend\Log\Logger;
 
 class DocumentConverterTest extends TestCase {
 
+    public static function setUpBeforeClass(){
+        var_dump(getcwd);
+        chdir('./test');
+        mkdir('tmp');
+    }
+
     /**
      * @dataProvider dataGetExtType
      */
     public function testGetExtType($paths, $extType) {
-        chdir('./test');
-        mkdir('./tmp/');
         $result = (new DocumentConverter('', new Logger(), new \Zend\Config\Config(['tempDir' => './tmp/'])))->getExtType($paths);
         $this->assertEquals($extType, $result);
     }
