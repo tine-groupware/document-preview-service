@@ -34,14 +34,14 @@ class DocumentPreview implements MiddlewareInterface
 
         // check post
         if (false === isset($request->getParsedBody()["config"])) {
-            $this->logger->info("[DocumentPreview] ".__METHOD__ . ' ' . __LINE__ . ': ' . "[INFO][$rhost]Missing arguments");
+            $this->logger->info("[DocumentPreview] " . __METHOD__ . ' ' . __LINE__ . ': ' . "[INFO][$rhost]Missing arguments");
             return new TextResponse(" Bad request missing arguments", 400);
         }
         $json = $request->getParsedBody()["config"];
 
         $conf = json_decode($json, true);
-        if ( false === $this->checkConfig($conf, true)) {
-            $this->logger->info("[DocumentPreview] ".__METHOD__ . ' ' . __LINE__ . ': ' . "[INFO][$rhost] JSON error: " . print_r($conf, true));
+        if (false === $this->checkConfig($conf, true)) {
+            $this->logger->info("[DocumentPreview] " . __METHOD__ . ' ' . __LINE__ . ': ' . "[INFO][$rhost] JSON error: " . print_r($conf, true));
             return new TextResponse("Bad request JSON error", 400);
         }
 
@@ -52,8 +52,8 @@ class DocumentPreview implements MiddlewareInterface
         else
             $path = $this->moveFiles($request);
 
-        if ( -1 === $path) {
-            $this->logger->err("[DocumentPreview] ".__METHOD__ . ' ' . __LINE__ . ': ' . "[ERROR][$rhost] Failed to move uploaded File");
+        if (-1 === $path) {
+            $this->logger->err("[DocumentPreview] " . __METHOD__ . ' ' . __LINE__ . ': ' . "[ERROR][$rhost] Failed to move uploaded File");
             return new TextResponse("Internal server error - 50011", 500);
         }
 
@@ -88,25 +88,27 @@ class DocumentPreview implements MiddlewareInterface
 
             try {
                 $rtn = (new DocumentConverter($this->tempDir, $this->logger, $this->config))($path, $conf);
-            }
-            catch (Exception $exception){
+            } catch (Exception $exception) {
                 $uid = uniqid();
-                $this->logger->err("[DocumentPreview] ".__METHOD__ . ' ' . __LINE__ . ': ' . "[ERROR][$rhost][$uid] " . $exception->getMessage());
-                return new TextResponse("Internal server error - $uid - ". $exception->getCode(), 500);
+                $this->logger->err("[DocumentPreview] " . __METHOD__ . ' ' . __LINE__ . ': ' . "[ERROR][$rhost][$uid] " . $exception->getMessage());
+                return new TextResponse("Internal server error - $uid - " . $exception->getCode(), 500);
             }
 
         } finally {
             if (null !== $semaphore && true === $semAcq) {
                 if (false === sem_release($semaphore)) {
-                    $this->logger->err("[DocumentPreview] ".__METHOD__ . ' ' . __LINE__ . ': ' . "[ERROR][$rhost] Failed to release semaphore");
+                    $this->logger->err("[DocumentPreview] " . __METHOD__ . ' ' . __LINE__ . ': ' . "[ERROR][$rhost] Failed to release semaphore");
                 }
             }
         }
 
         // clean up, if file is a pdf, it was moved away, so check first!
         clearstatcache();
-        if (true === is_file($path) && false === unlink($path)) {
-            $this->logger->err("[DocumentPreview] ".__METHOD__ . ' ' . __LINE__ . ': ' . "[ERROR][$rhost] Failed to unlink " . $path);
+
+        foreach ($path as $p) {
+            if (true === is_file($p) && false === unlink($p)) {
+                $this->logger->err("[DocumentPreview] " . __METHOD__ . ' ' . __LINE__ . ': ' . "[ERROR][$rhost] Failed to unlink " . $p);
+            }
         }
 
         return new JsonResponse($rtn);
