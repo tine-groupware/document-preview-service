@@ -2,7 +2,17 @@
 
 use Exception;
 
+/**
+ * Repesents a Document file
+ * Deletes file on destruction
+ * @package DocumentService\DocumentConverter
+ */
 class DocumentFile extends File{
+    /**
+     * Converts Documentfiles to pdfs using soffice
+     * @return PdfFile
+     * @throws Exception
+     */
     function convertToPdf(): PdfFile{
         $dir = new Directory();
         $ooDir = new Directory();

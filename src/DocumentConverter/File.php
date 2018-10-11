@@ -8,7 +8,7 @@ abstract class File {
 
     function __construct(string $path, bool $reference = false) {
         if (!is_file($path) && !is_readable($path)) {
-            throw new Exception('Not a readable file', 50141);
+            throw new Exception("Not a readable file", 50141);
         }
 
         $this->_reference = $reference;
