@@ -7,7 +7,7 @@ use Zend\Log\Logger;
 class DocumentConverterTest extends TestCase {
 
     public static function setUpBeforeClass(){
-        var_dump(getcwd);
+        var_dump(getcwd());
         chdir('./test');
         mkdir('tmp');
     }
@@ -75,7 +75,7 @@ class DocumentConverterTest extends TestCase {
                 'k3' => ['firstPage' => false, 'fileType' => 'odt', 'x' => 10, 'y' => 10, 'color' => false, 'merge' => true,],
                 'k4' => ['firstPage' => true, 'fileType' => 'png', 'x' => 10, 'y' => 10, 'color' => false, 'merge' => true,],
                 'k5' => ['firstPage' => true, 'fileType' => 'jpg', 'x' => 10, 'y' => 10, 'color' => false, 'merge' => true,]],
-                ['k1' => 4, 'k2' => 1, 'k3' => 1, 'k4' => 1, 'k5' => 1]],
+                ['k1' => 5, 'k2' => 1, 'k3' => 1, 'k4' => 1, 'k5' => 1]],
             [['./testFiles/imATestFile.pdf'], [
                 'k1' => ['firstPage' => false, 'fileType' => 'jpg', 'x' => 10, 'y' => 10, 'color' => false, 'merge' => true,],
                 'k2' => ['firstPage' => false, 'fileType' => 'pdf', 'x' => 10, 'y' => 10, 'color' => false, 'merge' => true,],
@@ -93,7 +93,7 @@ class DocumentConverterTest extends TestCase {
                 'k2' => ['firstPage' => false, 'fileType' => 'pdf', 'x' => 10, 'y' => 10, 'color' => false, 'merge' => false,],
                 'k3' => ['firstPage' => true, 'fileType' => 'png', 'x' => 10, 'y' => 10, 'color' => false, 'merge' => true,],
                 'k4' => ['firstPage' => false, 'fileType' => 'png', 'x' => 10, 'y' => 10, 'color' => false, 'merge' => true,]],
-                ['k1' => 1, 'k2' => 2, 'k3' => 1, 'k4' => 8,]],
+                ['k1' => 1, 'k2' => 2, 'k3' => 1, 'k4' => 10,]],
         ];
     }
 }
