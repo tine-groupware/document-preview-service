@@ -7,7 +7,6 @@ use Zend\Log\Logger;
 class DocumentConverterTest extends TestCase {
 
     public static function setUpBeforeClass(){
-        var_dump(getcwd());
         chdir('./test');
         mkdir('tmp');
     }
