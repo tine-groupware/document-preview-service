@@ -1,12 +1,12 @@
 <?php
 namespace DocumentService\Action;
 
-use Interop\Http\ServerMiddleware\DelegateInterface;
-use Interop\Http\ServerMiddleware\MiddlewareInterface;
 use Psr\Http\Message\ServerRequestInterface;
-use Zend\Diactoros\Response;
+use Psr\Http\Server\MiddlewareInterface;
+use Psr\Http\Server\RequestHandlerInterface;
 use Raven_Client;
 use Raven_ErrorHandler;
+use Psr\Http\Message\ResponseInterface;
 
 class SentryIO implements MiddlewareInterface
 {
@@ -17,8 +17,7 @@ class SentryIO implements MiddlewareInterface
         $this->sentryURL = $sentryURL;
     }
 
-    public function process(ServerRequestInterface $request, DelegateInterface $delegate)
-    {
+    public function process(ServerRequestInterface $request, RequestHandlerInterface $delegate): ResponseInterface {
         $client = new Raven_Client($this->sentryURL);
         $error_handler = new Raven_ErrorHandler($client);
         $error_handler->registerExceptionHandler();
@@ -29,6 +28,6 @@ class SentryIO implements MiddlewareInterface
             'request' => $request,
         ));
 
-        return $delegate->process($request);
+        return $delegate->handle($request);
     }
 }

@@ -2,8 +2,6 @@
 
 namespace DocumentService;
 
-use Symfony\Component\Finder\Exception\AccessDeniedException;
-
 class ConfigProvider
 {
     public function __invoke()
@@ -16,6 +14,7 @@ class ConfigProvider
                 "downUrl" => "https://download.invalid",
                 "maxProc" => 4,
                 "loggerOut" => "doc.log",
+                'authLogger' => 'auth.log',
                 "ext" => [
                     'txt', 'rtf', 'odt', 'ott', 'ods', 'ots', 'odp', 'otp', 'xls', 'xlt', 'xlsx', 'xltx', 'doc', 'dot', 'docx', 'dotx', 'ppt', 'pot', 'pptx', 'potx', 'pdf', 'jpg', 'jpeg', 'gif', 'tiff', 'png'
                 ],
@@ -25,6 +24,12 @@ class ConfigProvider
                 "imgExt" => [
                     'jpg', 'jpeg', 'gif', 'tiff', 'png'
                 ],
+                "ooBinary"=>'soffice',
+            ],
+            'auth' => [
+                'default' => ['name' => 'default', 'permission' => "false",], // default authentication, if no auth is configured auth will fail
+                'apiPingAuth' => ['name' => 'apiPingAuth', 'permission' => '(1=1)', 'required' => true],
+                'documentPreviewService' => ['name' => 'documentPreviewService', 'permission' => '(1=1)', 'required' => false],
             ],
         ];
     }

@@ -2,15 +2,16 @@
 namespace DocumentService\Action;
 
 use Exception;
-use Interop\Http\ServerMiddleware\DelegateInterface;
-use Interop\Http\ServerMiddleware\MiddlewareInterface;
 use Psr\Http\Message\ServerRequestInterface;
+use Psr\Http\Server\MiddlewareInterface;
+use Psr\Http\Server\RequestHandlerInterface;
 use Zend\Diactoros\Response\JsonResponse;
 use Zend\Diactoros\Response\TextResponse;
 use Zend\Log\Writer\Stream;
 use Zend\Log\Logger;
 use Zend\Config\Config;
 use DocumentService\DocumentConverter;
+use Psr\Http\Message\ResponseInterface;
 
 class DocumentPreview implements MiddlewareInterface 
 {
@@ -22,8 +23,7 @@ class DocumentPreview implements MiddlewareInterface
     protected $semTimeOut;
     protected $maxProc;
 
-    public function process(ServerRequestInterface $request, DelegateInterface $delegate)
-    {
+    public function process(ServerRequestInterface $request, RequestHandlerInterface $delegate): ResponseInterface {
         // setup
         $rhost = $request->getServerParams()['REMOTE_ADDR'];
 
