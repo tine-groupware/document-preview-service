@@ -1,19 +1,26 @@
-<?php namespace DocumentService\DocumentConverter;
+<?php declare(strict_types=1);
+
+namespace DocumentService\DocumentConverter;
 
 use Exception;
 
 /**
  * Repesents a Document file
  * Deletes file on destruction
+ *
  * @package DocumentService\DocumentConverter
  */
-class DocumentFile extends File{
+class DocumentFile extends File
+{
     /**
      * Converts Documentfiles to pdfs using soffice
+     *
      * @return PdfFile
-     * @throws Exception
+     * @throws Exception config not initialized
+     * @throws Exception soffice operation failed
      */
-    function convertToPdf(): PdfFile{
+    public function convertToPdf(): PdfFile
+    {
         $dir = new Directory();
         $ooDir = new Directory();
 
@@ -21,8 +28,8 @@ class DocumentFile extends File{
         $rtn = array();
         $err = 0;
         exec($cmd, $rtn, $err);
-        if (0 !== $err){
-            throw new Exception('soffice operation failed', 50131);
+        if (0 !== $err) {
+            throw new Exception('soffice operation failed', 5000601);
         }
 
         return $dir->getFiles(PdfFile::class)[0];

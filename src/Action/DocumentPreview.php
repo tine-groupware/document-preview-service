@@ -1,6 +1,9 @@
-<?php
+<?php declare(strict_types=1);
+
 namespace DocumentService\Action;
 
+use DocumentService\DocumentConverter\Config;
+use DocumentService\ErrorHandler;
 use Exception;
 use Psr\Http\Message\ServerRequestInterface;
 use Psr\Http\Server\MiddlewareInterface;
@@ -9,206 +12,193 @@ use Zend\Diactoros\Response\JsonResponse;
 use Zend\Diactoros\Response\TextResponse;
 use Zend\Log\Writer\Stream;
 use Zend\Log\Logger;
-use Zend\Config\Config;
 use DocumentService\DocumentConverter;
 use Psr\Http\Message\ResponseInterface;
 
 class DocumentPreview implements MiddlewareInterface 
 {
-    protected $config;
-    protected $logger;
-    protected $tempDir;
-    protected $downDir;
-    protected $downUrl;
-    protected $semTimeOut;
-    protected $maxProc;
 
-    public function process(ServerRequestInterface $request, RequestHandlerInterface $delegate): ResponseInterface {
-        // setup
-        $rhost = $request->getServerParams()['REMOTE_ADDR'];
-
-        $exts = $this->config->get('ext', array());
-        if (false === is_array($exts)) {
-            $exts = $exts->toArray();
-        }
-
-        // check post
-        if (false === isset($request->getParsedBody()["config"])) {
-            $this->logger->info("[DocumentPreview] " . __METHOD__ . ' ' . __LINE__ . ': ' . "[INFO][$rhost]Missing arguments");
-            return new TextResponse(" Bad request missing arguments", 400);
-        }
-        $json = $request->getParsedBody()["config"];
-
-        $conf = json_decode($json, true);
-        if (false === $this->checkConfig($conf, true)) {
-            $this->logger->info("[DocumentPreview] " . __METHOD__ . ' ' . __LINE__ . ': ' . "[INFO][$rhost] JSON error: " . print_r($conf, true));
-            return new TextResponse("Bad request JSON error", 400);
-        }
-
-        // magic setup
-
-        if (array_key_exists('file', $request->getUploadedFiles()))
-            $path = [$this->moveFile($request)];
-        else
-            $path = $this->moveFiles($request);
-
-        if (-1 === $path) {
-            $this->logger->err("[DocumentPreview] " . __METHOD__ . ' ' . __LINE__ . ': ' . "[ERROR][$rhost] Failed to move uploaded File");
-            return new TextResponse("Internal server error - 50011", 500);
-        }
-
-        $sysvsem_enabled = extension_loaded("sysvsem");
+    /**
+     * Process
+     *
+     * @param ServerRequestInterface  $request  "
+     * @param RequestHandlerInterface $delegate "
+     *
+     * @return ResponseInterface
+     * @throws Exception Hard Fail
+     * @throws Exception logger not initialized
+     */
+    public function process(ServerRequestInterface $request, RequestHandlerInterface $delegate): ResponseInterface
+    {
         $semaphore = null;
-
-
-        if ($sysvsem_enabled) {
-            //magic
-            $ipcId = ftok(__FILE__, 'g');
-            if (-1 === $ipcId) {
-                $this->logger->err("[DocumentPreview] " . __METHOD__ . ' ' . __LINE__ . ': ' . "[ERROR][$rhost] Could not generate ftok");
-                return new TextResponse("Internal server error - 50012", 500);
-            }
-
-            $semaphore = sem_get($ipcId, $this->maxProc);
-            if (false === $semaphore) {
-                $this->logger->err("[DocumentPreview] " . __METHOD__ . ' ' . __LINE__ . ': ' . "[ERROR][$rhost]Failed not get semaphore");
-                return new TextResponse("Internal server error - 50013", 500);
-            }
-        }
-
+        $semAcq = false;
         $rtn = null;
 
+        if (extension_loaded("sysvsem")) {
+            $semaphore = $this->getSem();
+            $semAcq = $this->semAcquire($semaphore);
+            if (false === $semAcq) {
+                (ErrorHandler::getInstance())->log(6, "Service occupied", __METHOD__);
+                return new TextResponse("Service occupied", 423);
+            }
+        }
+
         try {
-            if ($sysvsem_enabled) {
-                $semAcq = $this->semAcquire($semaphore);
-                if (false === $semAcq) {
-                    $this->logger->info("[DocumentPreview] " . __METHOD__ . ' ' . __LINE__ . ': ' . "[INFO][$rhost] Service occupied");
-                }
-            }
+            $conf = $this->getConf($request);
+            $files = $this->getFiles($request);
 
-            try {
-                $rtn = (new DocumentConverter($this->tempDir, $this->logger, $this->config))($path, $conf);
-            } catch (Exception $exception) {
-                $uid = uniqid();
-                $this->logger->err("[DocumentPreview] " . __METHOD__ . ' ' . __LINE__ . ': ' . "[ERROR][$rhost][$uid] " . $exception->getMessage());
-                return new TextResponse("Internal server error - $uid - " . $exception->getCode(), 500);
-            }
+            $rtn = (new DocumentConverter())($files, $conf);
 
+        } catch (Exception $exception) {
+            (ErrorHandler::getInstance())->handelException($exception);
         } finally {
             if (null !== $semaphore && true === $semAcq) {
                 if (false === sem_release($semaphore)) {
-                    $this->logger->err("[DocumentPreview] " . __METHOD__ . ' ' . __LINE__ . ': ' . "[ERROR][$rhost] Failed to release semaphore");
+                    (ErrorHandler::getInstance())->log(3, "Failed to release semaphore", __METHOD__);
                 }
             }
         }
 
-        // clean up, if file is a pdf, it was moved away, so check first!
         clearstatcache();
-
-        foreach ($path as $p) {
-            if (true === is_file($p) && false === unlink($p)) {
-                $this->logger->err("[DocumentPreview] " . __METHOD__ . ' ' . __LINE__ . ': ' . "[ERROR][$rhost] Failed to unlink " . $p);
-            }
-        }
 
         return new JsonResponse($rtn);
     }
 
-    public function __construct($configArray)
+
+    /**
+     * DocumentPreview constructor.
+     *
+     * @param array $configArray "
+     */
+    public function __construct(array $configArray)
     {
-        $this->config = new Config($configArray);
+        $config = new \Zend\Config\Config($configArray);
 
-        $loggerOut = $this->config->get('loggerOut', '/dev/zero');
+        $loggerOut = $config->get('loggerOut', '/dev/zero');
 
-        if ($loggerOut instanceof Logger){
-            $this->logger = $loggerOut;
-        }
-        else {
+        if ($loggerOut instanceof Logger) {
+            $logger = $loggerOut;
+        } else {
             $writer = new Stream($loggerOut);
-            $this->logger = new Logger();
-            $this->logger->addWriter($writer);
+            $logger = new Logger();
+            $logger->addWriter($writer);
         }
 
-        $this->tempDir = $this->config->get('tempDir', 'temp/').'/';
-        $this->downDir = $this->config->get('downDir', 'download/').'/';
-        $this->downUrl = $this->config->get('downUrl', 'download/').'/';
-        $this->semTimeOut = $this->config->get('timeOut', 30);
-        $this->maxProc = $this->config->get('maxProc', 4);
+        (Config::getInstance())->initialize($config);
+        (ErrorHandler::getInstance())->initialize($logger);
 
-        putenv("TMPDIR={$this->tempDir}");
+
+        $tempDir = $config->get('tempDir', 'temp/').'/';
+        putenv("TMPDIR={$tempDir}");
     }
 
-    /** @codeCoverageIgnore */
-    protected function moveFile(ServerRequestInterface $request){
-
-        $file = $request->getUploadedFiles()['file'];
-
-        if ($file == null || UPLOAD_ERR_OK !== $file->getError()) {
-            $this->logger->err("[DocumentPreview] ".__METHOD__ . ' ' . __LINE__ . ': ' . "[ERROR] File upload error");
-            return -1;
+    /**
+     * Extracts config
+     *
+     * @param ServerRequestInterface $request "
+     *
+     * @return array
+     * @throws Exception Bad config
+     */
+    protected function getConf(ServerRequestInterface $request): array
+    {
+        if (false === isset($request->getParsedBody()["config"])) {
+            throw new Exception("Bad request missing arguments", 400111);
         }
+        $json = $request->getParsedBody()["config"];
 
-        $path = $this->tempDir.uniqid().basename($file->getClientFilename());
-
-        if (false === $file->moveTo($path)){ // todo change to psr7file->moveUploaded file or some thing like that
-            $this->logger->err("[DocumentPreview] ".__METHOD__ . ' ' . __LINE__ . ': ' . "[ERROR] Failed to move file");
-            return -1;
+        $conf = json_decode($json, true);
+        if (false === $this->checkConfig()) {
+            throw new Exception("Bad request JSON error", 400112);
         }
-
-        if (false === is_file($path)){
-            $this->logger->err("[DocumentPreview] ".__METHOD__ . ' ' . __LINE__ . ': ' . "[ERROR] File was not moved");
-            return -1;
-        }
-
-        return $path;
+        return $conf;
     }
 
-    /** @codeCoverageIgnore */
-    protected function moveFiles(ServerRequestInterface $request){
-        $files = $request->getUploadedFiles()['files'];
-        $paths = [];
-        foreach ($files as $file) {
-            if ($file == null || UPLOAD_ERR_OK !== $file->getError()) {
-                $this->logger->err("[DocumentPreview] " . __METHOD__ . ' ' . __LINE__ . ': ' . "[ERROR] File upload error");
-                return -1;
-            }
-
-            $path = $this->tempDir . uniqid() . basename($file->getClientFilename());
-
-            if (false === $file->moveTo($path)) { // todo change to psr7file->moveUploaded file or some thing like that
-                $this->logger->err("[DocumentPreview] " . __METHOD__ . ' ' . __LINE__ . ': ' . "[ERROR] Failed to move file");
-                return -1;
-            }
-
-            if (false === is_file($path)) {
-                $this->logger->err("[DocumentPreview] " . __METHOD__ . ' ' . __LINE__ . ': ' . "[ERROR] File was not moved");
-                return -1;
-            }
-
-            $paths[] = $path;
+    /**
+     * Moves uploaded files in DocumentConverter Files
+     *
+     * @param ServerRequestInterface $request "
+     *
+     * @return array
+     * @throws Exception config not initialized
+     * @throws config file upload error
+     * @throws config file creation error
+     */
+    protected function getFiles(ServerRequestInterface $request): array
+    {
+        if (array_key_exists('file', $request->getUploadedFiles())) {
+            $UploadedFiles = [$request->getUploadedFiles()['file']];
+        } elseif (array_key_exists('files', $request->getUploadedFiles())) {
+            $UploadedFiles = $request->getUploadedFiles()['files'];
+        } else {
+            throw new Exception("Parameter file or files not set", 4000103);
         }
-        return $paths;
+
+        $files = [];
+        foreach ($UploadedFiles as $UploadedFile) {
+            if ($UploadedFile == null || UPLOAD_ERR_OK !== $UploadedFile->getError()) {
+                throw new Exception('No File Uploaded', 4000104);
+            }
+            $path = (Config::getInstance())->get('tempDir') . uniqid() . basename($UploadedFile->getClientFilename());
+            $UploadedFile->moveTo($path);
+            $file = DocumentConverter\File::fromPath($path);
+            unlink($path);
+            $files[] = $file;
+        }
+        return $files;
     }
 
-    protected function semAcquire($semaphore){
+    /**
+     * Acquire Semaphore
+     *
+     * @param resource $semaphore "
+     *
+     * @return bool
+     *
+     * @throws Exception Config not initialized
+     */
+    protected function semAcquire($semaphore): bool
+    {
         $timeStarted = time();
         do {
-            /** @noinspection PhpMethodParametersCountMismatchInspection */
             $semAcq = sem_acquire($semaphore, true);
             usleep(10000);
-        } while (false === $semAcq && time() - $timeStarted < $this->semTimeOut);
+        } while (false === $semAcq && time() - $timeStarted < (Config::getInstance())->get('semTimeOut'));
         return $semAcq;
     }
 
-    protected function checkConfig($conf, $extended){
-        if (false === is_array($conf)) {
-            return false;
+    /**
+     * Init Semaphore
+     *
+     * @return resource semaphore
+     * @throws Exception config not initialized
+     * @throws Exception logger not initialized
+     * @throws Exception systemv fail
+     */
+    protected function getSem()
+    {
+        $ipcId = ftok(__FILE__, 'g');
+        if (-1 === $ipcId) {
+            (ErrorHandler::getInstance())->log(6, "Could not generate ftok", __METHOD__);
+            throw new Exception('Could not generate ftok', 5000105);
         }
-        if (true === $extended) {
-            /** @codeCoverageIgnoreStart */
-            return DocumentConverter::checkConfig($conf);
-            /** @codeCoverageIgnoreEnd */
+
+        $semaphore = sem_get($ipcId, (Config::getInstance())->get('maxProc'));
+        if (false === $semaphore) {
+            (ErrorHandler::getInstance())->log(6, "Failed not get semaphore", __METHOD__);
+            throw new Exception('Failed not get semaphore', 5000106);
         }
+        return $semaphore;
+    }
+
+    /**
+     * Check config, also done in documentConverter
+     *
+     * @return bool
+     */
+    protected function checkConfig(): bool
+    {
+        //todo
         return true;
     }
 }
