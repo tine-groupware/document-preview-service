@@ -1,14 +1,18 @@
-<?php namespace DocumentService\Action;
+<?php declare(strict_types=1);
 
-use Interop\Http\ServerMiddleware\MiddlewareInterface;
-use Interop\Http\ServerMiddleware\DelegateInterface;
+namespace DocumentService\Action;
+
 use Psr\Http\Message\ServerRequestInterface;
-use Zend\Diactoros\Response\TextResponse;
+use Psr\Http\Server\MiddlewareInterface;
+use Psr\Http\Server\RequestHandlerInterface;
+use Zend\Diactoros\Response\JsonResponse;
+use Psr\Http\Message\ResponseInterface;
 
-class ApiPing implements MiddlewareInterface {
+class ApiPing implements MiddlewareInterface
+{
 
-    public function process(ServerRequestInterface $request, DelegateInterface $delegate){
-        $bn = file_get_contents('./buildnumber');
-        return new TextResponse("$bn");
+    public function process(ServerRequestInterface $request, RequestHandlerInterface $delegate): ResponseInterface
+    {
+        return new JsonResponse(['ack' => time()]);
     }
 }

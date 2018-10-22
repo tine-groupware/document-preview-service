@@ -1,5 +1,4 @@
-<?php
-namespace DocumentService\Factory;
+<?php namespace DocumentService\Factory;
 
 use DocumentService\Action\DocumentPreview;
 use PSR\Container\ContainerInterface;
