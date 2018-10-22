@@ -1,26 +1,33 @@
-<?php namespace DocumentService\DocumentConverter;
+<?php declare(strict_types=1);
+
+namespace DocumentService\DocumentConverter;
 
 use Exception;
 
 /**
  * Repesents a Pdf file
  * Deletes file on destruction
+ *
  * @package DocumentService\DocumentConverter
  */
-class PdfFile extends File {
+class PdfFile extends File
+{
 
     /**
-     * converts pdf to pngs using ghostscript
+     * Converts pdf to pngs using ghostscript
+     *
      * @return array image files
-     * @throws Exception
+     *
+     * @throws Exception Ghostscript operation failed
      */
-    function convertToPng(): array {
+    function convertToPng(): array
+    {
         $dir = new Directory();
         $cmd = 'gs -q -dQUIET -dSAFER -dBATCH -dNOPAUSE -dNOPROMPT -dMaxBitmap=500000000 -dAlignToPixels=0 -dGridFitTT=2 "-sDEVICE=pngalpha" -dTextAlphaBits=4 -dGraphicsAlphaBits=4 "-r150x150" -sOutputFile=' . escapeshellarg($dir->getPath() . 'image%03d.png') . ' ' . escapeshellarg($this->_path) . ' -c quit';
         $err = 0;
         exec($cmd, $rtn, $err);
-        if (0 !== $err){
-            throw new Exception('Ghostscript operation failed', 50161);
+        if (0 !== $err) {
+            throw new Exception('Ghostscript operation failed', 5000901);
         }
 
         return $dir->getFiles(ImageFile::class);
@@ -28,20 +35,24 @@ class PdfFile extends File {
 
     /**
      * Merges multiple pdf files in order using ghostscript
+     *
      * @param array $files PdfFiles
+     *
      * @return PdfFile
-     * @throws Exception
+     * @throws Exception Ghostscript operation failed
      */
-    static function merge(array $files): PdfFile {
+    static function merge(array $files): PdfFile
+    {
         $path = Config::getInstance()->get('tempdir').uniqid('file_', true).'.'.'pdf';
         $cmd = ('gs -dBATCH -dNOPAUSE -q -sDEVICE=pdfwrite -dPDFSETTINGS=/prepress -sOutputFile='.$path);
-        foreach ($files as $file)
+        foreach ($files as $file) {
             $cmd .= ' '.$file->getPath();
+        }
         $rtn = array();
         $err = 0;
         exec($cmd, $rtn, $err);
-        if (0 !== $err){
-            throw new Exception('Ghostscript operation failed', 50162);
+        if (0 !== $err) {
+            throw new Exception('Ghostscript operation failed', 5000902);
         }
 
         return new PdfFile($path, true);

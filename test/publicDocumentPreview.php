@@ -34,25 +34,7 @@ class docPre extends DocumentPreview
         $this->maxProc = $value;
     }
 
-
-
-    public function _checkExtension($path, $exts){  //-
-        return $this->checkExtension($path, $exts);
-    }
-
-    public function _moveFile(){ //?
-        return $this->moveFile();
-    }
-
     public function _semAcquire($semaphore){ //-
         return $this->semAcquire($semaphore);
-    }
-
-    public function _magic($path, $conf){//don't test
-        return $this->magic($path, $conf);
-    }
-
-    public function _checkConfig($conf){//-
-        return $this->checkConfig($conf, false);
     }
 }

@@ -4,11 +4,16 @@ namespace DocumentServiceTest;
 
 require_once __DIR__.'/publicDocumentPreview.php';
 
+use DocumentService\DocumentConverter\Config;
 use DocumentServiceTest\docPre;
 use PHPUnit\Framework\TestCase;
 
 final class testDocumentPreview extends TestCase
 {
+    public static function setUpBeforeClass(){
+        (Config::getInstance())->initialize(new \Zend\Config\Config([]));
+    }
+
     /**
      * @dataProvider dataSemAcquireBlock
      */
@@ -45,7 +50,7 @@ final class testDocumentPreview extends TestCase
     {
         $docPre = new docPre([]);
 
-        $docPre->setSemTimeOut($timeOut);
+        (Config::getInstance())->initialize(new \Zend\Config\Config(['timeOut' => $timeOut]));
 
         $ipcId = ftok(__FILE__, 'g');
 
@@ -55,7 +60,7 @@ final class testDocumentPreview extends TestCase
 
         $semAcq = $docPre->_semAcquire($semaphore);
 
-        if(true === $semAcq){
+        if(true === $semAcq) {
             sem_release($semaphore);
         }
         $x = time() - $timeAtStart;
@@ -65,25 +70,5 @@ final class testDocumentPreview extends TestCase
 
     public function dataSemAcquireTimeOut(){
         return[[10], [5], [30]];
-    }
-
-    /**
-     * @dataProvider dataCheckConfig
-     */
-    public function testCheckConfig($data, $expected){
-        $docPre = new docPre([]);
-        $this->assertEquals($expected, $docPre->_checkConfig($data));
-    }
-
-    public function dataCheckConfig(){
-        return [
-            [$this, false],
-            [array(), true],
-            [[], true],
-            [array('test'), true],
-            [array('hello','test'),true],
-            [10, false],
-            ['{"test":[1,2,3],"tester":{"testing":true}', false]
-        ];
     }
 }
