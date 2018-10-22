@@ -8,7 +8,7 @@ use Zend\Log\Logger;
 class ImageFileTest extends TestCase {
 
     public static function setUpBeforeClass() {
-        Config::getInstance()->initialize(new Logger(), new \Zend\Config\Config([]));
+        Config::getInstance()->initialize(new \Zend\Config\Config([]));
         parent::setUpBeforeClass();
     }
 
