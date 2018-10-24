@@ -7,6 +7,5 @@ log
 testing/
 .vagrant
 Vagrantfile
-public/index.php
 clover.xml
 coveralls-upload.json
