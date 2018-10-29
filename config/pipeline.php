@@ -14,6 +14,7 @@ use Zend\Expressive\Router\Middleware\ImplicitOptionsMiddleware;
 use Zend\Expressive\Router\Middleware\MethodNotAllowedMiddleware;
 use Zend\Expressive\Router\Middleware\RouteMiddleware;
 use Zend\Stratigility\Middleware\ErrorHandler;
+use DocumentService\Action\SentryIO;
 
 /**
  * Setup middleware pipeline:
@@ -22,6 +23,7 @@ return function (Application $app, MiddlewareFactory $factory, ContainerInterfac
     // The error handler should be the first (most outer) middleware to catch
     // all Exceptions.
     $app->pipe(ErrorHandler::class);
+    $app->pipe(SentryIO::class);
     $app->pipe(ServerUrlMiddleware::class);
 
     // Pipe more middleware here that you want to execute on every request:

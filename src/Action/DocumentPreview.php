@@ -42,7 +42,7 @@ class DocumentPreview implements MiddlewareInterface
                 return new TextResponse("Service occupied", 423);
             }
         }
-
+        
         try {
             $conf = $this->getConf($request);
             $files = $this->getFiles($request);
@@ -50,7 +50,7 @@ class DocumentPreview implements MiddlewareInterface
             $rtn = (new DocumentConverter())($files, $conf);
 
         } catch (Exception $exception) {
-            (ErrorHandler::getInstance())->handelException($exception);
+            return (ErrorHandler::getInstance())->handelException($exception);
         } finally {
             if (null !== $semaphore && true === $semAcq) {
                 if (false === sem_release($semaphore)) {
@@ -133,6 +133,7 @@ class DocumentPreview implements MiddlewareInterface
         } else {
             throw new Exception("Parameter file or files not set", 4000103);
         }
+
 
         $files = [];
         foreach ($UploadedFiles as $UploadedFile) {
