@@ -97,7 +97,7 @@ class ErrorHandler
 
         $message = 'Internal server error';
         $code = $exception->getCode();
-        $status = floor($exception->getCode()/100);
+        $status = intval($exception->getCode()/100);
         if ($code < 40000) {
             $message = $exception->getMessage();
         }
