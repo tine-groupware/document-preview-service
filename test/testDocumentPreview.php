@@ -50,7 +50,7 @@ final class testDocumentPreview extends TestCase
     {
         $docPre = new docPre([]);
 
-        (Config::getInstance())->initialize(new \Zend\Config\Config(['timeOut' => $timeOut]));
+        (Config::getInstance())->initialize(new \Zend\Config\Config(['timeOut' => $timeOut, 'tempDir' => '/dev/null']));
 
         $ipcId = ftok(__FILE__, 'g');
 
