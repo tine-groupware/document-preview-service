@@ -49,6 +49,7 @@ class PdfFile extends File
         foreach ($files as $file) {
             $cmd .= ' '.$file->getPath();
         }
+        $cmd .= ' 2> '.(Config::getInstance())->get('stderr');
         $rtn = array();
         $err = 0;
         exec($cmd, $rtn, $err);

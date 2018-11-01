@@ -24,7 +24,7 @@ class DocumentFile extends File
         $dir = new Directory();
         $ooDir = new Directory();
 
-        $cmd = (Config::getInstance())->get('ooBinary').' -env:SingleAppInstance=false -env:UserInstallation=file:///'.$ooDir->getPath().' --convert-to pdf ' . $this->_path . ' --outdir ' . $dir->getPath(). ' --headless --norestore';
+        $cmd = (Config::getInstance())->get('ooBinary').' -env:SingleAppInstance=false -env:UserInstallation=file:///'.$ooDir->getPath().' --convert-to pdf ' . $this->_path . ' --outdir ' . $dir->getPath(). ' --headless --norestore 2> '.(Config::getInstance())->get('stderr');
         $rtn = array();
         $err = 0;
         exec($cmd, $rtn, $err);

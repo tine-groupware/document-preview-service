@@ -36,6 +36,7 @@ class ImageFile extends File
             $cmd .= ' -gravity center -background ' . escapeshellarg($color) . ' -extent ' . escapeshellarg($x . 'x' . $y);
         }
         $cmd .= ' ' . escapeshellarg($path);
+        $cmd .= ' 2> '.(Config::getInstance())->get('stderr');
         $rtn = array();
         $err = 0;
         exec($cmd, $rtn, $err);

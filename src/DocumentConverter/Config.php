@@ -96,6 +96,8 @@ class Config
             return $this->_config->get('timeOut', 30);
         case 'maxProc':
             return $this->_config->get('maxProc', 4);
+        case 'stderr':
+            return $this->_config->get('stderr', '/dev/null');
         default:
             return $this->_config->get($arg);
         }
