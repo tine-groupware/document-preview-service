@@ -46,6 +46,12 @@ function getConfigPath(){
         $conf .= 'config.php';
         if (is_file($conf)) return $conf;
     }
+    $conf = getenv('documentpreviewconfig2.0');
+    if (!($conf == false || $conf == '')){
+        if (is_file($conf)) return $conf;
+        $conf .= 'config.php';
+        if (is_file($conf)) return $conf;
+    }
     return '/etc/documentPreviewService/VERSION/config.php';
 }
 

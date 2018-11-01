@@ -26,7 +26,7 @@ class DocumentConverter
      * @param array $conf  config
      *
      * @return array base64 encoded results
-     * @throws Exception
+     * @throws DocumentPreviewException
      */
     function __invoke(array $files, array $conf): array
     {
@@ -50,7 +50,7 @@ class DocumentConverter
                 $rtn[$key] = File::toBase64Array($this->convertToImage($files, $cnf));
             }
         } else {
-            throw new Exception('file extension unknown', 4150201);
+            throw new DocumentPreviewException('file extension unknown', 201, 415);
         }
 
         return $rtn;
@@ -64,7 +64,7 @@ class DocumentConverter
      * @param array $conf  "
      *
      * @return array
-     * @throws Exception config not initialized
+     * @throws DocumentPreviewException config not initialized
      */
     function convertToDoc(array $files, array $conf): array
     {
@@ -81,7 +81,7 @@ class DocumentConverter
      * @param array $conf  "
      *
      * @return array
-     * @throws Exception pdf merge fails
+     * @throws DocumentPreviewException pdf merge fails
      */
     function convertToPdf(array $files, array $conf): array
     {
@@ -100,8 +100,8 @@ class DocumentConverter
      * @param array $conf  "
      *
      * @return array
-     * @throws Exception pdf merge fail
-     * @throws Exception config not initialized
+     * @throws DocumentPreviewException pdf merge fail
+     * @throws DocumentPreviewException config not initialized
      */
     function mergePdf(array $files, array $conf): array
     {
@@ -216,14 +216,14 @@ class DocumentConverter
      * @param array $files "
      *
      * @return void
-     * @throws Exception file types differ
+     * @throws DocumentPreviewException file types differ
      */
     function checkAllSame(array $files): void
     {
         $class = get_class($files[0]);
         foreach ($files as $file) {
             if (get_class($file) != $class) {
-                throw new Exception('file types differ', 4000202);
+                throw new DocumentPreviewException('file types differ', 202, 400);
             }
         }
     }

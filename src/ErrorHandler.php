@@ -6,19 +6,24 @@ namespace DocumentService;
 
 use Exception;
 use Psr\Http\Message\ResponseInterface;
+use Raven_Client;
 use Zend\Diactoros\Response\TextResponse;
+use Zend\Log\Logger;
 
 /**
  * Class ErrorHandler
+ *
  * @package DocumentService
- * @property \Zend\Log\Logger $logger
+ *
+ * @property Raven_Client $_sentryClient
+ * @property \Zend\Log\Logger $_logger
  */
 class ErrorHandler
 {
-    protected static $instance = null;
-    protected $initialized = false;
-    protected $logger;
-    protected $uid;
+    private static $_instance = null;
+    private $_logger = null;
+    private $_sentryClient = null;
+    private $_uid;
 
     /**
      * Singleton
@@ -32,7 +37,7 @@ class ErrorHandler
      */
     protected function __construct()
     {
-        $this->uid = uniqid('', true);
+        $this->_uid = uniqid('', true);
     }
 
     /**
@@ -42,10 +47,10 @@ class ErrorHandler
      */
     public static function getInstance(): ErrorHandler
     {
-        if (null === self::$instance) {
-            self::$instance = new self;
+        if (null === self::$_instance) {
+            self::$_instance = new self;
         }
-        return self::$instance;
+        return self::$_instance;
     }
 
     /**
@@ -55,13 +60,22 @@ class ErrorHandler
      *
      * @return void
      */
-    public function initialize($logger): void
+    public function setLogger($logger): void
     {
-        $this->initialized = true;
-        $this->logger = $logger;
+        $this->_logger = $logger;
     }
 
-
+    /**
+     * Set Sentry Client
+     *
+     * @param Raven_Client $sentryClient "
+     *
+     * @return void
+     */
+    public function setSentryClient($sentryClient): void
+    {
+        $this->_sentryClient = $sentryClient;
+    }
 
     /**
      * Logs Exception and returns error response
@@ -69,15 +83,15 @@ class ErrorHandler
      * @param Exception $exception "
      *
      * @return ResponseInterface
-     * @throws Exception not initialized
      */
-    public function handelException(Exception $exception): ResponseInterface
+    public function handelException(DocumentPreviewException $exception): ResponseInterface
     {
-        if (true !== $this->initialized) {
-            throw new Exception("Not initialized", 5000301);
+        if (null !== $this->_logger) {
+            $this->log($exception->getStatusCode() < 400 ? Logger::INFO : Logger::ALERT, $exception->getMessage(), $exception->getCode());
         }
-
-        $this->log($exception->getCode() < 40000 ? 6 : 2, $exception->getMessage(), $exception->getCode());
+        if (null !== $this->_sentryClient) {
+            $this->_sentryClient->captureException($exception);
+        }
         return $this->getResponse($exception);
     }
 
@@ -87,21 +101,16 @@ class ErrorHandler
      * @param Exception $exception "
      *
      * @return ResponseInterface
-     * @throws Exception not initialized
      */
-    public function getResponse(Exception $exception): ResponseInterface
+    public function getResponse(DocumentPreviewException $exception): ResponseInterface
     {
-        if (true !== $this->initialized) {
-            throw new Exception("Not initialized", 5000302);
-        }
-
         $message = 'Internal server error';
         $code = $exception->getCode();
-        $status = intval($exception->getCode()/100);
-        if ($code < 40000) {
+        $status = $exception->getStatusCode();
+        if ($status < 400) {
             $message = $exception->getMessage();
         }
-        return new TextResponse("$message - $code - $this->uid", $status);
+        return new TextResponse("$message - $code - $this->_uid", $status);
     }
 
     /**
@@ -112,13 +121,11 @@ class ErrorHandler
      * @param string $source   Error code or __METHOD__
      *
      * @return void
-     * @throws Exception not initialized
      */
     public function log($priority, $message, $source = ""): void
     {
-        if (true !== $this->initialized) {
-            throw new Exception("Not initialized", 5000303);
+        if (null !== $this->_logger) {
+            $this->_logger->log($priority, "[$priority][$this->_uid][$source] $message");
         }
-        $this->logger->log($priority, "[$priority][$this->uid][$source] $message");
     }
 }
