@@ -2,7 +2,7 @@
 
 namespace DocumentService\DocumentConverter;
 
-use Exception;
+use DocumentService\DocumentPreviewException;
 
 abstract class File
 {
@@ -15,13 +15,13 @@ abstract class File
      * @param string $path      "
      * @param bool   $reference "
      *
-     * @throws Exception Not a readable file
-     * @throws Exception config not initialized
+     * @throws DocumentPreviewException Not a readable file
+     * @throws DocumentPreviewException config not initialized
      */
     function __construct(string $path, bool $reference = false)
     {
         if (!is_file($path) && !is_readable($path)) {
-            throw new Exception("Not a readable file", 5000701);
+            throw new DocumentPreviewException("Not a readable file", 701, 500);
         }
 
         $this->_reference = $reference;

@@ -3,6 +3,7 @@
 namespace DocumentService\Action;
 
 use DocumentService\DocumentConverter\Config;
+use DocumentService\DocumentPreviewException;
 use DocumentService\ErrorHandler;
 use Exception;
 use Psr\Http\Message\ServerRequestInterface;
@@ -25,8 +26,7 @@ class DocumentPreview implements MiddlewareInterface
      * @param RequestHandlerInterface $delegate "
      *
      * @return ResponseInterface
-     * @throws Exception Hard Fail
-     * @throws Exception logger not initialized
+     * @throws DocumentPreviewException
      */
     public function process(ServerRequestInterface $request, RequestHandlerInterface $delegate): ResponseInterface
     {
@@ -38,7 +38,7 @@ class DocumentPreview implements MiddlewareInterface
             $semaphore = $this->getSem();
             $semAcq = $this->semAcquire($semaphore);
             if (false === $semAcq) {
-                (ErrorHandler::getInstance())->log(6, "Service occupied", __METHOD__);
+                (ErrorHandler::getInstance())->log(Logger::INFO, "Service occupied", __METHOD__);
                 return new TextResponse("Service occupied", 423);
             }
         }
@@ -49,12 +49,12 @@ class DocumentPreview implements MiddlewareInterface
 
             $rtn = (new DocumentConverter())($files, $conf);
 
-        } catch (Exception $exception) {
+        } catch (DocumentPreviewException $exception) {
             return (ErrorHandler::getInstance())->handelException($exception);
         } finally {
             if (null !== $semaphore && true === $semAcq) {
                 if (false === sem_release($semaphore)) {
-                    (ErrorHandler::getInstance())->log(3, "Failed to release semaphore", __METHOD__);
+                    (ErrorHandler::getInstance())->log(Logger::ERR, "Failed to release semaphore", __METHOD__);
                 }
             }
         }
@@ -69,6 +69,8 @@ class DocumentPreview implements MiddlewareInterface
      * DocumentPreview constructor.
      *
      * @param array $configArray "
+     *
+     * @throws DocumentPreviewException
      */
     public function __construct(array $configArray)
     {
@@ -80,16 +82,23 @@ class DocumentPreview implements MiddlewareInterface
             $logger = $loggerOut;
         } else {
             $writer = new Stream($loggerOut);
+            $filter = new \Zend\Log\Filter\Priority($config->get('logLevel', Logger::NOTICE));
+            $writer->addFilter($filter);
             $logger = new Logger();
             $logger->addWriter($writer);
         }
 
+
+
+
         (Config::getInstance())->initialize($config);
-        (ErrorHandler::getInstance())->initialize($logger);
+        (ErrorHandler::getInstance())->setLogger($logger);
 
+        if (!is_writable($config->get('tempDir', 'temp/'))) {
+            throw new DocumentPreviewException("Temp dir is not writable", 500, 110);
+        }
 
-        $tempDir = $config->get('tempDir', 'temp/').'/';
-        putenv("TMPDIR={$tempDir}");
+        putenv("TMPDIR={$config->get('tempDir', 'temp/')}");
     }
 
     /**
@@ -98,18 +107,18 @@ class DocumentPreview implements MiddlewareInterface
      * @param ServerRequestInterface $request "
      *
      * @return array
-     * @throws Exception Bad config
+     * @throws DocumentPreviewException Bad config
      */
     protected function getConf(ServerRequestInterface $request): array
     {
         if (false === isset($request->getParsedBody()["config"])) {
-            throw new Exception("Bad request missing arguments", 400111);
+            throw new DocumentPreviewException("Bad request missing arguments", 111, 400);
         }
         $json = $request->getParsedBody()["config"];
 
         $conf = json_decode($json, true);
         if (false === $this->checkConfig()) {
-            throw new Exception("Bad request JSON error", 400112);
+            throw new DocumentPreviewException("Bad request JSON error", 112, 400);
         }
         return $conf;
     }
@@ -120,9 +129,9 @@ class DocumentPreview implements MiddlewareInterface
      * @param ServerRequestInterface $request "
      *
      * @return array
-     * @throws Exception config not initialized
-     * @throws config file upload error
-     * @throws config file creation error
+     * @throws DocumentPreviewException config not initialized
+     * @throws DocumentPreviewException config file upload error
+     * @throws DocumentPreviewException config file creation error
      */
     protected function getFiles(ServerRequestInterface $request): array
     {
@@ -131,14 +140,14 @@ class DocumentPreview implements MiddlewareInterface
         } elseif (array_key_exists('files', $request->getUploadedFiles())) {
             $UploadedFiles = $request->getUploadedFiles()['files'];
         } else {
-            throw new Exception("Parameter file or files not set", 4000103);
+            throw new DocumentPreviewException("Parameter file or files not set", 103, 400);
         }
 
 
         $files = [];
         foreach ($UploadedFiles as $UploadedFile) {
             if ($UploadedFile == null || UPLOAD_ERR_OK !== $UploadedFile->getError()) {
-                throw new Exception('No File Uploaded', 4000104);
+                throw new DocumentPreviewException('No File Uploaded', 104, 400);
             }
             $path = (Config::getInstance())->get('tempDir') . uniqid() . basename($UploadedFile->getClientFilename());
             $UploadedFile->moveTo($path);
@@ -156,7 +165,7 @@ class DocumentPreview implements MiddlewareInterface
      *
      * @return bool
      *
-     * @throws Exception Config not initialized
+     * @throws DocumentPreviewException Config not initialized
      */
     protected function semAcquire($semaphore): bool
     {
@@ -172,22 +181,22 @@ class DocumentPreview implements MiddlewareInterface
      * Init Semaphore
      *
      * @return resource semaphore
-     * @throws Exception config not initialized
-     * @throws Exception logger not initialized
-     * @throws Exception systemv fail
+     * @throws DocumentPreviewException config not initialized
+     * @throws DocumentPreviewException logger not initialized
+     * @throws DocumentPreviewException systemv fail
      */
     protected function getSem()
     {
         $ipcId = ftok(__FILE__, 'g');
         if (-1 === $ipcId) {
-            (ErrorHandler::getInstance())->log(6, "Could not generate ftok", __METHOD__);
-            throw new Exception('Could not generate ftok', 5000105);
+            (ErrorHandler::getInstance())->log(Logger::ERR, "Could not generate ftok", __METHOD__);
+            throw new DocumentPreviewException('Could not generate ftok', 105, 500);
         }
 
         $semaphore = sem_get($ipcId, (Config::getInstance())->get('maxProc'));
         if (false === $semaphore) {
-            (ErrorHandler::getInstance())->log(6, "Failed not get semaphore", __METHOD__);
-            throw new Exception('Failed not get semaphore', 5000106);
+            (ErrorHandler::getInstance())->log(Logger::ERR, "Failed not get semaphore", __METHOD__);
+            throw new DocumentPreviewException('Failed not get semaphore', 106, 500);
         }
         return $semaphore;
     }

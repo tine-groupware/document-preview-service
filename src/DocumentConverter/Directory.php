@@ -2,7 +2,7 @@
 
 namespace DocumentService\DocumentConverter;
 
-use Exception;
+use DocumentService\DocumentPreviewException;
 
 /**
  * Repesents an temp dir
@@ -12,18 +12,18 @@ use Exception;
  */
 class Directory
 {
-    protected $path;
+    private $_path;
 
     /**
      * Directory constructor.
      *
-     * @throws Exception config not initialized
+     * @throws DocumentPreviewException config not initialized
      */
     function __construct()
     {
-        $this->path = Config::getInstance()->get('tempdir').uniqid('dir_', true).'/';
-        mkdir($this->path);
-        return $this->path;
+        $this->_path = Config::getInstance()->get('tempdir').uniqid('dir_', true).'/';
+        mkdir($this->_path);
+        return $this->_path;
     }
 
 
@@ -34,7 +34,7 @@ class Directory
      */
     function getPath(): string
     {
-        return $this->path;
+        return $this->_path;
     }
 
     /**
@@ -43,20 +43,20 @@ class Directory
      * @param string $class Fully qualified class name
      *
      * @return array of files of type $class
-     * @throws Exception Scan dir failed
+     * @throws DocumentPreviewException Scan dir failed
      */
     function getFiles(string $class): array
     {
         $rtn = [];
-        $files = scandir($this->path);
+        $files = scandir($this->_path);
         if (false === $files) {
-            throw new Exception('Scan dir failed', 5000501);
+            throw new DocumentPreviewException('Scan dir failed', 501, 500);
         }
         foreach ($files as $file) {
-            if (!is_file($this->path.'/'.$file)) {
+            if (!is_file($this->_path.'/'.$file)) {
                 continue;
             }
-            $rtn[] = new $class($this->path.'/'.$file);
+            $rtn[] = new $class($this->_path.'/'.$file);
         }
         return $rtn;
     }
@@ -67,7 +67,7 @@ class Directory
      */
     function __destruct()
     {
-        self::rmrf($this->path);
+        self::rmrf($this->_path);
     }
 
 

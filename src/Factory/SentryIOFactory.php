@@ -8,6 +8,7 @@ class SentryIOFactory
     public function __invoke(ContainerInterface $container)
     {
         $sentry_url = '';
+
         if (key_exists('sentryio', $container->get('config')) && isset($container->get('config')['sentryio'])) {
             $sentry_url = $container->get('config')['sentryio'];
         }

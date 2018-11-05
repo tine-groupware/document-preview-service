@@ -2,7 +2,7 @@
 
 namespace DocumentService\DocumentConverter;
 
-use Exception;
+use DocumentService\DocumentPreviewException;
 use phpDocumentor\Reflection\Types\Mixed;
 
 /**
@@ -14,9 +14,9 @@ use phpDocumentor\Reflection\Types\Mixed;
  */
 class Config
 {
-    protected static $instance = null;
-    protected $initialized = false;
-    protected $config;
+    private static $_instance = null;
+    private $_initialized = false;
+    private $_config;
 
 
     /**
@@ -26,10 +26,10 @@ class Config
      */
     public static function getInstance(): Config
     {
-        if (null === self::$instance) {
-            self::$instance = new self;
+        if (null === self::$_instance) {
+            self::$_instance = new self;
         }
-        return self::$instance;
+        return self::$_instance;
     }
 
 
@@ -60,7 +60,7 @@ class Config
      */
     function initialize(\Zend\Config\Config $config): void
     {
-        $this->initialized = true;
+        $this->_initialized = true;
         $this->_config = $config;
     }
 
@@ -70,12 +70,12 @@ class Config
      * @param string $arg key
      *
      * @return int|string|array
-     * @throws Exception not initialized
+     * @throws DocumentPreviewException not initialized
      */
     function get(string $arg)
     {
-        if (true !== $this->initialized) {
-            throw new Exception("Not initialized", 5000401);
+        if (true !== $this->_initialized) {
+            throw new DocumentPreviewException("Not initialized", 401, 500);
         }
         switch ($arg) {
         case 'docExt':
@@ -96,6 +96,8 @@ class Config
             return $this->_config->get('timeOut', 30);
         case 'maxProc':
             return $this->_config->get('maxProc', 4);
+        case 'stderr':
+            return $this->_config->get('stderr', '/dev/null');
         default:
             return $this->_config->get($arg);
         }

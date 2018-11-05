@@ -2,6 +2,7 @@
 
 namespace DocumentService\DocumentConverter;
 
+use DocumentService\DocumentPreviewException;
 use Exception;
 
 /**
@@ -23,8 +24,8 @@ class ImageFile extends File
      * @param bool   $color fill color
      *
      * @return ImageFile
-     * @throws Exception graphicsmagick operation failed
-     * @throws Exception config not initialized
+     * @throws DocumentPreviewException graphicsmagick operation failed
+     * @throws DocumentPreviewException config not initialized
      */
     function fitToSize($ext, $x, $y, $color = false): ImageFile
     {
@@ -35,11 +36,12 @@ class ImageFile extends File
             $cmd .= ' -gravity center -background ' . escapeshellarg($color) . ' -extent ' . escapeshellarg($x . 'x' . $y);
         }
         $cmd .= ' ' . escapeshellarg($path);
+        $cmd .= ' 2> '.(Config::getInstance())->get('stderr');
         $rtn = array();
         $err = 0;
         exec($cmd, $rtn, $err);
         if (0 !== $err) {
-            throw new Exception('graphicsmagick operation failed', 5000801);
+            throw new DocumentPreviewException('graphicsmagick operation failed', 801, 500);
         }
 
         return new ImageFile($path, true);

@@ -2,6 +2,7 @@
 
 namespace DocumentService\DocumentConverter;
 
+use DocumentService\DocumentPreviewException;
 use Exception;
 
 /**
@@ -27,7 +28,7 @@ class PdfFile extends File
         $err = 0;
         exec($cmd, $rtn, $err);
         if (0 !== $err) {
-            throw new Exception('Ghostscript operation failed', 5000901);
+            throw new DocumentPreviewException('Ghostscript operation failed', 901, 500);
         }
 
         return $dir->getFiles(ImageFile::class);
@@ -39,7 +40,7 @@ class PdfFile extends File
      * @param array $files PdfFiles
      *
      * @return PdfFile
-     * @throws Exception Ghostscript operation failed
+     * @throws DocumentPreviewException Ghostscript operation failed
      */
     static function merge(array $files): PdfFile
     {
@@ -48,11 +49,12 @@ class PdfFile extends File
         foreach ($files as $file) {
             $cmd .= ' '.$file->getPath();
         }
+        $cmd .= ' 2> '.(Config::getInstance())->get('stderr');
         $rtn = array();
         $err = 0;
         exec($cmd, $rtn, $err);
         if (0 !== $err) {
-            throw new Exception('Ghostscript operation failed', 5000902);
+            throw new DocumentPreviewException('Ghostscript operation failed', 902, 500);
         }
 
         return new PdfFile($path, true);

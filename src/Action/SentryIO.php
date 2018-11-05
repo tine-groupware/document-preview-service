@@ -2,12 +2,14 @@
 
 namespace DocumentService\Action;
 
+use DocumentService\ErrorHandler;
+use Exception;
 use Psr\Http\Message\ServerRequestInterface;
 use Psr\Http\Server\MiddlewareInterface;
 use Psr\Http\Server\RequestHandlerInterface;
 use Raven_Client;
-use Raven_ErrorHandler;
 use Psr\Http\Message\ResponseInterface;
+use Zend\Diactoros\Response\TextResponse;
 
 class SentryIO implements MiddlewareInterface
 {
@@ -21,16 +23,16 @@ class SentryIO implements MiddlewareInterface
     public function process(ServerRequestInterface $request, RequestHandlerInterface $delegate): ResponseInterface
     {
         $client = new Raven_Client($this->_sentryURL);
-        $error_handler = new Raven_ErrorHandler($client);
-        $error_handler->registerExceptionHandler();
-        $error_handler->registerErrorHandler();
-        $error_handler->registerShutdownFunction();
+
+        $client->install();
 
         $client->user_context(
             array(
             'request' => $request,
             )
         );
+
+        (ErrorHandler::getInstance())->setSentryClient($client);
 
         return $delegate->handle($request);
     }
