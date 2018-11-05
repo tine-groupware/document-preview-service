@@ -19,7 +19,7 @@ final class testDocumentPreview extends TestCase
      */
     public function testSemAcquireBlock($maxProc, $expected)
     {
-        $docPre = new docPre([]);
+        $docPre = new docPre(['tempDir' => '/tmp']);
 
         $docPre->setSemTimeOut(1);
 
@@ -29,7 +29,7 @@ final class testDocumentPreview extends TestCase
 
         $semAcq = $docPre->_semAcquire($semaphore);
 
-        if(true === $semAcq){
+        if (true === $semAcq) {
             sem_release($semaphore);
         }
 
@@ -48,9 +48,7 @@ final class testDocumentPreview extends TestCase
      */
     public function testSemAcquireTimeOut($timeOut)
     {
-        $docPre = new docPre([]);
-
-        (Config::getInstance())->initialize(new \Zend\Config\Config(['timeOut' => $timeOut, 'tempDir' => '/dev/null']));
+        $docPre = new docPre(['timeOut' => $timeOut, 'tempDir' => '/tmp']);
 
         $ipcId = ftok(__FILE__, 'g');
 
@@ -60,7 +58,7 @@ final class testDocumentPreview extends TestCase
 
         $semAcq = $docPre->_semAcquire($semaphore);
 
-        if(true === $semAcq) {
+        if (true === $semAcq) {
             sem_release($semaphore);
         }
         $x = time() - $timeAtStart;
