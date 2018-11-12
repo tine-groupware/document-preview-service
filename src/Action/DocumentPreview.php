@@ -51,7 +51,7 @@ class DocumentPreview implements MiddlewareInterface
 
             $rtn = (new DocumentConverter())($files, $conf);
 
-            (ErrorHandler::getInstance())->log(Logger::DEBUG, "Converted files in ". microtime(true) - $startTime ."seconds.", __METHOD__);
+            (ErrorHandler::getInstance())->log(Logger::DEBUG, "Converted files in ". (string)(microtime(true) - $startTime) ." seconds.", __METHOD__);
 
         } catch (DocumentPreviewException $exception) {
             return (ErrorHandler::getInstance())->handelException($exception);

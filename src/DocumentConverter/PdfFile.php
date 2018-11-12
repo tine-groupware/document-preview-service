@@ -27,15 +27,16 @@ class PdfFile extends File
     {
         $dir = new Directory();
         $cmd = 'gs -q -dQUIET -dSAFER -dBATCH -dNOPAUSE -dNOPROMPT -dMaxBitmap=500000000 -dAlignToPixels=0 -dGridFitTT=2 "-sDEVICE=pngalpha" -dTextAlphaBits=4 -dGraphicsAlphaBits=4 "-r150x150" -sOutputFile='
-            .escapeshellarg($dir->getPath() . 'image%03d.png') . ' '. escapeshellarg($this->_path) . ' -c quit';
+            .escapeshellarg($dir->getPath() . 'image%03d.png') . ' '. escapeshellarg($this->_path) . ' -c quit  2>&1';
         $err = 0;
         exec($cmd, $rtn, $err);
-        if (0 !== $err) {
-            throw new DocumentPreviewException('Ghostscript operation failed', 901, 500);
-        }
 
         foreach ($rtn as $line) {
-            (ErrorHandler::getInstance())->log(Logger::INFO, $line,__METHOD__);
+            (ErrorHandler::getInstance())->log(0 == $err ? Logger::DEBUG : Logger::INFO , $line,__METHOD__);
+        }
+
+        if (0 !== $err) {
+            throw new DocumentPreviewException('Ghostscript operation failed', 901, 500);
         }
 
         return $dir->getFiles(ImageFile::class);
@@ -59,6 +60,11 @@ class PdfFile extends File
         $rtn = array();
         $err = 0;
         exec($cmd, $rtn, $err);
+
+        foreach ($rtn as $line) {
+            (ErrorHandler::getInstance())->log(0 == $err ? Logger::DEBUG : Logger::INFO , $line,__METHOD__);
+        }
+
         if (0 !== $err) {
             throw new DocumentPreviewException('Ghostscript operation failed', 902, 500);
         }

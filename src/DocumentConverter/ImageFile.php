@@ -41,12 +41,13 @@ class ImageFile extends File
         $rtn = array();
         $err = 0;
         exec($cmd, $rtn, $err);
-        if (0 !== $err) {
-            throw new DocumentPreviewException('graphicsmagick operation failed', 801, 500);
-        }
 
         foreach ($rtn as $line) {
-            (ErrorHandler::getInstance())->log(Logger::INFO, $line,__METHOD__);
+            (ErrorHandler::getInstance())->log(0 == $err ? Logger::DEBUG : Logger::INFO , $line,__METHOD__);
+        }
+
+        if (0 !== $err) {
+            throw new DocumentPreviewException('graphicsmagick operation failed', 801, 500);
         }
 
         return new ImageFile($path, true);

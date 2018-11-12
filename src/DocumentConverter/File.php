@@ -102,7 +102,7 @@ abstract class File
         } else if (in_array(mb_strtolower($ext), (Config::getInstance())->get('imgExt'))) {
             return new ImageFile($path);
         } else {
-            throw new Exception('file extension unknown', 4150702);
+            throw new DocumentPreviewException('file extension unknown', 702, 415);
         }
     }
 }
