@@ -30,12 +30,13 @@ class PdfFile extends File
             .escapeshellarg($dir->getPath() . 'image%03d.png') . ' '. escapeshellarg($this->_path) . ' -c quit';
         $err = 0;
         exec($cmd, $rtn, $err);
-        if (0 !== $err) {
-            throw new DocumentPreviewException('Ghostscript operation failed', 901, 500);
-        }
 
         foreach ($rtn as $line) {
-            (ErrorHandler::getInstance())->log(Logger::INFO, $line,__METHOD__);
+            (ErrorHandler::getInstance())->log(0 == $err ? Logger::DEBUG : Logger::INFO , $line,__METHOD__);
+        }
+
+        if (0 !== $err) {
+            throw new DocumentPreviewException('Ghostscript operation failed', 901, 500);
         }
 
         return $dir->getFiles(ImageFile::class);
@@ -59,6 +60,11 @@ class PdfFile extends File
         $rtn = array();
         $err = 0;
         exec($cmd, $rtn, $err);
+
+        foreach ($rtn as $line) {
+            (ErrorHandler::getInstance())->log(0 == $err ? Logger::DEBUG : Logger::INFO , $line,__METHOD__);
+        }
+
         if (0 !== $err) {
             throw new DocumentPreviewException('Ghostscript operation failed', 902, 500);
         }
