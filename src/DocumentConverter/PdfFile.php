@@ -3,7 +3,9 @@
 namespace DocumentService\DocumentConverter;
 
 use DocumentService\DocumentPreviewException;
+use DocumentService\ErrorHandler;
 use Exception;
+use Zend\Log\Logger;
 
 /**
  * Repesents a Pdf file
@@ -24,11 +26,16 @@ class PdfFile extends File
     function convertToPng(): array
     {
         $dir = new Directory();
-        $cmd = 'gs -q -dQUIET -dSAFER -dBATCH -dNOPAUSE -dNOPROMPT -dMaxBitmap=500000000 -dAlignToPixels=0 -dGridFitTT=2 "-sDEVICE=pngalpha" -dTextAlphaBits=4 -dGraphicsAlphaBits=4 "-r150x150" -sOutputFile=' . escapeshellarg($dir->getPath() . 'image%03d.png') . ' ' . escapeshellarg($this->_path) . ' -c quit';
+        $cmd = 'gs -q -dQUIET -dSAFER -dBATCH -dNOPAUSE -dNOPROMPT -dMaxBitmap=500000000 -dAlignToPixels=0 -dGridFitTT=2 "-sDEVICE=pngalpha" -dTextAlphaBits=4 -dGraphicsAlphaBits=4 "-r150x150" -sOutputFile='
+            .escapeshellarg($dir->getPath() . 'image%03d.png') . ' '. escapeshellarg($this->_path) . ' -c quit';
         $err = 0;
         exec($cmd, $rtn, $err);
         if (0 !== $err) {
             throw new DocumentPreviewException('Ghostscript operation failed', 901, 500);
+        }
+
+        foreach ($rtn as $line) {
+            (ErrorHandler::getInstance())->log(Logger::INFO, $line,__METHOD__);
         }
 
         return $dir->getFiles(ImageFile::class);
@@ -49,7 +56,6 @@ class PdfFile extends File
         foreach ($files as $file) {
             $cmd .= ' '.$file->getPath();
         }
-        $cmd .= ' 2> '.(Config::getInstance())->get('stderr');
         $rtn = array();
         $err = 0;
         exec($cmd, $rtn, $err);

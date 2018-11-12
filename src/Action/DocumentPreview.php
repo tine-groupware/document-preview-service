@@ -47,7 +47,11 @@ class DocumentPreview implements MiddlewareInterface
             $conf = $this->getConf($request);
             $files = $this->getFiles($request);
 
+            $startTime = microtime(true);
+
             $rtn = (new DocumentConverter())($files, $conf);
+
+            (ErrorHandler::getInstance())->log(Logger::DEBUG, "Converted files in ". microtime(true) - $startTime ."seconds.", __METHOD__);
 
         } catch (DocumentPreviewException $exception) {
             return (ErrorHandler::getInstance())->handelException($exception);
@@ -95,7 +99,7 @@ class DocumentPreview implements MiddlewareInterface
         (ErrorHandler::getInstance())->setLogger($logger);
 
         if (!is_writable($config->get('tempDir', 'temp/'))) {
-            throw new DocumentPreviewException("Temp dir is not writable", 500, 110);
+            throw new DocumentPreviewException("Temp dir is not writable", 110, 500);
         }
 
         putenv("TMPDIR={$config->get('tempDir', 'temp/')}");

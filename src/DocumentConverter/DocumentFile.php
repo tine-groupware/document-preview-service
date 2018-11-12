@@ -3,6 +3,8 @@
 namespace DocumentService\DocumentConverter;
 
 use DocumentService\DocumentPreviewException;
+use DocumentService\ErrorHandler;
+use Zend\Log\Logger;
 
 /**
  * Repesents a Document file
@@ -24,12 +26,17 @@ class DocumentFile extends File
         $dir = new Directory();
         $ooDir = new Directory();
 
-        $cmd = (Config::getInstance())->get('ooBinary').' -env:SingleAppInstance=false -env:UserInstallation=file:///'.$ooDir->getPath().' --convert-to pdf ' . $this->_path . ' --outdir ' . $dir->getPath(). ' --headless --norestore 2> '.(Config::getInstance())->get('stderr');
+        $cmd = (Config::getInstance())->get('ooBinary').' -env:SingleAppInstance=false -env:UserInstallation=file:///'
+            .$ooDir->getPath().' --convert-to pdf ' . $this->_path . ' --outdir ' . $dir->getPath(). ' --headless --norestore';
         $rtn = array();
         $err = 0;
         exec($cmd, $rtn, $err);
         if (0 !== $err) {
             throw new DocumentPreviewException('soffice operation failed', 601, 500);
+        }
+
+        foreach ($rtn as $line) {
+            (ErrorHandler::getInstance())->log(Logger::INFO, $line,__METHOD__);
         }
 
         return $dir->getFiles(PdfFile::class)[0];

@@ -3,7 +3,6 @@
 namespace DocumentService\DocumentConverter;
 
 use DocumentService\DocumentPreviewException;
-use phpDocumentor\Reflection\Types\Mixed;
 
 /**
  * Singleton wrapper for zend config
@@ -96,8 +95,6 @@ class Config
             return $this->_config->get('timeOut', 30);
         case 'maxProc':
             return $this->_config->get('maxProc', 4);
-        case 'stderr':
-            return $this->_config->get('stderr', '/dev/null');
         default:
             return $this->_config->get($arg);
         }
