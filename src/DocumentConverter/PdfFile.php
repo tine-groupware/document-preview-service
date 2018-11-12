@@ -27,7 +27,7 @@ class PdfFile extends File
     {
         $dir = new Directory();
         $cmd = 'gs -q -dQUIET -dSAFER -dBATCH -dNOPAUSE -dNOPROMPT -dMaxBitmap=500000000 -dAlignToPixels=0 -dGridFitTT=2 "-sDEVICE=pngalpha" -dTextAlphaBits=4 -dGraphicsAlphaBits=4 "-r150x150" -sOutputFile='
-            .escapeshellarg($dir->getPath() . 'image%03d.png') . ' '. escapeshellarg($this->_path) . ' -c quit';
+            .escapeshellarg($dir->getPath() . 'image%03d.png') . ' '. escapeshellarg($this->_path) . ' -c quit  2>&1';
         $err = 0;
         exec($cmd, $rtn, $err);
 
