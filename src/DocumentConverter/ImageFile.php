@@ -3,7 +3,9 @@
 namespace DocumentService\DocumentConverter;
 
 use DocumentService\DocumentPreviewException;
+use DocumentService\ErrorHandler;
 use Exception;
+use Zend\Log\Logger;
 
 /**
  * Repesents a Image file
@@ -36,12 +38,15 @@ class ImageFile extends File
             $cmd .= ' -gravity center -background ' . escapeshellarg($color) . ' -extent ' . escapeshellarg($x . 'x' . $y);
         }
         $cmd .= ' ' . escapeshellarg($path);
-        $cmd .= ' 2> '.(Config::getInstance())->get('stderr');
         $rtn = array();
         $err = 0;
         exec($cmd, $rtn, $err);
         if (0 !== $err) {
             throw new DocumentPreviewException('graphicsmagick operation failed', 801, 500);
+        }
+
+        foreach ($rtn as $line) {
+            (ErrorHandler::getInstance())->log(Logger::INFO, $line,__METHOD__);
         }
 
         return new ImageFile($path, true);
