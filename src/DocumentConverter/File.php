@@ -56,6 +56,15 @@ abstract class File
         return base64_encode(file_get_contents($this->_path));
     }
 
+    /**
+     * Returns md5 hash of file
+     *
+     * @return string
+     */
+    function getMd5Hash(): string
+    {
+        return md5_file($this->_path);
+    }
 
     /**
      * Remove file, when no longer needed
