@@ -1,6 +1,9 @@
 <?php
 namespace DocumentService;
 
+use DocumentService\DocumentConverter\Config;
+use Zend\Log\Logger;
+
 class Lock
 {
     public const HIGHPRIORITY = true;
@@ -14,6 +17,13 @@ class Lock
     private $maxLowPrio;
     private $maxHighPrio;
 
+    /**
+     * Lock constructor.
+     * @param bool $prio
+     * @param int $maxLowPrio
+     * @param int $maxHighPrio
+     * @throws DocumentPreviewException
+     */
     public function __construct(bool $prio, int $maxLowPrio, int $maxHighPrio)
     {
         $this->prio = $prio;
@@ -24,7 +34,7 @@ class Lock
             throw new DocumentPreviewException('Could not get ftok', 0);
         }
         $this->semid = sem_get($this->key, 1);
-        if (fales == $this->semid) {
+        if (false == $this->semid) {
             throw new DocumentPreviewException('Could not get semaphore', 0);
         }
     }
@@ -60,7 +70,7 @@ class Lock
 
         shmop_close($shm_id);
         if (false == sem_release($this->semid)) {
-            //todo
+            (ErrorHandler::getInstance())->log(Logger::ERR, "Failed to release semaphore", __METHOD__);
         }
 
         return [0 => $locks[1], 1 => $locks[2]];
@@ -106,7 +116,7 @@ class Lock
         } else {
             shmop_close($shm_id);
             if (false == sem_release($this->semid)) {
-                //todo
+                (ErrorHandler::getInstance())->log(Logger::ERR, "Failed to release semaphore", __METHOD__);
             }
             return false;
         }
@@ -119,7 +129,7 @@ class Lock
 
         shmop_close($shm_id);
         if (false == sem_release($this->semid)) {
-            //todo
+            (ErrorHandler::getInstance())->log(Logger::ERR, "Failed to release semaphore", __METHOD__);
         }
 
         return true;
@@ -165,7 +175,7 @@ class Lock
 
         shmop_close($shm_id);
         if (false == sem_release($this->semid)) {
-            //todo
+            (ErrorHandler::getInstance())->log(Logger::ERR, "Failed to release semaphore", __METHOD__);
         }
 
         return true;

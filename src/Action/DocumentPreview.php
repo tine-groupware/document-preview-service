@@ -5,6 +5,7 @@ namespace DocumentService\Action;
 use DocumentService\DocumentConverter\Config;
 use DocumentService\DocumentPreviewException;
 use DocumentService\ErrorHandler;
+use DocumentService\Lock;
 use Exception;
 use Psr\Http\Message\ServerRequestInterface;
 use Psr\Http\Server\MiddlewareInterface;
@@ -30,21 +31,24 @@ class DocumentPreview implements MiddlewareInterface
      */
     public function process(ServerRequestInterface $request, RequestHandlerInterface $delegate): ResponseInterface
     {
-        $semaphore = null;
+        $lock = null;
         $semAcq = false;
         $rtn = null;
 
-        if (extension_loaded("sysvsem")) {
-            $semaphore = $this->getSem();
-            $semAcq = $this->semAcquire($semaphore);
-            if (false === $semAcq) {
-                (ErrorHandler::getInstance())->log(Logger::INFO, "Service occupied", __METHOD__);
-                return new TextResponse("Service occupied", 423);
-            }
-        }
-        
+        (ErrorHandler::getInstance())->setRequest($request);
+
         try {
             $conf = $this->getConf($request);
+
+            if (extension_loaded("sysvsem")) {
+                $lock = new Lock($conf['synchronRequest'], (Config::getInstance())->get('maxProc'),(Config::getInstance())->get('maxProcHighPrio'));
+                $semAcq = $lock->lock();
+                if (false === $semAcq) {
+                    (ErrorHandler::getInstance())->log(Logger::INFO, "Service occupied", __METHOD__);
+                    return new TextResponse("Service occupied", 423);
+                }
+            }
+
             $files = $this->getFiles($request);
 
             $startTime = microtime(true);
@@ -57,8 +61,8 @@ class DocumentPreview implements MiddlewareInterface
         } catch (DocumentPreviewException $exception) {
             return (ErrorHandler::getInstance())->handelException($exception);
         } finally {
-            if (null !== $semaphore && true === $semAcq) {
-                if (false === sem_release($semaphore)) {
+            if (null !== $lock && true === $semAcq) {
+                if (false === $lock->unlock()) {
                     (ErrorHandler::getInstance())->log(Logger::ERR, "Failed to release semaphore", __METHOD__);
                 }
             }
@@ -92,9 +96,6 @@ class DocumentPreview implements MiddlewareInterface
             $logger = new Logger();
             $logger->addWriter($writer);
         }
-
-
-
 
         (Config::getInstance())->initialize($config);
         (ErrorHandler::getInstance())->setLogger($logger);
