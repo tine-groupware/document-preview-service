@@ -86,7 +86,7 @@ class Lock
      */
     public function lock(): bool
     {
-        if ($this->locked == true) {
+        if (true == $this->locked) {
             return true;
         }
 
@@ -95,7 +95,7 @@ class Lock
         }
 
         $shm_id = shmop_open($this->key, 'n', 0644, 2);
-        if ($shm_id != false) {
+        if (false != $shm_id) {
             $locks = [1 => $this->maxLowPrio, 2=> $this->maxHighPrio];
         } else {
             $shm_id = shmop_open($this->key, 'c', 0644, 2);
@@ -109,9 +109,9 @@ class Lock
             $locks = unpack('C*', $mem);
         }
 
-        if ($this->prio == Lock::LOWPRIORITY && $locks[1] - ($this->maxHighPrio - $locks[2]) > 0) {
+        if (Lock::LOWPRIORITY == $this->prio && $locks[1] - ($this->maxHighPrio - $locks[2]) > 0) {
             $locks[1]--;
-        } elseif ($this->prio == Lock::HIGHPRIORITY && $locks[2] > 0) {
+        } elseif (Lock::HIGHPRIORITY == $this->prio && $locks[2] > 0) {
             $locks[2]--;
         } else {
             shmop_close($shm_id);
@@ -144,7 +144,7 @@ class Lock
      */
     public function unlock(): bool
     {
-        if ($this->locked == false) {
+        if (false == $this->locked) {
             return true;
         }
 
@@ -163,9 +163,9 @@ class Lock
         }
         $locks = unpack('C*', $mem);
 
-        if ($this->prio == Lock::LOWPRIORITY) {
+        if (Lock::LOWPRIORITY == $this->prio) {
             $locks[1]++;
-        } elseif ($this->prio == Lock::HIGHPRIORITY) {
+        } elseif (Lock::HIGHPRIORITY == $this->prio) {
             $locks[2]++;
         }
 

@@ -6,7 +6,6 @@ use DocumentService\DocumentConverter\Config;
 use DocumentService\DocumentPreviewException;
 use DocumentService\ErrorHandler;
 use DocumentService\Lock;
-use Exception;
 use Psr\Http\Message\ServerRequestInterface;
 use Psr\Http\Server\MiddlewareInterface;
 use Psr\Http\Server\RequestHandlerInterface;
@@ -17,7 +16,7 @@ use Zend\Log\Logger;
 use DocumentService\DocumentConverter;
 use Psr\Http\Message\ResponseInterface;
 
-class DocumentPreview implements MiddlewareInterface 
+class DocumentPreview implements MiddlewareInterface
 {
 
     /**
@@ -41,7 +40,11 @@ class DocumentPreview implements MiddlewareInterface
             $conf = $this->getConf($request);
 
             if (extension_loaded("sysvsem")) {
-                $lock = new Lock($conf['synchronRequest'], (Config::getInstance())->get('maxProc'),(Config::getInstance())->get('maxProcHighPrio'));
+                $lock = new Lock(
+                    $conf['synchronRequest'],
+                    (Config::getInstance())->get('maxProc'),
+                    (Config::getInstance())->get('maxProcHighPrio')
+                );
                 $semAcq = $lock->lock();
                 if (false === $semAcq) {
                     (ErrorHandler::getInstance())->log(Logger::INFO, "Service occupied", __METHOD__);
@@ -152,7 +155,7 @@ class DocumentPreview implements MiddlewareInterface
 
         $files = [];
         foreach ($UploadedFiles as $UploadedFile) {
-            if ($UploadedFile == null || UPLOAD_ERR_OK !== $UploadedFile->getError()) {
+            if (null == $UploadedFile || UPLOAD_ERR_OK !== $UploadedFile->getError()) {
                 throw new DocumentPreviewException('No File Uploaded', 104, 400);
             }
             $path = (Config::getInstance())->get('tempDir') . uniqid() . basename($UploadedFile->getClientFilename());

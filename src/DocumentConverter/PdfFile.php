@@ -23,16 +23,17 @@ class PdfFile extends File
      *
      * @throws Exception Ghostscript operation failed
      */
-    function convertToPng(): array
+    public function convertToPng(): array
     {
         $dir = new Directory();
-        $cmd = 'gs -q -dQUIET -dSAFER -dBATCH -dNOPAUSE -dNOPROMPT -dMaxBitmap=500000000 -dAlignToPixels=0 -dGridFitTT=2 "-sDEVICE=pngalpha" -dTextAlphaBits=4 -dGraphicsAlphaBits=4 "-r150x150" -sOutputFile='
-            .escapeshellarg($dir->getPath() . 'image%03d.png') . ' '. escapeshellarg($this->_path) . ' -c quit  2>&1';
+        $cmd = 'gs -q -dQUIET -dSAFER -dBATCH -dNOPAUSE -dNOPROMPT -dMaxBitmap=500000000 -dAlignToPixels=0 -dGridFitTT'.
+            '=2 "-sDEVICE=pngalpha" -dTextAlphaBits=4 -dGraphicsAlphaBits=4 "-r150x150" -sOutputFile='
+            .escapeshellarg($dir->getPath() . 'image%03d.png') . ' '. escapeshellarg($this->path) . ' -c quit  2>&1';
         $err = 0;
         exec($cmd, $rtn, $err);
 
         foreach ($rtn as $line) {
-            (ErrorHandler::getInstance())->log(0 == $err ? Logger::DEBUG : Logger::INFO , $line,__METHOD__);
+            (ErrorHandler::getInstance())->log(0 == $err ? Logger::DEBUG : Logger::INFO, $line, __METHOD__);
         }
 
         if (0 !== $err) {
@@ -50,7 +51,7 @@ class PdfFile extends File
      * @return PdfFile
      * @throws DocumentPreviewException Ghostscript operation failed
      */
-    static function merge(array $files): PdfFile
+    public static function merge(array $files): PdfFile
     {
         $path = Config::getInstance()->get('tempdir').uniqid('file_', true).'.'.'pdf';
         $cmd = ('gs -dBATCH -dNOPAUSE -q -sDEVICE=pdfwrite -dPDFSETTINGS=/prepress -sOutputFile='.$path);
@@ -62,7 +63,7 @@ class PdfFile extends File
         exec($cmd, $rtn, $err);
 
         foreach ($rtn as $line) {
-            (ErrorHandler::getInstance())->log(0 == $err ? Logger::DEBUG : Logger::INFO , $line,__METHOD__);
+            (ErrorHandler::getInstance())->log(0 == $err ? Logger::DEBUG : Logger::INFO, $line, __METHOD__);
         }
 
         if (0 !== $err) {

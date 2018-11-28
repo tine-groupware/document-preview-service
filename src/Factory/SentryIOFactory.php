@@ -12,7 +12,7 @@ class SentryIOFactory
         if (key_exists('sentryio', $container->get('config')) && isset($container->get('config')['sentryio'])) {
             $sentry_url = $container->get('config')['sentryio'];
         }
-        if ($sentry_url == null) {
+        if (null == $sentry_url) {
             $sentry_url = '';
         }
         return new SentryIO($sentry_url);

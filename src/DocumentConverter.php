@@ -28,7 +28,7 @@ class DocumentConverter
      * @return array base64 encoded results
      * @throws DocumentPreviewException
      */
-    function __invoke(array $files, array $conf): array
+    public function __invoke(array $files, array $conf): array
     {
         $this->checkAllSame($files);
 
@@ -41,11 +41,11 @@ class DocumentConverter
             foreach ($conf as $key => $cnf) {
                 $rtn[$key] = File::toBase64Array($this->convertToDoc($files, $cnf));
             }
-        } else if ($files[0] instanceof PdfFile) {
+        } elseif ($files[0] instanceof PdfFile) {
             foreach ($conf as $key => $cnf) {
                 $rtn[$key] = File::toBase64Array($this->mergePdf($files, $cnf));
             }
-        } else if ($files[0] instanceof ImageFile) {
+        } elseif ($files[0] instanceof ImageFile) {
             foreach ($conf as $key => $cnf) {
                 $rtn[$key] = File::toBase64Array($this->convertToImage($files, $cnf));
             }
@@ -66,7 +66,7 @@ class DocumentConverter
      * @return array
      * @throws DocumentPreviewException config not initialized
      */
-    function convertToDoc(array $files, array $conf): array
+    protected function convertToDoc(array $files, array $conf): array
     {
         if (in_array(mb_strtolower($conf['fileType']), (Config::getInstance())->get('docExt'))) {
             return $files;
@@ -83,7 +83,7 @@ class DocumentConverter
      * @return array
      * @throws DocumentPreviewException pdf merge fails
      */
-    function convertToPdf(array $files, array $conf): array
+    protected function convertToPdf(array $files, array $conf): array
     {
         $pdfs = [];
 
@@ -103,7 +103,7 @@ class DocumentConverter
      * @throws DocumentPreviewException pdf merge fail
      * @throws DocumentPreviewException config not initialized
      */
-    function mergePdf(array $files, array $conf): array
+    protected function mergePdf(array $files, array $conf): array
     {
         if (true === $conf['merge'] && count($files) > 1) {
             $files = [PdfFile::merge($files)];
@@ -122,12 +122,12 @@ class DocumentConverter
      *
      * @return array
      */
-    function convertToPng(array $files, array $conf): array
+    protected function convertToPng(array $files, array $conf): array
     {
         $images = [];
 
         foreach ($files as $file) {
-            if (false == $conf['firstPage'] ) {
+            if (false == $conf['firstPage']) {
                 foreach ($file->convertToPng() as $image) {
                     $images[] = $image;
                 }
@@ -148,7 +148,7 @@ class DocumentConverter
      *
      * @return array
      */
-    function convertToImage(array $files, array $conf): array
+    protected function convertToImage(array $files, array $conf): array
     {
         $images = [];
 
@@ -167,7 +167,7 @@ class DocumentConverter
      *
      * todo find better solution
      */
-    function cleanConf(array $config): array
+    protected function cleanConf(array $config): array
     {
         $configuration = [];
         foreach ($config as $key => $conf) {
@@ -180,10 +180,16 @@ class DocumentConverter
                 'merge' => true,
             ];
 
-            if (array_key_exists('firstPage', $conf) && isset($conf['firstPage']) && ($conf['firstPage'] === 'true' || $conf['firstPage'] === true)) {
+            if (array_key_exists('firstPage', $conf)
+                && isset($conf['firstPage'])
+                && ('true' === $conf['firstPage'] || true === $conf['firstPage'])
+            ) {
                 $cnf['firstPage'] = true;
             }
-            if (array_key_exists('firstpage', $conf) && isset($conf['firstpage']) && ($conf['firstpage'] === 'true' || $conf['firstpage'] === true)) {
+            if (array_key_exists('firstpage', $conf)
+                && isset($conf['firstpage'])
+                && ('true' === $conf['firstpage'] || true === $conf['firstpage'])
+            ) {
                 $cnf['firstPage'] = true; //compensate inconsistent api desing
             }
             if (array_key_exists('filetype', $conf) && isset($conf['filetype'])) {
@@ -198,10 +204,16 @@ class DocumentConverter
             if (array_key_exists('y', $conf) && isset($conf['y'])) {
                 $cnf['y'] = $conf['y'];
             }
-            if (array_key_exists('color', $conf) && isset($conf['color']) && !($conf['color'] === 'false' || $conf['color'] === false)) {
+            if (array_key_exists('color', $conf)
+                && isset($conf['color'])
+                && !('false' === $conf['color'] || false === $conf['color'])
+            ) {
                 $cnf['color'] = mb_strtolower($conf['color']);
             }
-            if (array_key_exists('merge', $conf) && isset($conf['merge']) && ($conf['merge'] === 'false' || $conf['merge'] === false)) {
+            if (array_key_exists('merge', $conf)
+                && isset($conf['merge'])
+                && ('false' === $conf['merge'] || false === $conf['merge'])
+            ) {
                 $cnf['merge'] = false;
             }
 
@@ -218,7 +230,7 @@ class DocumentConverter
      * @return void
      * @throws DocumentPreviewException file types differ
      */
-    function checkAllSame(array $files): void
+    protected function checkAllSame(array $files): void
     {
         $class = get_class($files[0]);
         foreach ($files as $file) {

@@ -9,13 +9,13 @@ use DocumentService\DocumentPreviewException;
  *
  * @package DocumentService\DocumentConverter
  *
- * @property \Zend\Config\Config $_config
+ * @property \Zend\Config\Config $config
  */
 class Config
 {
-    private static $_instance = null;
-    private $_initialized = false;
-    private $_config;
+    private static $instance = null;
+    private $initialized = false;
+    private $config;
 
 
     /**
@@ -25,10 +25,10 @@ class Config
      */
     public static function getInstance(): Config
     {
-        if (null === self::$_instance) {
-            self::$_instance = new self;
+        if (null === self::$instance) {
+            self::$instance = new self;
         }
-        return self::$_instance;
+        return self::$instance;
     }
 
 
@@ -57,10 +57,10 @@ class Config
      *
      * @return void
      */
-    function initialize(\Zend\Config\Config $config): void
+    public function initialize(\Zend\Config\Config $config): void
     {
-        $this->_initialized = true;
-        $this->_config = $config;
+        $this->initialized = true;
+        $this->config = $config;
     }
 
     /**
@@ -71,34 +71,37 @@ class Config
      * @return int|string|array
      * @throws DocumentPreviewException not initialized
      */
-    function get(string $arg)
+    public function get(string $arg)
     {
-        if (true !== $this->_initialized) {
+        if (true !== $this->initialized) {
             throw new DocumentPreviewException("Not initialized", 401, 500);
         }
         switch ($arg) {
-        case 'docExt':
-            return $this->_config->get('docExt', new \Zend\Config\Config(['txt', 'rtf', 'odt', 'ott', 'ods', 'ots', 'odp', 'otp', 'xls', 'xlt', 'xlsx', 'xltx', 'doc', 'dot', 'docx', 'dotx', 'ppt', 'pot', 'pptx', 'potx']))->toArray();
-        case 'pdfExt':
-            return $this->_config->get('pdfExt', new \Zend\Config\Config(['pdf', 'ps']))->toArray();
-        case 'imgExt':
-            return $this->_config->get('imgExt', new \Zend\Config\Config(['jpg', 'jpeg', 'gif', 'tiff', 'png']))->toArray();
-        case 'tempdir':
-            $dir = $this->_config->get('tempDir', '/tmp');
-            if (substr($dir, 1) !== '/') {
-                $dir .= '/';
-            }
-            return $dir;
-        case 'ooBinary':
-            return $this->_config->get('ooBinary', 'soffice');
-        case 'semTimeOut':
-            return $this->_config->get('timeOut', 30);
-        case 'maxProc':
-            return $this->_config->get('maxProc', 4);
-        case 'maxProcHighPrio':
-            return $this->_config->get('maxProcHighPrio', 4);
-        default:
-            return $this->_config->get($arg);
+            case 'docExt':
+                return $this->config->get('docExt', new \Zend\Config\Config(['txt', 'odt', 'docx']))->toArray();
+            case 'pdfExt':
+                return $this->config->get('pdfExt', new \Zend\Config\Config(['pdf', 'ps']))->toArray();
+            case 'imgExt':
+                return $this->config->get(
+                    'imgExt',
+                    new \Zend\Config\Config(['jpg', 'jpeg', 'gif', 'tiff', 'png'])
+                )->toArray();
+            case 'tempdir':
+                $dir = $this->config->get('tempDir', '/tmp');
+                if (substr($dir, 1) !== '/') {
+                    $dir .= '/';
+                }
+                return $dir;
+            case 'ooBinary':
+                return $this->config->get('ooBinary', 'soffice');
+            case 'semTimeOut':
+                return $this->config->get('timeOut', 30);
+            case 'maxProc':
+                return $this->config->get('maxProc', 4);
+            case 'maxProcHighPrio':
+                return $this->config->get('maxProcHighPrio', 4);
+            default:
+                return $this->config->get($arg);
         }
     }
 }

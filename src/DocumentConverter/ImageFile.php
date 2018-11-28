@@ -29,13 +29,14 @@ class ImageFile extends File
      * @throws DocumentPreviewException graphicsmagick operation failed
      * @throws DocumentPreviewException config not initialized
      */
-    function fitToSize($ext, $x, $y, $color = false): ImageFile
+    public function fitToSize($ext, $x, $y, $color = false): ImageFile
     {
         $path = Config::getInstance()->get('tempdir').uniqid('file_', true).'.'.$ext;
 
-        $cmd = 'gm convert ' . $this->_path . ' -resize ' . escapeshellarg($x . 'x' . $y);
+        $cmd = 'gm convert ' . $this->path . ' -resize ' . escapeshellarg($x . 'x' . $y);
         if (false != $color) {
-            $cmd .= ' -gravity center -background ' . escapeshellarg($color) . ' -extent ' . escapeshellarg($x . 'x' . $y);
+            $cmd .= ' -gravity center -background ' . escapeshellarg($color) . ' -extent '
+                . escapeshellarg($x . 'x' . $y);
         }
         $cmd .= ' ' . escapeshellarg($path);
         $rtn = array();
@@ -43,7 +44,7 @@ class ImageFile extends File
         exec($cmd, $rtn, $err);
 
         foreach ($rtn as $line) {
-            (ErrorHandler::getInstance())->log(0 == $err ? Logger::DEBUG : Logger::INFO , $line,__METHOD__);
+            (ErrorHandler::getInstance())->log(0 == $err ? Logger::DEBUG : Logger::INFO, $line, __METHOD__);
         }
 
         if (0 !== $err) {

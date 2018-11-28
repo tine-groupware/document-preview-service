@@ -16,17 +16,17 @@ use Zend\Log\Logger;
  *
  * @package DocumentService
  *
- * @property Raven_Client $_sentryClient
- * @property \Zend\Log\Logger $_logger
+ * @property Raven_Client $sentryClient
+ * @property \Zend\Log\Logger $logger
  * @property ServerRequestInterface $request
  */
 class ErrorHandler
 {
-    private static $_instance = null;
-    private $_logger = null;
-    private $_sentryClient = null;
+    private static $instance = null;
+    private $logger = null;
+    private $sentryClient = null;
     private $request = null;
-    private $_uid;
+    private $uid;
 
     /**
      * Singleton
@@ -40,7 +40,7 @@ class ErrorHandler
      */
     protected function __construct()
     {
-        $this->_uid = uniqid('', true);
+        $this->uid = uniqid('', true);
     }
 
     /**
@@ -50,10 +50,10 @@ class ErrorHandler
      */
     public static function getInstance(): ErrorHandler
     {
-        if (null === self::$_instance) {
-            self::$_instance = new self;
+        if (null === self::$instance) {
+            self::$instance = new self;
         }
-        return self::$_instance;
+        return self::$instance;
     }
 
     /**
@@ -65,7 +65,7 @@ class ErrorHandler
      */
     public function setLogger($logger): void
     {
-        $this->_logger = $logger;
+        $this->logger = $logger;
     }
 
     /**
@@ -90,7 +90,7 @@ class ErrorHandler
      */
     public function setSentryClient($sentryClient): void
     {
-        $this->_sentryClient = $sentryClient;
+        $this->sentryClient = $sentryClient;
     }
 
     /**
@@ -102,11 +102,15 @@ class ErrorHandler
      */
     public function handelException(DocumentPreviewException $exception): ResponseInterface
     {
-        if (null !== $this->_logger) {
-            $this->log($exception->getStatusCode() < 400 ? Logger::INFO : Logger::ALERT, $exception->getMessage(), $exception->getCode());
+        if (null !== $this->logger) {
+            $this->log(
+                $exception->getStatusCode() < 400 ? Logger::INFO : Logger::ALERT,
+                $exception->getMessage(),
+                $exception->getCode()
+            );
         }
-        if (null !== $this->_sentryClient) {
-            $this->_sentryClient->captureException($exception);
+        if (null !== $this->sentryClient) {
+            $this->sentryClient->captureException($exception);
         }
         return $this->getResponse($exception);
     }
@@ -114,7 +118,7 @@ class ErrorHandler
     /**
      * Returns error response
      *
-     * @param Exception $exception "
+     * @param DocumentPreviewException $exception "
      *
      * @return ResponseInterface
      */
@@ -126,7 +130,7 @@ class ErrorHandler
         if ($status < 400) {
             $message = $exception->getMessage();
         }
-        return new TextResponse("$message - $code - $this->_uid", $status);
+        return new TextResponse("$message - $code - $this->uid", $status);
     }
 
     /**
@@ -140,8 +144,11 @@ class ErrorHandler
      */
     public function log($priority, $message, $source = ""): void
     {
-        if (null !== $this->_logger) {
-            $this->_logger->log($priority, "[$priority][$this->_uid][".$this->request->getAttribute('certInfo')."][$source] $message");
+        if (null !== $this->logger) {
+            $this->logger->log(
+                $priority,
+                "[$priority][$this->uid][".$this->request->getAttribute('certInfo')."][$source] $message"
+            );
         }
     }
 }
