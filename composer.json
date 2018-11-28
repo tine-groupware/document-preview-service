@@ -12,6 +12,7 @@
     "ext-json":"*",
     "ext-fileinfo":"*",
     "ext-sysvsem":"*",
+    "ext-shmop":"*",
     "tine20/auth-middleware": "dev-develop",
     "zendframework/zend-component-installer": "^2.1.1",
     "zendframework/zend-config-aggregator": "^1.0",

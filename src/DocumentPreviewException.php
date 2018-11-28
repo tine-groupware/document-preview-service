@@ -13,7 +13,7 @@ use Exception;
  */
 class DocumentPreviewException extends Exception
 {
-    private $_statusCode;
+    private $statusCode;
 
     /**
      * DocumentPreviewException Constructor
@@ -22,9 +22,9 @@ class DocumentPreviewException extends Exception
      * @param int    $code       Exception code
      * @param int    $statusCode intended http status code
      */
-    function __construct(string $message = "", int $code = 0, int $statusCode = 500)
+    public function __construct(string $message = "", int $code = 0, int $statusCode = 500)
     {
-        $this->_statusCode = $statusCode;
+        $this->statusCode = $statusCode;
         parent::__construct($message, $code);
     }
 
@@ -35,6 +35,6 @@ class DocumentPreviewException extends Exception
      */
     public function getStatusCode()
     {
-        return $this->_statusCode;
+        return $this->statusCode;
     }
 }

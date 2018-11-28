@@ -16,10 +16,12 @@ class ConfigProvider
                 "loggerOut" => "doc.log",
                 'authLogger' => 'auth.log',
                 "ext" => [
-                    'txt', 'rtf', 'odt', 'ott', 'ods', 'ots', 'odp', 'otp', 'xls', 'xlt', 'xlsx', 'xltx', 'doc', 'dot', 'docx', 'dotx', 'ppt', 'pot', 'pptx', 'potx', 'pdf', 'jpg', 'jpeg', 'gif', 'tiff', 'png'
+                    'txt', 'rtf', 'odt', 'ott', 'ods', 'ots', 'odp', 'otp', 'xls', 'xlt', 'xlsx', 'xltx', 'doc', 'dot',
+                    'docx', 'dotx', 'ppt', 'pot', 'pptx', 'potx', 'pdf', 'jpg', 'jpeg', 'gif', 'tiff', 'png'
                 ],
                 "docExt" => [
-                    'txt', 'rtf', 'odt', 'ott', 'ods', 'ots', 'odp', 'otp', 'xls', 'xlt', 'xlsx', 'xltx', 'doc', 'dot', 'docx', 'dotx', 'ppt', 'pot', 'pptx', 'potx',
+                    'txt', 'rtf', 'odt', 'ott', 'ods', 'ots', 'odp', 'otp', 'xls', 'xlt', 'xlsx', 'xltx', 'doc', 'dot',
+                    'docx', 'dotx', 'ppt', 'pot', 'pptx', 'potx',
                     ],
                 "imgExt" => [
                     'jpg', 'jpeg', 'gif', 'tiff', 'png'
@@ -27,9 +29,11 @@ class ConfigProvider
                 "ooBinary"=>'soffice',
             ],
             'auth' => [
-                'default' => ['name' => 'default', 'permission' => "false",], // default authentication, if no auth is configured auth will fail
+                // default authentication, if no auth is configured auth will fail
+                'default' => ['name' => 'default', 'permission' => "false",],
                 'apiPingAuth' => ['name' => 'apiPingAuth', 'permission' => '(1=1)', 'required' => true],
-                'documentPreviewService' => ['name' => 'documentPreviewService', 'permission' => '(1=1)', 'required' => false],
+                'documentPreviewService' =>
+                    ['name' => 'documentPreviewService', 'permission' => '(1=1)', 'required' => false],
             ],
         ];
     }

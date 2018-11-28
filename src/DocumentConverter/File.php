@@ -18,19 +18,19 @@ abstract class File
      * @throws DocumentPreviewException Not a readable file
      * @throws DocumentPreviewException config not initialized
      */
-    function __construct(string $path, bool $reference = false)
+    public function __construct(string $path, bool $reference = false)
     {
         if (!is_file($path) && !is_readable($path)) {
             throw new DocumentPreviewException("Not a readable file", 701, 500);
         }
 
-        $this->_reference = $reference;
+        $this->reference = $reference;
 
-        if (!$reference) {
-            $this->_path = Config::getInstance()->get('tempdir').uniqid('file_', true).'.'.pathinfo($path)['extension'];
-            copy($path, $this->_path);
+        if (false === $reference) {
+            $this->path = Config::getInstance()->get('tempdir').uniqid('file_', true).'.'.pathinfo($path)['extension'];
+            copy($path, $this->path);
         } else {
-            $this->_path = $path;
+            $this->path = $path;
         }
     }
 
@@ -40,9 +40,9 @@ abstract class File
      *
      * @return string
      */
-    function getPath(): string
+    public function getPath(): string
     {
-        return $this->_path;
+        return $this->path;
     }
 
 
@@ -51,9 +51,9 @@ abstract class File
      *
      * @return string
      */
-    function getBase64(): string
+    public function getBase64(): string
     {
-        return base64_encode(file_get_contents($this->_path));
+        return base64_encode(file_get_contents($this->path));
     }
 
     /**
@@ -61,9 +61,9 @@ abstract class File
      *
      * @return string
      */
-    function getMd5Hash(): string
+    public function getMd5Hash(): string
     {
-        return md5_file($this->_path);
+        return md5_file($this->path);
     }
 
     /**
@@ -71,7 +71,7 @@ abstract class File
      */
     function __destruct()
     {
-        unlink($this->_path);
+        unlink($this->path);
     }
 
 
@@ -82,7 +82,7 @@ abstract class File
      *
      * @return array
      */
-    static function toBase64Array(array $files): array
+    public static function toBase64Array(array $files): array
     {
         $rtn = [];
         foreach ($files as $file) {
@@ -97,18 +97,18 @@ abstract class File
      * @param string $path "
      *
      * @return File
-     * @throws Exception Exception Not a readable file
-     * @throws Exception config not initialized
-     * @throws Exception file extension unknown
+     * @throws DocumentPreviewException Exception Not a readable file
+     * @throws DocumentPreviewException config not initialized
+     * @throws DocumentPreviewException file extension unknown
      */
-    static function fromPath(string $path): File
+    public static function fromPath(string $path): File
     {
         $ext = pathinfo($path)['extension'];
         if (in_array(mb_strtolower($ext), (Config::getInstance())->get('docExt'))) {
             return new DocumentFile($path);
-        } else if (in_array(mb_strtolower($ext), (Config::getInstance())->get('pdfExt'))) {
+        } elseif (in_array(mb_strtolower($ext), (Config::getInstance())->get('pdfExt'))) {
             return new PdfFile($path);
-        } else if (in_array(mb_strtolower($ext), (Config::getInstance())->get('imgExt'))) {
+        } elseif (in_array(mb_strtolower($ext), (Config::getInstance())->get('imgExt'))) {
             return new ImageFile($path);
         } else {
             throw new DocumentPreviewException('file extension unknown', 702, 415);

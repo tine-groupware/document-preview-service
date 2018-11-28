@@ -27,13 +27,14 @@ class DocumentFile extends File
         $ooDir = new Directory();
 
         $cmd = (Config::getInstance())->get('ooBinary').' -env:SingleAppInstance=false -env:UserInstallation=file:///'
-            .$ooDir->getPath().' --convert-to pdf ' . $this->_path . ' --outdir ' . $dir->getPath(). ' --headless --norestore 2>&1';
+            .$ooDir->getPath().' --convert-to pdf ' . $this->path . ' --outdir ' . $dir->getPath()
+            . ' --headless --norestore 2>&1';
         $rtn = array();
         $err = 0;
         exec($cmd, $rtn, $err);
 
         foreach ($rtn as $line) {
-            (ErrorHandler::getInstance())->log(0 == $err ? Logger::DEBUG : Logger::INFO , $line,__METHOD__);
+            (ErrorHandler::getInstance())->log(0 == $err ? Logger::DEBUG : Logger::INFO, $line, __METHOD__);
         }
 
         if (0 !== $err) {

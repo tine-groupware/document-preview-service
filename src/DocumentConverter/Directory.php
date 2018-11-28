@@ -12,18 +12,18 @@ use DocumentService\DocumentPreviewException;
  */
 class Directory
 {
-    private $_path;
+    private $path;
 
     /**
      * Directory constructor.
      *
      * @throws DocumentPreviewException config not initialized
      */
-    function __construct()
+    public function __construct()
     {
-        $this->_path = Config::getInstance()->get('tempdir').uniqid('dir_', true).'/';
-        mkdir($this->_path);
-        return $this->_path;
+        $this->path = Config::getInstance()->get('tempdir').uniqid('dir_', true).'/';
+        mkdir($this->path);
+        return $this->path;
     }
 
 
@@ -32,9 +32,9 @@ class Directory
      *
      * @return string
      */
-    function getPath(): string
+    public function getPath(): string
     {
-        return $this->_path;
+        return $this->path;
     }
 
     /**
@@ -45,18 +45,18 @@ class Directory
      * @return array of files of type $class
      * @throws DocumentPreviewException Scan dir failed
      */
-    function getFiles(string $class): array
+    public function getFiles(string $class): array
     {
         $rtn = [];
-        $files = scandir($this->_path);
+        $files = scandir($this->path);
         if (false === $files) {
             throw new DocumentPreviewException('Scan dir failed', 501, 500);
         }
         foreach ($files as $file) {
-            if (!is_file($this->_path.'/'.$file)) {
+            if (!is_file($this->path.'/'.$file)) {
                 continue;
             }
-            $rtn[] = new $class($this->_path.'/'.$file);
+            $rtn[] = new $class($this->path.'/'.$file);
         }
         return $rtn;
     }
@@ -65,9 +65,9 @@ class Directory
     /**
      * Remove directory if no longer needed
      */
-    function __destruct()
+    public function __destruct()
     {
-        self::rmrf($this->_path);
+        self::rmrf($this->path);
     }
 
 
