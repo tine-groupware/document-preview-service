@@ -147,7 +147,7 @@ class ErrorHandler
         if (null !== $this->logger) {
             $this->logger->log(
                 $priority,
-                "[$priority][$this->uid][".$this->request->getAttribute('certInfo')."][$source] $message"
+                "[$priority][$this->uid][".$this->request->getAttribute('certInfo')[0]."][$source] $message"
             );
         }
     }
