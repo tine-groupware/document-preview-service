@@ -3,6 +3,8 @@
 namespace DocumentService\DocumentConverter;
 
 use DocumentService\DocumentPreviewException;
+use DocumentService\ErrorHandler;
+use Zend\Log\Logger;
 
 abstract class File
 {
@@ -22,6 +24,23 @@ abstract class File
     {
         if (!is_file($path) && !is_readable($path)) {
             throw new DocumentPreviewException("Not a readable file", 701, 500);
+        }
+
+        $ext = pathinfo($path)['extension'];
+
+        if (array_key_exists($ext, (Config::getInstance())->get('extToMime'))) {
+            if ((Config::getInstance())->get('extToMime')[$ext] == mime_content_type($path)
+            ) {
+                if ($reference) {
+                    unlink($path);
+                }
+                (ErrorHandler::getInstance())->log(Logger::DEBUG, "path: " . $path, __METHOD__);
+                (ErrorHandler::getInstance())->log(Logger::DEBUG, "mime-type: " . mime_content_type($path), __METHOD__);
+                throw new DocumentPreviewException("Extension dose not match mime-type", 703, 422);
+            }
+        } else {
+            (ErrorHandler::getInstance())->log(Logger::INFO, "Unmaped extension " . $ext, __METHOD__);
+            (ErrorHandler::getInstance())->log(Logger::INFO, (Config::getInstance())->get('extToMime'), __METHOD__);
         }
 
         $this->reference = $reference;
@@ -69,7 +88,7 @@ abstract class File
     /**
      * Remove file, when no longer needed
      */
-    function __destruct()
+    public function __destruct()
     {
         unlink($this->path);
     }

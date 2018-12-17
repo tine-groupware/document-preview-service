@@ -100,6 +100,8 @@ class Config
                 return $this->config->get('maxProc', 4);
             case 'maxProcHighPrio':
                 return $this->config->get('maxProcHighPrio', 4);
+            case 'extToMime':
+                return $this->config->get('extToMime', new \Zend\Config\Config(['txt' => 'text/plain']))->toArray();
             default:
                 return $this->config->get($arg);
         }

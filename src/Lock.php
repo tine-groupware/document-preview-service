@@ -1,7 +1,6 @@
 <?php
 namespace DocumentService;
 
-use DocumentService\DocumentConverter\Config;
 use Zend\Log\Logger;
 
 class Lock

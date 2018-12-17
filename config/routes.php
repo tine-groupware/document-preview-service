@@ -7,6 +7,7 @@ use Auth\Action\AuthSSL;
 use Auth\Action\NeedsAuth;
 use DocumentService\Action\ApiPing;
 use DocumentService\Action\DocumentPreview;
+use DocumentService\Action\Info;
 use Psr\Container\ContainerInterface;
 use Zend\Expressive\Application;
 use Zend\Expressive\MiddlewareFactory;
@@ -28,4 +29,5 @@ return function (Application $app, MiddlewareFactory $factory, ContainerInterfac
     $app->route('/v2/ping', ApiPing::class, ['POST', 'GET'], 'apiPing');
     $app->route('/v2/ping/auth', [NeedsAuth::class, AuthSSL::class, AuthCheck::class, ApiPing::class], ['POST', 'GET'], 'apiPingAuth');
     $app->route('/v2/documentPreviewService', [NeedsAuth::class, AuthSSL::class, AuthCheck::class, DocumentPreview::class],['POST'], 'documentPreviewService');
+    $app->route('/v2/info', Info::Class, 'info');
 };
