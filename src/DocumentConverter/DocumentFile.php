@@ -38,6 +38,11 @@ class DocumentFile extends File
         }
 
         if (0 !== $err) {
+            copy(
+                $this->path,
+                (Config::getInstance())->get('tempdir') . 'error-file' .
+                    (ErrorHandler::getInstance())->getUid() . '.' .  pathinfo($this)['extension']
+            );
             throw new DocumentPreviewException('soffice operation failed', 601, 500);
         }
 

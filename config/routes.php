@@ -29,5 +29,5 @@ return function (Application $app, MiddlewareFactory $factory, ContainerInterfac
     $app->route('/v2/ping', ApiPing::class, ['POST', 'GET'], 'apiPing');
     $app->route('/v2/ping/auth', [NeedsAuth::class, AuthSSL::class, AuthCheck::class, ApiPing::class], ['POST', 'GET'], 'apiPingAuth');
     $app->route('/v2/documentPreviewService', [NeedsAuth::class, AuthSSL::class, AuthCheck::class, DocumentPreview::class],['POST'], 'documentPreviewService');
-    $app->route('/v2/info', Info::Class, 'info');
+    $app->route('/v2/info', Info::Class, ['GET'], 'info');
 };

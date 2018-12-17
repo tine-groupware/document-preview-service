@@ -29,14 +29,17 @@ abstract class File
         $ext = pathinfo($path)['extension'];
 
         if (array_key_exists($ext, (Config::getInstance())->get('extToMime'))) {
-            if ((Config::getInstance())->get('extToMime')[$ext] == mime_content_type($path)
+            if ((Config::getInstance())->get('extToMime')[$ext] != mime_content_type($path)
             ) {
                 if ($reference) {
                     unlink($path);
                 }
                 (ErrorHandler::getInstance())->log(Logger::DEBUG, "path: " . $path, __METHOD__);
-                (ErrorHandler::getInstance())->log(Logger::DEBUG, "mime-type: " . mime_content_type($path), __METHOD__);
-                throw new DocumentPreviewException("Extension dose not match mime-type", 703, 422);
+                throw new DocumentPreviewException(
+                    "Extension ($ext) dose not match mime-type " . mime_content_type($path),
+                    703,
+                    422
+                );
             }
         } else {
             (ErrorHandler::getInstance())->log(Logger::INFO, "Unmaped extension " . $ext, __METHOD__);

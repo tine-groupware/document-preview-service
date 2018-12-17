@@ -57,6 +57,16 @@ class ErrorHandler
     }
 
     /**
+     * Get Uid
+     *
+     * @return string
+     */
+    public function getUid(): string
+    {
+        return $this->uid;
+    }
+
+    /**
      * Set logger
      *
      * @param \Zend\Log\Logger $logger "
@@ -110,6 +120,7 @@ class ErrorHandler
             );
         }
         if (null !== $this->sentryClient) {
+            $this->sentryClient->user_context(['logUid' => $this->uid]);
             $this->sentryClient->captureException($exception);
         }
         return $this->getResponse($exception);
