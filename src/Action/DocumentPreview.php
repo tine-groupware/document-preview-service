@@ -39,9 +39,15 @@ class DocumentPreview implements MiddlewareInterface
         try {
             $conf = $this->getConf($request);
 
+            $synchronRequest = array_key_exists('synchronRequest', $conf) && $conf['synchronRequest'];
+
+            if ($synchronRequest) {
+                unset($conf['synchronRequest']);
+            }
+
             if (extension_loaded("sysvsem")) {
                 $lock = new Lock(
-                    array_key_exists('synchronRequest', $conf) && $conf['synchronRequest'],
+                    $synchronRequest,
                     (Config::getInstance())->get('maxProc'),
                     (Config::getInstance())->get('maxProcHighPrio')
                 );
