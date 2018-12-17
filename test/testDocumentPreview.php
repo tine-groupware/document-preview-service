@@ -14,9 +14,9 @@ final class testDocumentPreview extends TestCase
         (Config::getInstance())->initialize(new \Zend\Config\Config([]));
     }
 
-    /**
+    /*
      * @dataProvider dataSemAcquireBlock
-     */
+     *//*
     public function testSemAcquireBlock($maxProc, $expected)
     {
         $docPre = new docPre(['tempDir' => '/tmp']);
@@ -41,11 +41,12 @@ final class testDocumentPreview extends TestCase
             [1, true],
             [0, false]
         ];
-    }
+    }*/
 
-    /**
+
+    /*
      * @dataProvider dataSemAcquireTimeOut
-     */
+     *//*
     public function testSemAcquireTimeOut($timeOut)
     {
         $docPre = new docPre(['timeOut' => $timeOut, 'tempDir' => '/tmp']);
@@ -68,5 +69,5 @@ final class testDocumentPreview extends TestCase
 
     public function dataSemAcquireTimeOut(){
         return[[10], [5], [30]];
-    }
+    }*/
 }
