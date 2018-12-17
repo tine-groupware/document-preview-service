@@ -104,7 +104,7 @@ class ErrorHandler
     {
         if (null !== $this->logger) {
             $this->log(
-                $exception->getStatusCode() < 400 ? Logger::INFO : Logger::ALERT,
+                $exception->getStatusCode() < 500 ? Logger::INFO : Logger::ALERT,
                 $exception->getMessage(),
                 $exception->getCode()
             );

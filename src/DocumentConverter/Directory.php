@@ -56,7 +56,14 @@ class Directory
             if (!is_file($this->path.'/'.$file)) {
                 continue;
             }
-            $rtn[] = new $class($this->path.'/'.$file);
+            $f = new $class($this->path.'/'.$file);
+            if (null === $f) {
+                throw new DocumentPreviewException('Cound not load file', 502, 500);
+            }
+            $rtn[] = $f;
+        }
+        if ([] == $rtn) {
+            throw new DocumentPreviewException('No files found in dir', 503, 500);
         }
         return $rtn;
     }

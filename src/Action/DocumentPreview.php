@@ -46,6 +46,7 @@ class DocumentPreview implements MiddlewareInterface
                     (Config::getInstance())->get('maxProcHighPrio')
                 );
                 $semAcq = $lock->lock();
+                //$semAcq = $this->lockAcquire($lock);
                 if (false === $semAcq) {
                     (ErrorHandler::getInstance())->log(Logger::INFO, "Service occupied", __METHOD__);
                     return new TextResponse("Service occupied", 423);
@@ -167,47 +168,14 @@ class DocumentPreview implements MiddlewareInterface
         return $files;
     }
 
-    /**
-     * Acquire Semaphore
-     *
-     * @param resource $semaphore "
-     *
-     * @return bool
-     *
-     * @throws DocumentPreviewException Config not initialized
-     */
-    protected function semAcquire($semaphore): bool
+    protected function lockAcquire($lock): bool
     {
         $timeStarted = time();
         do {
-            $semAcq = sem_acquire($semaphore, true);
+            $semAcq = $lock->lock();
             usleep(10000);
         } while (false === $semAcq && time() - $timeStarted < (Config::getInstance())->get('semTimeOut'));
         return $semAcq;
-    }
-
-    /**
-     * Init Semaphore
-     *
-     * @return resource semaphore
-     * @throws DocumentPreviewException config not initialized
-     * @throws DocumentPreviewException logger not initialized
-     * @throws DocumentPreviewException systemv fail
-     */
-    protected function getSem()
-    {
-        $ipcId = ftok(__FILE__, 'g');
-        if (-1 === $ipcId) {
-            (ErrorHandler::getInstance())->log(Logger::ERR, "Could not generate ftok", __METHOD__);
-            throw new DocumentPreviewException('Could not generate ftok', 105, 500);
-        }
-
-        $semaphore = sem_get($ipcId, (Config::getInstance())->get('maxProc'));
-        if (false === $semaphore) {
-            (ErrorHandler::getInstance())->log(Logger::ERR, "Failed not get semaphore", __METHOD__);
-            throw new DocumentPreviewException('Failed not get semaphore', 106, 500);
-        }
-        return $semaphore;
     }
 
     /**
