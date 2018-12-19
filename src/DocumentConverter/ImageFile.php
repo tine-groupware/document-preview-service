@@ -4,7 +4,6 @@ namespace DocumentService\DocumentConverter;
 
 use DocumentService\DocumentPreviewException;
 use DocumentService\ErrorHandler;
-use Exception;
 use Zend\Log\Logger;
 
 /**

@@ -7,7 +7,6 @@ use DocumentService\DocumentConverter\DocumentFile;
 use DocumentService\DocumentConverter\File;
 use DocumentService\DocumentConverter\ImageFile;
 use DocumentService\DocumentConverter\PdfFile;
-use Exception;
 
 /**
  * Converts multible files to to specs
@@ -228,14 +227,14 @@ class DocumentConverter
      * @param array $files "
      *
      * @return void
-     * @throws DocumentPreviewException file types differ
+     * @throws BadRequestException file types differ
      */
     protected function checkAllSame(array $files): void
     {
         $class = get_class($files[0]);
         foreach ($files as $file) {
             if (get_class($file) != $class) {
-                throw new DocumentPreviewException('file types differ', 202, 400);
+                throw new BadRequestException('file types differ', 202, 400);
             }
         }
     }

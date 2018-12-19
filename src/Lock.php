@@ -134,7 +134,6 @@ class Lock
         return true;
     }
 
-
     /**
      * Unlocks
      *
@@ -180,4 +179,3 @@ class Lock
         return true;
     }
 }
-
