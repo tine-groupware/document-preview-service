@@ -93,10 +93,10 @@ class Lock
             throw new DocumentPreviewException('Failed to acquire semaphore', 0);
         }
 
-        $shm_id = shmop_open($this->key, 'n', 0644, 2);
-        if (false != $shm_id) {
-            $locks = [1 => $this->maxLowPrio, 2=> $this->maxHighPrio];
-        } else {
+        // Suppress shmop_open(): unable to attach or create shared memory segment 'File exists'
+        // shmop_open(create) is used to test, if shared memory is initialised
+        @ $shm_id = shmop_open($this->key, 'n', 0644, 2);
+        if (false == $shm_id) {
             $shm_id = shmop_open($this->key, 'c', 0644, 2);
             if (false == $shm_id) {
                 throw new DocumentPreviewException('Failed to open shared memory', 0);
@@ -106,6 +106,8 @@ class Lock
                 throw new DocumentPreviewException('Failed to read shared memory', 0);
             }
             $locks = unpack('C*', $mem);
+        } else {
+            $locks = [1 => $this->maxLowPrio, 2=> $this->maxHighPrio];
         }
 
         if (Lock::LOWPRIORITY == $this->prio && $locks[1] - ($this->maxHighPrio - $locks[2]) > 0) {
