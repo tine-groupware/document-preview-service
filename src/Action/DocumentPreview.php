@@ -2,9 +2,11 @@
 
 namespace DocumentService\Action;
 
+use DocumentService\BadRequestException;
 use DocumentService\DocumentConverter\Config;
 use DocumentService\DocumentPreviewException;
 use DocumentService\ErrorHandler;
+use DocumentService\ExtensionDoseNotMatchMineTypeException;
 use DocumentService\Lock;
 use Psr\Http\Message\ServerRequestInterface;
 use Psr\Http\Server\MiddlewareInterface;
@@ -65,9 +67,14 @@ class DocumentPreview implements MiddlewareInterface
 
             $rtn = (new DocumentConverter())($files, $conf);
 
-            (ErrorHandler::getInstance())->log(Logger::DEBUG, "Converted files in ".
-                (string)(microtime(true) - $startTime) ." seconds.", $files[0]->getMd5Hash());
-
+            (ErrorHandler::getInstance())->log(Logger::DEBUG, "Converted files in " .
+                (string)(microtime(true) - $startTime) . " seconds.", $files[0]->getMd5Hash());
+        } catch (ExtensionDoseNotMatchMineTypeException $exception) {
+            (ErrorHandler::getInstance())->log(Logger::INFO, $exception->getMessage(), $exception->getCode());
+            return (ErrorHandler::getInstance())->getResponse($exception);
+        } catch (BadRequestException $exception) {
+            (ErrorHandler::getInstance())->log(Logger::INFO, $exception->getMessage(), $exception->getCode());
+            return (ErrorHandler::getInstance())->getResponse($exception);
         } catch (DocumentPreviewException $exception) {
             return (ErrorHandler::getInstance())->handelException($exception);
         } finally {
@@ -123,18 +130,18 @@ class DocumentPreview implements MiddlewareInterface
      * @param ServerRequestInterface $request "
      *
      * @return array
-     * @throws DocumentPreviewException Bad config
+     * @throws BadRequestException Bad config
      */
     protected function getConf(ServerRequestInterface $request): array
     {
         if (false === isset($request->getParsedBody()["config"])) {
-            throw new DocumentPreviewException("Bad request missing arguments", 111, 400);
+            throw new BadRequestException("Bad request missing arguments", 111, 400);
         }
         $json = $request->getParsedBody()["config"];
 
         $conf = json_decode($json, true);
         if (false === $this->checkConfig()) {
-            throw new DocumentPreviewException("Bad request JSON error", 112, 400);
+            throw new BadRequestException("Bad request JSON error", 112, 400);
         }
         return $conf;
     }
@@ -146,8 +153,9 @@ class DocumentPreview implements MiddlewareInterface
      *
      * @return array
      * @throws DocumentPreviewException config not initialized
-     * @throws DocumentPreviewException config file upload error
-     * @throws DocumentPreviewException config file creation error
+     * @throws BadRequestException file upload error
+     * @throws BadRequestException file creation error
+     * @throws ExtensionDoseNotMatchMineTypeException
      */
     protected function getFiles(ServerRequestInterface $request): array
     {
@@ -156,14 +164,14 @@ class DocumentPreview implements MiddlewareInterface
         } elseif (array_key_exists('files', $request->getUploadedFiles())) {
             $UploadedFiles = $request->getUploadedFiles()['files'];
         } else {
-            throw new DocumentPreviewException("Parameter file or files not set", 103, 400);
+            throw new BadRequestException("Parameter file or files not set", 103, 400);
         }
 
 
         $files = [];
         foreach ($UploadedFiles as $UploadedFile) {
             if (null == $UploadedFile || UPLOAD_ERR_OK !== $UploadedFile->getError()) {
-                throw new DocumentPreviewException('No File Uploaded', 104, 400);
+                throw new BadRequestException('No File Uploaded', 104, 400);
             }
             $path = (Config::getInstance())->get('tempDir') . uniqid() . basename($UploadedFile->getClientFilename());
             $UploadedFile->moveTo($path);
@@ -174,6 +182,12 @@ class DocumentPreview implements MiddlewareInterface
         return $files;
     }
 
+
+    /**
+     * @param $lock Lock
+     * @return bool true if lock acquire
+     * @throws DocumentPreviewException config not initialised
+     */
     protected function lockAcquire($lock): bool
     {
         $timeStarted = time();

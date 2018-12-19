@@ -4,6 +4,7 @@ namespace DocumentService\DocumentConverter;
 
 use DocumentService\DocumentPreviewException;
 use DocumentService\ErrorHandler;
+use DocumentService\ExtensionDoseNotMatchMineTypeException;
 use Zend\Log\Logger;
 
 abstract class File
@@ -19,6 +20,7 @@ abstract class File
      *
      * @throws DocumentPreviewException Not a readable file
      * @throws DocumentPreviewException config not initialized
+     * @throws ExtensionDoseNotMatchMineTypeException
      */
     public function __construct(string $path, bool $reference = false)
     {
@@ -35,11 +37,7 @@ abstract class File
                     unlink($path);
                 }
                 (ErrorHandler::getInstance())->log(Logger::DEBUG, "path: " . $path, __METHOD__);
-                throw new DocumentPreviewException(
-                    "Extension ($ext) dose not match mime-type " . mime_content_type($path),
-                    703,
-                    422
-                );
+                throw new ExtensionDoseNotMatchMineTypeException($ext, mime_content_type($path), 703);
             }
         } else {
             (ErrorHandler::getInstance())->log(Logger::INFO, "Unmaped extension " . $ext, __METHOD__);
@@ -122,6 +120,7 @@ abstract class File
      * @throws DocumentPreviewException Exception Not a readable file
      * @throws DocumentPreviewException config not initialized
      * @throws DocumentPreviewException file extension unknown
+     * @throws ExtensionDoseNotMatchMineTypeException
      */
     public static function fromPath(string $path): File
     {

@@ -106,7 +106,7 @@ class ErrorHandler
     /**
      * Logs Exception and returns error response
      *
-     * @param Exception $exception "
+     * @param DocumentPreviewException $exception "
      *
      * @return ResponseInterface
      */
@@ -138,7 +138,7 @@ class ErrorHandler
         $message = 'Internal server error';
         $code = $exception->getCode();
         $status = $exception->getStatusCode();
-        if ($status < 400) {
+        if ($status < 500) {
             $message = $exception->getMessage();
         }
         return new TextResponse("$message - $code - $this->uid", $status);
