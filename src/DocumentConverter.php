@@ -170,6 +170,13 @@ class DocumentConverter
     {
         $configuration = [];
         foreach ($config as $key => $conf) {
+            if (! is_array($conf)) {
+                // TODO make logger work
+//                (ErrorHandler::getInstance())->log(Logger::WARN, "invalid config option: "
+//                    . $key . '=' . $conf, __METHOD__);
+                continue;
+            }
+
             $cnf = [
                 'firstPage' => false,
                 'fileType' => 'png',
