@@ -170,6 +170,10 @@ class DocumentConverter
     {
         $configuration = [];
         foreach ($config as $key => $conf) {
+            if (! is_array($conf)) {
+                continue;
+            }
+
             $cnf = [
                 'firstPage' => false,
                 'fileType' => 'png',
