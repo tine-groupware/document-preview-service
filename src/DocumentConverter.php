@@ -7,6 +7,7 @@ use DocumentService\DocumentConverter\DocumentFile;
 use DocumentService\DocumentConverter\File;
 use DocumentService\DocumentConverter\ImageFile;
 use DocumentService\DocumentConverter\PdfFile;
+use DocumentService\DocumentConverter\Request;
 
 /**
  * Converts multible files to to specs
@@ -22,31 +23,31 @@ class DocumentConverter
      * Converts multible files to to specs
      *
      * @param array $files files to convert
-     * @param array $conf  config
+     * @param array $requests  config
      *
      * @return array base64 encoded results
      * @throws DocumentPreviewException
      */
-    public function __invoke(array $files, array $conf): array
+    public function __invoke(array $files, array $requests): array
     {
         $this->checkAllSame($files);
 
-        $conf = $this->cleanConf($conf);
+        $requests = new Request();
 
         $rtn = [];
 
 
         if ($files[0] instanceof DocumentFile) {
-            foreach ($conf as $key => $cnf) {
-                $rtn[$key] = File::toBase64Array($this->convertToDoc($files, $cnf));
+            foreach ($requests as $key => $request) {
+                $rtn[$key] = File::toBase64Array($this->convertToDoc($files, $request));
             }
         } elseif ($files[0] instanceof PdfFile) {
-            foreach ($conf as $key => $cnf) {
-                $rtn[$key] = File::toBase64Array($this->mergePdf($files, $cnf));
+            foreach ($requests as $key => $request) {
+                $rtn[$key] = File::toBase64Array($this->mergePdf($files, $request));
             }
         } elseif ($files[0] instanceof ImageFile) {
-            foreach ($conf as $key => $cnf) {
-                $rtn[$key] = File::toBase64Array($this->convertToImage($files, $cnf));
+            foreach ($requests as $key => $request) {
+                $rtn[$key] = File::toBase64Array($this->convertToImage($files, $$request));
             }
         } else {
             throw new DocumentPreviewException('file extension unknown', 201, 415);
@@ -60,73 +61,73 @@ class DocumentConverter
      * pass them on or break if the specified filetype is reached
      *
      * @param array $files "
-     * @param array $conf  "
+     * @param Request $request  "
      *
      * @return array
      * @throws DocumentPreviewException config not initialized
      */
-    protected function convertToDoc(array $files, array $conf): array
+    protected function convertToDoc(array $files, Request $request): array
     {
-        if (in_array(mb_strtolower($conf['fileType']), (Config::getInstance())->get('docExt'))) {
+        if (in_array(mb_strtolower($request->fileType), (Config::getInstance())->get('docExt'))) {
             return $files;
         }
-        return $this->convertToPdf($files, $conf);
+        return $this->convertToPdf($files, $request);
     }
 
     /**
      * Converts DocumentFiles to PdfFiles
      *
      * @param array $files "
-     * @param array $conf  "
+     * @param Request $request  "
      *
      * @return array
      * @throws DocumentPreviewException pdf merge fails
      */
-    protected function convertToPdf(array $files, array $conf): array
+    protected function convertToPdf(array $files, Request $request): array
     {
         $pdfs = [];
 
         foreach ($files as $file) {
             $pdfs[] = $file->convertToPdf();
         }
-        return $this->mergePdf($pdfs, $conf);
+        return $this->mergePdf($pdfs, $request);
     }
 
     /**
      * Merges PdfFiles in array order
      *
      * @param array $files "
-     * @param array $conf  "
+     * @param Request $request  "
      *
      * @return array
      * @throws DocumentPreviewException pdf merge fail
      * @throws DocumentPreviewException config not initialized
      */
-    protected function mergePdf(array $files, array $conf): array
+    protected function mergePdf(array $files, Request $request): array
     {
-        if (true === $conf['merge'] && count($files) > 1) {
+        if (true === $request->merge && count($files) > 1) {
             $files = [PdfFile::merge($files)];
         }
-        if (in_array(mb_strtolower($conf['fileType']), (Config::getInstance())->get('pdfExt'))) {
+        if (in_array(mb_strtolower($request->fileType), (Config::getInstance())->get('pdfExt'))) {
             return $files;
         }
-        return $this->convertToPng($files, $conf);
+        return $this->convertToPng($files, $request);
     }
 
     /**
      * Converts PDFFiles To Png
      *
      * @param array $files "
-     * @param array $conf  "
+     * @param Request $request  "
      *
      * @return array
      */
-    protected function convertToPng(array $files, array $conf): array
+    protected function convertToPng(array $files, Request $request): array
     {
         $images = [];
 
         foreach ($files as $file) {
-            if (false == $conf['firstPage']) {
+            if (false == $request->firstPage) {
                 foreach ($file->convertToPng() as $image) {
                     $images[] = $image;
                 }
@@ -135,7 +136,7 @@ class DocumentConverter
             }
         }
 
-        return $this->convertToImage($images, $conf);
+        return $this->convertToImage($images, $request);
     }
 
 
@@ -143,83 +144,20 @@ class DocumentConverter
      * Converts images to images and changes size
      *
      * @param array $files "
-     * @param array $conf  "
+     * @param Request $request  "
      *
      * @return array
      */
-    protected function convertToImage(array $files, array $conf): array
+    protected function convertToImage(array $files, Request $request): array
     {
         $images = [];
 
         foreach ($files as $file) {
-            $images[] = $file->fitToSize($conf['fileType'], $conf['x'], $conf['y'], $conf['color']);
+            $images[] = $file->fitToSize($request->fileType, $request->x, $request->y, $request->color);
         }
         return $images;
     }
 
-    /**
-     * Creates a clean config
-     *
-     * @param array $config "
-     *
-     * @return array
-     *
-     * todo find better solution
-     */
-    protected function cleanConf(array $config): array
-    {
-        $configuration = [];
-        foreach ($config as $key => $conf) {
-            $cnf = [
-                'firstPage' => false,
-                'fileType' => 'png',
-                'x' => 200,
-                'y' => 200,
-                'color' => false,
-                'merge' => true,
-            ];
-
-            if (array_key_exists('firstPage', $conf)
-                && isset($conf['firstPage'])
-                && ('true' === $conf['firstPage'] || true === $conf['firstPage'])
-            ) {
-                $cnf['firstPage'] = true;
-            }
-            if (array_key_exists('firstpage', $conf)
-                && isset($conf['firstpage'])
-                && ('true' === $conf['firstpage'] || true === $conf['firstpage'])
-            ) {
-                $cnf['firstPage'] = true; //compensate inconsistent api desing
-            }
-            if (array_key_exists('filetype', $conf) && isset($conf['filetype'])) {
-                $cnf['fileType'] = mb_strtolower($conf['filetype']);
-            }
-            if (array_key_exists('fileType', $conf) && isset($conf['fileType'])) {
-                $cnf['fileType'] = mb_strtolower($conf['fileType']); //same as above
-            }
-            if (array_key_exists('x', $conf) && isset($conf['x'])) {
-                $cnf['x'] = $conf['x'];
-            }
-            if (array_key_exists('y', $conf) && isset($conf['y'])) {
-                $cnf['y'] = $conf['y'];
-            }
-            if (array_key_exists('color', $conf)
-                && isset($conf['color'])
-                && !('false' === $conf['color'] || false === $conf['color'])
-            ) {
-                $cnf['color'] = mb_strtolower($conf['color']);
-            }
-            if (array_key_exists('merge', $conf)
-                && isset($conf['merge'])
-                && ('false' === $conf['merge'] || false === $conf['merge'])
-            ) {
-                $cnf['merge'] = false;
-            }
-
-            $configuration[$key] = $cnf;
-        }
-        return $configuration;
-    }
 
     /**
      * Checks if all files have the same type
