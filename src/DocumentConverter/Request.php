@@ -2,6 +2,9 @@
 
 namespace DocumentService\DocumentConverter;
 
+use DocumentService\ErrorHandler;
+use Zend\Log\Logger;
+
 class Request
 {
     public $firstPage = false;
@@ -15,6 +18,13 @@ class Request
     {
         $requests = [];
         foreach ($requestConfig as $key => $conf) {
+            if (is_array($conf) != true) {
+                if ($key != "synchronRequest") {
+                    ErrorHandler::getInstance()->log(Logger::NOTICE, "Unknown array option: " . $key ." => " . $conf);
+                }
+                continue;
+            }
+
             $request = new Request();
 
             $request->firstPage = (
@@ -28,7 +38,7 @@ class Request
                 && ('true' === $conf['firstpage'] || true === $conf['firstpage'])
             );
 
-            $request['merge'] =  ! (
+            $request->merge =  ! (
                    array_key_exists('merge', $conf)
                 && isset($conf['merge'])
                 && ('false' === $conf['merge'] || false === $conf['merge'])

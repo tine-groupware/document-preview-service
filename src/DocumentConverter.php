@@ -32,7 +32,7 @@ class DocumentConverter
     {
         $this->checkAllSame($files);
 
-        $requests = new Request();
+        $requests = Request::newRequests($requests);
 
         $rtn = [];
 
