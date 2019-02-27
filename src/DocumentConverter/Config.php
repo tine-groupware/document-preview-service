@@ -88,7 +88,7 @@ class Config
                 )->toArray();
             case 'tempdir':
                 $dir = $this->config->get('tempDir', '/tmp');
-                if (substr($dir, 1) !== '/') {
+                if (substr($dir, -1) !== '/') {
                     $dir .= '/';
                 }
                 return $dir;
