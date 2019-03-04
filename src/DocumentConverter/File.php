@@ -28,9 +28,9 @@ abstract class File
             throw new DocumentPreviewException("Not a readable file", 701, 500);
         }
 
-        $ext = pathinfo($path)['extension'];
+        $ext =  strtolower(pathinfo($path)['extension']);
 
-        if (array_key_exists($ext, (Config::getInstance())->get('extToMime'))) {
+        if (array_key_exists(strtolower($ext), (Config::getInstance())->get('extToMime'))) {
             if ((Config::getInstance())->get('extToMime')[$ext] != mime_content_type($path)
             ) {
                 if ($reference) {

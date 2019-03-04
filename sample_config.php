@@ -5,7 +5,8 @@ return [
         "tempDir" => "/var/lib/documentPreviewService/", //temp folder, must be rw
         "maxProc" => 4, //maximum concurrent conversions
         "loggerOut" => "/var/log/documentPreviewService/doc.log", // log file documentPreview, can be a file path (or a zend logger)
-        "ooBinary"=>'soffice'
+	"ooBinary"=>'soffice',
+	"logLevel" => "8",
     ],
     'authLogger' => '/var/log/documentPreviewService/auth.log', // auth logger, can be a file path (or a zend logger)
     'sentryio' => 'https://<key>:<secret>@sentry.io/<project>', //sentry uri

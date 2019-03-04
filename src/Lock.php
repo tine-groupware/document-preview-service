@@ -52,7 +52,9 @@ class Lock
             throw new DocumentPreviewException('Failed to acquire semaphore', 0);
         }
 
-        $shm_id = shmop_open($this->key, 'n', 0644, 2);
+        // Suppress shmop_open(): unable to attach or create shared memory segment 'File exists'
+        // shmop_open(create) is used to test, if shared memory is initialised
+        @ $shm_id = shmop_open($this->key, 'n', 0644, 2);
         if (false != $shm_id) {
             $locks = [1 => $this->maxLowPrio, 2=> $this->maxHighPrio];
         } else {
