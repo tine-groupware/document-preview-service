@@ -4,7 +4,6 @@
 
 namespace DocumentService;
 
-use Exception;
 use Psr\Http\Message\ResponseInterface;
 use Psr\Http\Message\ServerRequestInterface;
 use Raven_Client;

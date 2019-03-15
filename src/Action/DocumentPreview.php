@@ -4,6 +4,7 @@ namespace DocumentService\Action;
 
 use DocumentService\BadRequestException;
 use DocumentService\DocumentConverter\Config;
+use DocumentService\DocumentConverter\FileSystem\File;
 use DocumentService\DocumentPreviewException;
 use DocumentService\ErrorHandler;
 use DocumentService\ExtensionDoseNotMatchMineTypeException;
@@ -40,6 +41,9 @@ class DocumentPreview implements MiddlewareInterface
 
         try {
             $conf = $this->getConf($request);
+            $files = $this->getFiles($request);
+
+            //priority queuing
 
             $synchronRequest = array_key_exists('synchronRequest', $conf) && $conf['synchronRequest'];
 
@@ -53,15 +57,12 @@ class DocumentPreview implements MiddlewareInterface
                     (Config::getInstance())->get('maxProc'),
                     (Config::getInstance())->get('maxProcHighPrio')
                 );
-                $semAcq = $lock->lock();
-                //$semAcq = $this->lockAcquire($lock);
+                $semAcq = $this->lockAcquire($lock);
                 if (false === $semAcq) {
                     (ErrorHandler::getInstance())->log(Logger::INFO, "Service occupied", __METHOD__);
                     return new TextResponse("Service occupied", 423);
                 }
             }
-
-            $files = $this->getFiles($request);
 
             $startTime = microtime(true);
 
@@ -175,7 +176,7 @@ class DocumentPreview implements MiddlewareInterface
             }
             $path = (Config::getInstance())->get('tempDir') . uniqid() . basename($UploadedFile->getClientFilename());
             $UploadedFile->moveTo($path);
-            $file = DocumentConverter\File::fromPath($path);
+            $file = new File($path);
             unlink($path);
             $files[] = $file;
         }

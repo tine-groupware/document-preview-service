@@ -1,34 +1,39 @@
 <?php declare(strict_types=1);
 
-namespace DocumentService\DocumentConverter;
+namespace DocumentService\DocumentConverter\FileSystem;
 
+use DocumentService\DocumentConverter\Config;
 use DocumentService\DocumentPreviewException;
 use DocumentService\ErrorHandler;
 use DocumentService\ExtensionDoseNotMatchMineTypeException;
 use Zend\Log\Logger;
 
-abstract class File
+class File
 {
     protected $path;
     protected $reference;
+    protected $format;
 
     /**
      * File constructor.
      *
-     * @param string $path      "
-     * @param bool   $reference "
+     * @param string $path "
+     * @param bool $reference "
      *
-     * @throws DocumentPreviewException Not a readable file
-     * @throws DocumentPreviewException config not initialized
-     * @throws ExtensionDoseNotMatchMineTypeException
+     * @param string|null $format
      */
-    public function __construct(string $path, bool $reference = false)
+    public function __construct(string $path, bool $reference = false, string $format = null)
     {
         if (!is_file($path) && !is_readable($path)) {
             throw new DocumentPreviewException("Not a readable file", 701, 500);
         }
 
         $ext =  strtolower(pathinfo($path)['extension']);
+
+        if (null === $format) {
+            $format = $ext;
+        }
+        $this->format = $format;
 
         if (array_key_exists(strtolower($ext), (Config::getInstance())->get('extToMime'))) {
             if ((Config::getInstance())->get('extToMime')[$ext] != mime_content_type($path)
@@ -86,6 +91,11 @@ abstract class File
         return md5_file($this->path);
     }
 
+    public function getFormat()
+    {
+        return $this->format;
+    }
+
     /**
      * Remove file, when no longer needed
      */
@@ -109,30 +119,5 @@ abstract class File
             $rtn[] = $file->getBase64();
         }
         return $rtn;
-    }
-
-    /**
-     * Creates a new File the class is selected based on the extention
-     *
-     * @param string $path "
-     *
-     * @return File
-     * @throws DocumentPreviewException Exception Not a readable file
-     * @throws DocumentPreviewException config not initialized
-     * @throws DocumentPreviewException file extension unknown
-     * @throws ExtensionDoseNotMatchMineTypeException
-     */
-    public static function fromPath(string $path): File
-    {
-        $ext = pathinfo($path)['extension'];
-        if (in_array(mb_strtolower($ext), (Config::getInstance())->get('docExt'))) {
-            return new DocumentFile($path);
-        } elseif (in_array(mb_strtolower($ext), (Config::getInstance())->get('pdfExt'))) {
-            return new PdfFile($path);
-        } elseif (in_array(mb_strtolower($ext), (Config::getInstance())->get('imgExt'))) {
-            return new ImageFile($path);
-        } else {
-            throw new DocumentPreviewException('file extension unknown', 702, 415);
-        }
     }
 }

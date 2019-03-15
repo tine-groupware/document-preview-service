@@ -2,8 +2,6 @@
 
 namespace DocumentService\DocumentConverter;
 
-use DocumentService\DocumentPreviewException;
-
 /**
  * Singleton wrapper for zend config
  *
