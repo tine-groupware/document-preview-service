@@ -30,7 +30,8 @@ class File
 
         (ErrorHandler::getInstance())->log(
             Logger::DEBUG,
-            "Call create file. reference: $reference  path: " . $path,
+            "Call create file. reference: $reference  path: " . $path . "\n"
+            . json_encode(debug_backtrace($options = 2, 4)),
             "FILECYCLEDEBUG"
         );
 
