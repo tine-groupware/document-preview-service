@@ -28,6 +28,12 @@ class File
             throw new DocumentPreviewException("Not a readable file", 701, 500);
         }
 
+        (ErrorHandler::getInstance())->log(
+            Logger::DEBUG,
+            "Call create file. reference: $reference  path: " . $path,
+            "FILECYCLEDEBUG"
+        );
+
         $ext =  strtolower(pathinfo($path)['extension']);
 
         if (null === $format) {
@@ -41,7 +47,11 @@ class File
                 if ($reference) {
                     unlink($path);
                 }
-                (ErrorHandler::getInstance())->log(Logger::DEBUG, "path: " . $path, __METHOD__);
+                (ErrorHandler::getInstance())->log(
+                    Logger::DEBUG,
+                    "path: " . $path . " mimetype: \"" . mime_content_type($path) . "\"",
+                    __METHOD__
+                );
                 throw new ExtensionDoseNotMatchMineTypeException($ext, mime_content_type($path), 703);
             }
         } else {
@@ -57,6 +67,12 @@ class File
         } else {
             $this->path = $path;
         }
+
+        (ErrorHandler::getInstance())->log(
+            Logger::DEBUG,
+            "Created file. reference: $reference  path: " . $path,
+            "FILECYCLEDEBUG"
+        );
     }
 
 
@@ -101,6 +117,11 @@ class File
      */
     public function __destruct()
     {
+        (ErrorHandler::getInstance())->log(
+            Logger::DEBUG,
+            "Created file. reference: $this->reference  path: " . $this->path,
+            "FILECYCLEDEBUG"
+        );
         unlink($this->path);
     }
 
