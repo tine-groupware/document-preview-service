@@ -21,12 +21,18 @@ class PdfMergeFinalizer implements Finalizer
 
     public function convert(array $files, Request $request): array
     {
-        if (true === $request->merge) {
+        if (true === $request->merge && sizeof($files) > 1) {
             return $this->mergePdfs($files);
         }
         return $files;
     }
 
+    /**
+     * @param array $files
+     * @return File[]
+     * @throws DocumentPreviewException
+     * @throws \DocumentService\ExtensionDoseNotMatchMineTypeException
+     */
     protected function mergePdfs(array $files)
     {
         $path = Config::getInstance()->get('tempdir').uniqid('file_', true).'.'.'pdf';

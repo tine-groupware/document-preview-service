@@ -31,6 +31,12 @@ class PdfToImage implements Converter
         return ['jpg', 'jpeg', 'gif', 'tiff', 'png'];
     }
 
+    /**
+     * @param File $file
+     * @param Request $request
+     * @return File[]
+     * @throws DocumentPreviewException
+     */
     public function convert(File $file, Request $request): array
     {
         $dir = new Directory();

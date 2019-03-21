@@ -31,6 +31,13 @@ class ImageToImage implements Converter
         return [];
     }
 
+    /**
+     * @param File $file
+     * @param Request $request
+     * @return File[]
+     * @throws DocumentPreviewException
+     * @throws \DocumentService\ExtensionDoseNotMatchMineTypeException
+     */
     public function convert(File $file, Request $request): array
     {
         $path = Config::getInstance()->get('tempdir').uniqid('file_', true).'.'.$request->fileType;
