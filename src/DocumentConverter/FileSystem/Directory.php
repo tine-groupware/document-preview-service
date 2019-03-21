@@ -1,7 +1,8 @@
 <?php declare(strict_types=1);
 
-namespace DocumentService\DocumentConverter;
+namespace DocumentService\DocumentConverter\FileSystem;
 
+use DocumentService\DocumentConverter\Config;
 use DocumentService\DocumentPreviewException;
 
 /**
@@ -37,6 +38,7 @@ class Directory
         return $this->path;
     }
 
+
     /**
      * Returns all files in dir as $class
      *
@@ -45,7 +47,7 @@ class Directory
      * @return array of files of type $class
      * @throws DocumentPreviewException Scan dir failed
      */
-    public function getFiles(string $class): array
+    public function getFiles(string $format): array
     {
         $rtn = [];
         $files = scandir($this->path);
@@ -56,7 +58,7 @@ class Directory
             if (!is_file($this->path.'/'.$file)) {
                 continue;
             }
-            $f = new $class($this->path.'/'.$file);
+            $f = new File($this->path.'/'.$file, false, $format);
             if (null === $f) {
                 throw new DocumentPreviewException('Cound not load file', 502, 500);
             }

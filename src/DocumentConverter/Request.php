@@ -8,7 +8,8 @@ use Zend\Log\Logger;
 class Request
 {
     public $firstPage = false;
-    public $fileType = 'png';
+    public $fileTypes = ['png'];
+    public $fileType;
     public $x = 200;
     public $y = 200;
     public $color = false;
@@ -45,17 +46,35 @@ class Request
             );
 
             if (array_key_exists('filetype', $conf) && isset($conf['filetype'])) {
-                $request->fileType = mb_strtolower($conf['filetype']);
+                if (is_array($conf['filetype'])) {
+                    $request->fileTypes = [];
+                    foreach ($conf['filetype'] as $type) {
+                        $request->fileTypes []= mb_strtolower($type);
+                    }
+                } else {
+                    $request->fileTypes = [mb_strtolower($conf['filetype'])];
+                }
             }
+
             if (array_key_exists('fileType', $conf) && isset($conf['fileType'])) {
-                $request->fileType = mb_strtolower($conf['fileType']);
+                if (is_array($conf['fileType'])) {
+                    $request->fileTypes = [];
+                    foreach ($conf['fileType'] as $type) {
+                        $request->fileTypes []= mb_strtolower($type);
+                    }
+                } else {
+                    $request->fileTypes = [mb_strtolower($conf['fileType'])];
+                }
             }
+
             if (array_key_exists('x', $conf) && isset($conf['x'])) {
                 $request->x = $conf['x'];
             }
+
             if (array_key_exists('y', $conf) && isset($conf['y'])) {
                 $request->y = $conf['y'];
             }
+
             if (array_key_exists('color', $conf)
                 && isset($conf['color'])
                 && !('false' === $conf['color'] || false === $conf['color'])
