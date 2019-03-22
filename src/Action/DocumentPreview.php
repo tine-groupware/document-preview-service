@@ -14,6 +14,7 @@ use Psr\Http\Server\MiddlewareInterface;
 use Psr\Http\Server\RequestHandlerInterface;
 use Zend\Diactoros\Response\JsonResponse;
 use Zend\Diactoros\Response\TextResponse;
+use Zend\Log\Formatter\Simple;
 use Zend\Log\Writer\Stream;
 use Zend\Log\Logger;
 use DocumentService\DocumentConverter;
@@ -33,6 +34,8 @@ class DocumentPreview implements MiddlewareInterface
      */
     public function process(ServerRequestInterface $request, RequestHandlerInterface $delegate): ResponseInterface
     {
+        (ErrorHandler::getInstance())->dlog("Client Connected", __METHOD__);
+
         $lock = null;
         $semAcq = false;
         $rtn = null;
@@ -59,6 +62,7 @@ class DocumentPreview implements MiddlewareInterface
                 );
                 $semAcq = $this->lockAcquire($lock);
                 if (false === $semAcq) {
+                    (ErrorHandler::getInstance())->dlog("Error: Service occupied", __METHOD__);
                     (ErrorHandler::getInstance())->log(Logger::INFO, "Service occupied", __METHOD__);
                     return new TextResponse("Service occupied", 423);
                 }
@@ -71,9 +75,11 @@ class DocumentPreview implements MiddlewareInterface
             (ErrorHandler::getInstance())->log(Logger::DEBUG, "Converted files in " .
                 (string)(microtime(true) - $startTime) . " seconds.", $files[0]->getMd5Hash());
         } catch (ExtensionDoseNotMatchMineTypeException $exception) {
+            (ErrorHandler::getInstance())->dlog("Error: ExtensionDoseNotMatchMineTypeException", __METHOD__);
             (ErrorHandler::getInstance())->log(Logger::INFO, $exception->getMessage(), $exception->getCode());
             return (ErrorHandler::getInstance())->getResponse($exception);
         } catch (BadRequestException $exception) {
+            (ErrorHandler::getInstance())->dlog("Error: BadRequestException", __METHOD__);
             (ErrorHandler::getInstance())->log(Logger::INFO, $exception->getMessage(), $exception->getCode());
             return (ErrorHandler::getInstance())->getResponse($exception);
         } catch (DocumentPreviewException $exception) {
@@ -87,6 +93,8 @@ class DocumentPreview implements MiddlewareInterface
         }
 
         clearstatcache();
+
+        (ErrorHandler::getInstance())->dlog("Success", __METHOD__);
 
         return new JsonResponse($rtn);
     }
@@ -113,6 +121,18 @@ class DocumentPreview implements MiddlewareInterface
             $writer->addFilter($filter);
             $logger = new Logger();
             $logger->addWriter($writer);
+        }
+
+        $dloggerOut = $config->get('dloggerOut', '/dev/zero');
+        if ($dloggerOut !== '/dev/zero') {
+            $dwriter = new Stream($dloggerOut);
+            $dfilter = new \Zend\Log\Filter\Priority($config->get('dlogLevel', Logger::DEBUG));
+            $dwriter->addFilter($dfilter);
+            $formatter = new Simple('%message%,' . PHP_EOL);
+            $dwriter->setFormatter($formatter);
+            $dlogger = new Logger();
+            $dlogger->addWriter($dwriter);
+            (ErrorHandler::getInstance())->setDlogger($dlogger);
         }
 
         (Config::getInstance())->initialize($config);

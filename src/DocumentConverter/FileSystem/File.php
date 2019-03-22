@@ -28,11 +28,10 @@ class File
             throw new DocumentPreviewException("Not a readable file", 701, 500);
         }
 
-        (ErrorHandler::getInstance())->log(
-            Logger::DEBUG,
-            "Call create file. reference: $reference  path: " . $path . "\n"
-            . json_encode(debug_backtrace($options = 2, 4)),
-            "FILECYCLEDEBUG"
+        (ErrorHandler::getInstance())->dlog(
+            ["message" => "Call to create File", "reference" => $reference, "path" => $path],
+            __METHOD__,
+            true
         );
 
         $ext =  strtolower(pathinfo($path)['extension']);
@@ -56,6 +55,17 @@ class File
                 throw new ExtensionDoseNotMatchMineTypeException($ext, mime_content_type($path), 703);
             }
         } else {
+            (ErrorHandler::getInstance())->dlog(
+                [
+                    "message" => "Unmaped extension",
+                    "ext" => $ext,
+                    "path" => $path,
+                    "extMime" => (Config::getInstance())->get('extToMime'),
+                    "realMime" => mime_content_type($path)
+                ],
+                __METHOD__,
+                true
+            );
             (ErrorHandler::getInstance())->log(Logger::INFO, "Unmaped extension " . $ext, __METHOD__);
             (ErrorHandler::getInstance())->log(Logger::INFO, (Config::getInstance())->get('extToMime'), __METHOD__);
         }
@@ -69,10 +79,10 @@ class File
             $this->path = $path;
         }
 
-        (ErrorHandler::getInstance())->log(
-            Logger::DEBUG,
-            "Created file. reference: $reference  path: " . $path,
-            "FILECYCLEDEBUG"
+        (ErrorHandler::getInstance())->dlog(
+            ["message" => "Created file", "reference" => $reference, "path" => $path],
+            __METHOD__,
+            true
         );
     }
 
@@ -118,12 +128,12 @@ class File
      */
     public function __destruct()
     {
-        (ErrorHandler::getInstance())->log(
-            Logger::DEBUG,
-            "Created file. reference: $this->reference  path: " . $this->path,
-            "FILECYCLEDEBUG"
-        );
         unlink($this->path);
+        (ErrorHandler::getInstance())->dlog(
+            ["message" => "Deleted file", "reference" => $this->reference, "path" => $this->path],
+            __METHOD__,
+            true
+        );
     }
 
 
