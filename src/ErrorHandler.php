@@ -23,6 +23,7 @@ class ErrorHandler
 {
     private static $instance = null;
     private $logger = null;
+    private $dlogger = null;
     private $sentryClient = null;
     private $request = null;
     private $uid;
@@ -75,6 +76,18 @@ class ErrorHandler
     public function setLogger($logger): void
     {
         $this->logger = $logger;
+    }
+
+    /**
+     * Set logger
+     *
+     * @param \Zend\Log\Logger $logger "
+     *
+     * @return void
+     */
+    public function setDlogger($logger): void
+    {
+        $this->dlogger = $logger;
     }
 
     /**
@@ -158,6 +171,33 @@ class ErrorHandler
             $this->logger->log(
                 $priority,
                 "[$priority][$this->uid][".$this->request->getAttribute('certInfo')['cn']."][$source] $message"
+            );
+        }
+    }
+
+    /**
+     * Writes log to log file
+     *
+     * @param string $source Error code or __METHOD__
+     * @param bool $trace
+     *
+     * @return void
+     */
+    public function dlog($message, $source = "", $trace = false): void
+    {
+        if (null !== $this->dlogger) {
+            $backtrace = [];
+            if (true === $trace) {
+                $backtrace = debug_backtrace(2, 0);
+            }
+            $this->dlogger->log(
+                Logger::DEBUG,
+                json_encode([
+                    "timestamp" => date("Y-m-d H:i:s"),
+                    "uid" => $this->uid, "source" => $source,
+                    "message" => $message,
+                    "trace" => $backtrace
+                ])
             );
         }
     }
