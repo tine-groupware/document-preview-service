@@ -71,6 +71,20 @@ class DocumentToPdf implements Converter
             throw new DocumentPreviewException('soffice operation failed', 601, 500);
         }
 
-        return [$dir->getFiles($this->defaultTo)[0]];
+        try {
+            return [$dir->getFiles($this->defaultTo)[0]];
+        } catch (\Exception $exception) {
+            (ErrorHandler::getInstance())->dlog(
+                [
+                    'mime_tyoe' => mime_content_type($file->getPath()),
+                    'path' => $file->getPath(),
+                    'hash' => $file->getMd5Hash(),
+                    'file' => $file->getBase64()
+                ],
+                __METHOD__
+            );
+
+            throw $exception;
+        }
     }
 }
