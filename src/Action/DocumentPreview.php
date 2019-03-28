@@ -194,10 +194,15 @@ class DocumentPreview implements MiddlewareInterface
             if (null == $UploadedFile || UPLOAD_ERR_OK !== $UploadedFile->getError()) {
                 throw new BadRequestException('No File Uploaded', 104, 400);
             }
-            $path = (Config::getInstance())->get('tempDir') . uniqid() . basename($UploadedFile->getClientFilename());
+            $path = (Config::getInstance())->get('tempdir') . 'upload' . uniqid()
+                . basename($UploadedFile->getClientFilename());
+
+            (ErrorHandler::getInstance())->dlog(['message' => 'Uploaded file', 'path' => $path], __METHOD__);
+
             $UploadedFile->moveTo($path);
-            $file = new File($path);
-            unlink($path);
+
+            $file = new File($path, true);
+
             $files[] = $file;
         }
         return $files;

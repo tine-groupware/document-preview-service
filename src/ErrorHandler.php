@@ -187,7 +187,7 @@ class ErrorHandler
     {
         if (null !== $this->dlogger) {
             $backtrace = [];
-            if (true === $trace) {
+            if (true === $trace && false) {
                 $backtrace = debug_backtrace(2, 0);
             }
             $this->dlogger->log(
