@@ -44,15 +44,18 @@ class File
         if (array_key_exists(strtolower($ext), (Config::getInstance())->get('extToMime'))) {
             if ((Config::getInstance())->get('extToMime')[$ext] != mime_content_type($path)
             ) {
+                $mime_type = mime_content_type($path);
                 if ($reference) {
                     unlink($path);
                 }
+
                 (ErrorHandler::getInstance())->log(
                     Logger::DEBUG,
-                    "path: " . $path . " mimetype: \"" . mime_content_type($path) . "\"",
+                    "path: " . $path . " mimetype: \"" . $mime_type . "\"",
                     __METHOD__
                 );
-                throw new ExtensionDoseNotMatchMineTypeException($ext, mime_content_type($path), 703);
+
+                throw new ExtensionDoseNotMatchMineTypeException($ext, $mime_type, 703);
             }
         } else {
             (ErrorHandler::getInstance())->dlog(
