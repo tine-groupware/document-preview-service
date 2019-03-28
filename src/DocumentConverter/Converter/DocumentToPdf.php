@@ -45,10 +45,15 @@ class DocumentToPdf implements Converter
     {
         $dir = new Directory();
         $ooDir = new Directory();
+        $tmpDir = new Directory();
 
-        $cmd = (Config::getInstance())->get('ooBinary').' -env:SingleAppInstance=false -env:UserInstallation=file:///'
+        //TMPDIR sets soffice tempdir. so lu*.tmp files can be deleted
+        //-env:UserInstallation=file:///... otherwise only one instance of soffice can run for the current user
+        $cmd = 'TMPDIR='. $tmpDir->getPath() . ' ' . (Config::getInstance())->get('ooBinary').' -env:SingleAppInstance=false -env:UserInstallation=file:///'
             .$ooDir->getPath().' --convert-to pdf ' . $file->getPath() . ' --outdir ' . $dir->getPath()
             . ' --headless --norestore 2>&1';
+
+
         $rtn = array();
         $err = 0;
         exec($cmd, $rtn, $err);
