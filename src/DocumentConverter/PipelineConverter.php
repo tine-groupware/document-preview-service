@@ -3,6 +3,7 @@
 namespace DocumentService\DocumentConverter;
 
 use DocumentService\DocumentConverter\FileSystem\File;
+use DocumentService\DocumentPreviewException;
 
 class PipelineConverter
 {
@@ -51,7 +52,10 @@ class PipelineConverter
         }
 
         $converter = $this->getNextConverter($file->getFormat(), $request->fileType);
-        //todo throw in null
+        if ($converter === null) {
+            throw new DocumentPreviewException("Conversion not possible", 0, 400);
+        }
+
         $newFiles =  $converter->convert($file, $request);
 
         $convertedFiles = [];
