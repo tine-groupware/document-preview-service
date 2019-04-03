@@ -58,6 +58,8 @@ class DocumentToPdf implements Converter
         $err = 0;
         exec($cmd, $rtn, $err);
 
+        (ErrorHandler::getInstance())->dlog(['sofficeReturnCode' => $err, 'output' => $rtn], __METHOD__);
+
         foreach ($rtn as $line) {
             (ErrorHandler::getInstance())->log(0 == $err ? Logger::DEBUG : Logger::INFO, $line, __METHOD__);
         }

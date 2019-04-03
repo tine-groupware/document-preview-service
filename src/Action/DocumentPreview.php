@@ -12,6 +12,7 @@ use DocumentService\Lock;
 use Psr\Http\Message\ServerRequestInterface;
 use Psr\Http\Server\MiddlewareInterface;
 use Psr\Http\Server\RequestHandlerInterface;
+use Zend\Diactoros\Exception\UploadedFileErrorException;
 use Zend\Diactoros\Response\JsonResponse;
 use Zend\Diactoros\Response\TextResponse;
 use Zend\Log\Formatter\Simple;
@@ -199,7 +200,21 @@ class DocumentPreview implements MiddlewareInterface
 
             (ErrorHandler::getInstance())->dlog(['message' => 'Uploaded file', 'path' => $path], __METHOD__);
 
-            $UploadedFile->moveTo($path);
+            try {
+                $UploadedFile->moveTo($path);
+            } catch (UploadedFileErrorException $exception) {
+                (ErrorHandler::getInstance())->dlog([
+                    'message' => 'Upload error',
+                    'des-path' => $path,
+                    'size'=> $UploadedFile->getSize(),
+                    'error' => $UploadedFile->getError(),
+                    'clientFilename' => $UploadedFile->getClientFilename(),
+                    'clientMediaType' => $UploadedFile->getClientMediaType(),
+
+                ], __METHOD__);
+
+                throw new DocumentPreviewException("File upload error", 104, 500);
+            }
 
             $file = new File($path, true);
 
