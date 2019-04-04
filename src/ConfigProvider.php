@@ -76,6 +76,7 @@ class ConfigProvider
             'factories'  => [
                 Action\SentryIO::class => Factory\SentryIOFactory::class,
                 Action\DocumentPreview::class => Factory\DocumentPreviewFactory::class,
+                Action\Info::class => Factory\InfoFactory::class,
             ],
         ];
     }
