@@ -80,8 +80,7 @@ class DocumentToPdf implements Converter
                 [
                     'mime_tyoe' => mime_content_type($file->getPath()),
                     'path' => $file->getPath(),
-                    'hash' => $file->getMd5Hash(),
-                    'file' => $file->getBase64()
+                    'hash' => $file->getMd5Hash()
                 ],
                 __METHOD__
             );

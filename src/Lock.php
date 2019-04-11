@@ -54,22 +54,27 @@ class Lock
 
         // Suppress shmop_open(): unable to attach or create shared memory segment 'File exists'
         // shmop_open(create) is used to test, if shared memory is initialised
-        @ $shm_id = shmop_open($this->key, 'n', 0644, 2);
-        if (false != $shm_id) {
-            $locks = [1 => $this->maxLowPrio, 2=> $this->maxHighPrio];
-        } else {
+        @ $created = $shm_id = shmop_open($this->key, 'n', 0644, 2);
+        if (false == $created) {
             $shm_id = shmop_open($this->key, 'c', 0644, 2);
             if (false == $shm_id) {
                 throw new DocumentPreviewException('Failed to open shared memory', 0);
             }
+
             $mem = shmop_read($shm_id, 0, 2);
             if (false == $mem) {
                 throw new DocumentPreviewException('Failed to read shared memory', 0);
             }
             $locks = unpack('C*', $mem);
+
+            shmop_close($shm_id);
+        } else {
+            shmop_delete($shm_id);
+
+            $locks = [1 => $this->maxLowPrio, 2=> $this->maxHighPrio];
         }
 
-        shmop_close($shm_id);
+
         if (false == sem_release($this->semid)) {
             (ErrorHandler::getInstance())->log(Logger::ERR, "Failed to release semaphore", __METHOD__);
         }
@@ -97,12 +102,13 @@ class Lock
 
         // Suppress shmop_open(): unable to attach or create shared memory segment 'File exists'
         // shmop_open(create) is used to test, if shared memory is initialised
-        @ $shm_id = shmop_open($this->key, 'n', 0644, 2);
-        if (false == $shm_id) {
+        @ $created = $shm_id = shmop_open($this->key, 'n', 0644, 2);
+        if (false == $created) {
             $shm_id = shmop_open($this->key, 'c', 0644, 2);
             if (false == $shm_id) {
                 throw new DocumentPreviewException('Failed to open shared memory', 0);
             }
+
             $mem = shmop_read($shm_id, 0, 2);
             if (false == $mem) {
                 throw new DocumentPreviewException('Failed to read shared memory', 0);
@@ -181,5 +187,31 @@ class Lock
         }
 
         return true;
+    }
+
+    public function clear(): void
+    {
+        if (false == sem_acquire($this->semid)) {
+            throw new DocumentPreviewException('Failed to acquire semaphore', 0);
+        }
+
+        // Suppress shmop_open(): unable to attach or create shared memory segment 'File exists'
+        // shmop_open(create) is used to test, if shared memory is initialised
+        @ $created = $shm_id = shmop_open($this->key, 'n', 0644, 2);
+        if (false == $created) {
+            $shm_id = shmop_open($this->key, 'c', 0644, 2);
+            if (false == $shm_id) {
+                throw new DocumentPreviewException('Failed to open shared memory', 0);
+            }
+        }
+
+        if (false == shmop_delete($shm_id)) {
+            (ErrorHandler::getInstance())->log(Logger::ERR, "Failed to delete shomp", __METHOD__);
+            shmop_close($shm_id);
+        }
+
+        if (false == sem_release($this->semid)) {
+            (ErrorHandler::getInstance())->log(Logger::ERR, "Failed to release semaphore", __METHOD__);
+        }
     }
 }
