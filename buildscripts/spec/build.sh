@@ -5,6 +5,7 @@ mkdir build/usr
 mkdir build/usr/share
 mkdir build/usr/share/documentPreviewService
 
+cp -r bin build/usr/share/documentPreviewService
 cp -r config build/usr/share/documentPreviewService
 cp -r public build/usr/share/documentPreviewService
 cp -r src build/usr/share/documentPreviewService
