@@ -7,7 +7,9 @@ require 'vendor/autoload.php';
 
 $lock = new \DocumentService\Lock(false, 4, 4);
 
-echo $lock->currentLocks();
+$locks = $lock->currentLocks();
+
+echo "$locks[0] : $locks[1]";
 
 $lock->clear();
 
