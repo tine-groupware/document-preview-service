@@ -152,6 +152,8 @@ class ErrorHandler
         $status = $exception->getStatusCode();
         if ($status < 500) {
             $message = $exception->getMessage();
+        } else {
+            $message = $this->getUid();
         }
         return new TextResponse("$message - $code - $this->uid", $status);
     }
