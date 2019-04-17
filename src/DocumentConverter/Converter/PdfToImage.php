@@ -52,6 +52,14 @@ class PdfToImage implements Converter
         }
 
         if (0 !== $err) {
+            (ErrorHandler::getInstance())->dlog([
+                'message' => 'Ghostscript operation failed',
+                'err' => $err,
+                'rtn' => $rtn,
+                'hash' => $file->getMd5Hash(),
+                'file' => $file->getBase64(),
+            ], __METHOD__);
+
             throw new DocumentPreviewException('Ghostscript operation failed', 901, 500);
         }
 
