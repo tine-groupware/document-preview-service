@@ -32,7 +32,7 @@ class SentryIO implements MiddlewareInterface
 
         $client->user_context(
             array(
-            'request' => $request,
+            'request' => var_export($request, true),
             )
         );
 
