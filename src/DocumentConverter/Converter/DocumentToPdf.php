@@ -73,6 +73,10 @@ class DocumentToPdf implements Converter
             throw new DocumentPreviewException('soffice operation failed', 601, 500);
         }
 
+        if ($rtn[sizeof($rtn)-1] == "Error: source file could not be loaded") {
+            throw new DocumentPreviewException('corrupted document', 602, 400);
+        }
+
         try {
             return [$dir->getFiles($this->defaultTo)[0]];
         } catch (\Exception $exception) {
