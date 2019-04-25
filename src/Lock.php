@@ -13,7 +13,6 @@ class Lock
     private const FREE = false;
 
     private const VARIABLE_ID = 5435;
-    private const SHM_KEY = 3464;
     private const SLEEP_TIME = 10000;
 
     private $semIdentifier;
@@ -56,7 +55,7 @@ class Lock
             throw new Exception("Failed to get semaphore");
         }
 
-        $this->shmIdentifier = shm_attach(self::SHM_KEY);
+        $this->shmIdentifier = shm_attach($ftok);
         if (false === $this->semIdentifier) {
             throw new Exception("Failed to attach shared memory");
         }
@@ -66,6 +65,9 @@ class Lock
         $this->priority = $priority === true ? self::HIGH_PRIORITY : self::LOW_PRIORITY;
     }
 
+    /**
+     * @throws Exception
+     */
     public function __destruct()
     {
         $this->unlockLockedSlot();
@@ -74,7 +76,7 @@ class Lock
     /**
      * Trys to lock a free slot in priority, with a timeout
      *
-     * @param int $timeout
+     * @param float $timeout unit secends
      * @return bool
      * @throws Exception invalid priority
      * @throws Exception $slot value not in interval
@@ -84,17 +86,17 @@ class Lock
      * @throws Exception Failed to release semaphore
      * @throws Exception Failed to acquire semaphore
      */
-    public function lock(int $timeout): bool
+    public function lock(float $timeout): bool
     {
         if (true === $this->locked) {
             return true;
         }
 
-        $endTime = time() + $timeout;
+        $endTime = microtime(true) + $timeout;
         do {
             //sleeps on unsuccessful acquire
             $semAcquired = $this->lockFreeSlot();
-        } while (false === $semAcquired && time() > $endTime);
+        } while (false === $semAcquired && microtime(true) < $endTime);
 
         return $semAcquired;
     }
@@ -258,7 +260,7 @@ class Lock
                 }
             }
 
-            if ($usage_count > $this->maxLowPrioritySlots) {
+            if ($usage_count >= $this->maxLowPrioritySlots) {
                 return null;
             }
         }
@@ -293,17 +295,17 @@ class Lock
         }
 
         // set high prio bit
-        if (self::HIGH_PRIORITY == $this->priority) {
+        if (self::HIGH_PRIORITY === $this->priority) {
             $slot += 128;
         }
 
         $key = ftok(__FILE__, chr($slot));
-        if (-1 == $key) {
+        if (-1 === $key) {
             throw new Exception('Could not get ftok');
         }
 
         $this->slotSemIdentifier = sem_get($key, 1);
-        if (false == $this->slotSemIdentifier) {
+        if (false === $this->slotSemIdentifier) {
             throw new Exception('Could not get semaphore');
         }
 
