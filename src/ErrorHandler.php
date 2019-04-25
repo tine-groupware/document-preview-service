@@ -131,7 +131,7 @@ class ErrorHandler
                 $exception->getCode()
             );
         }
-        if (null !== $this->sentryClient) {
+        if (null !== $this->sentryClient && $exception->getStatusCode() != 400) {
             $this->sentryClient->user_context(['logUid' => $this->uid]);
             $this->sentryClient->captureException($exception);
         }

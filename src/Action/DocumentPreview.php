@@ -38,7 +38,6 @@ class DocumentPreview implements MiddlewareInterface
         (ErrorHandler::getInstance())->dlog("Client Connected", __METHOD__);
 
         $lock = null;
-        $semAcq = false;
         $rtn = null;
 
         (ErrorHandler::getInstance())->setRequest($request);
@@ -61,7 +60,7 @@ class DocumentPreview implements MiddlewareInterface
                     (Config::getInstance())->get('maxProc'),
                     (Config::getInstance())->get('maxProcHighPrio')
                 );
-                $semAcq = $this->lockAcquire($lock);
+                $semAcq = $lock->lock((Config::getInstance())->get('semTimeOut'));
                 if (false === $semAcq) {
                     (ErrorHandler::getInstance())->dlog("Error: Service occupied", __METHOD__);
                     (ErrorHandler::getInstance())->log(Logger::INFO, "Service occupied", __METHOD__);
@@ -73,24 +72,24 @@ class DocumentPreview implements MiddlewareInterface
 
             $rtn = (new DocumentConverter())($files, $conf);
 
-            (ErrorHandler::getInstance())->log(Logger::DEBUG, "Converted files in " .
-                (string)(microtime(true) - $startTime) . " seconds.", $files[0]->getMd5Hash());
+            (ErrorHandler::getInstance())->log(Logger::DEBUG, "Converted files in "
+                . (string)(microtime(true) - $startTime) . " seconds.", $files[0]->getMd5Hash());
+
         } catch (ExtensionDoseNotMatchMineTypeException $exception) {
             (ErrorHandler::getInstance())->dlog("Error: ExtensionDoseNotMatchMineTypeException", __METHOD__);
             (ErrorHandler::getInstance())->log(Logger::INFO, $exception->getMessage(), $exception->getCode());
             return (ErrorHandler::getInstance())->getResponse($exception);
+
         } catch (BadRequestException $exception) {
             (ErrorHandler::getInstance())->dlog("Error: BadRequestException", __METHOD__);
             (ErrorHandler::getInstance())->log(Logger::INFO, $exception->getMessage(), $exception->getCode());
             return (ErrorHandler::getInstance())->getResponse($exception);
+
         } catch (DocumentPreviewException $exception) {
             return (ErrorHandler::getInstance())->handelException($exception);
+
         } finally {
-            if (null !== $lock && true === $semAcq) {
-                if (false === $lock->unlock()) {
-                    (ErrorHandler::getInstance())->log(Logger::ERR, "Failed to release semaphore", __METHOD__);
-                }
-            }
+            $lock = null;
         }
 
         clearstatcache();
@@ -221,22 +220,6 @@ class DocumentPreview implements MiddlewareInterface
             $files[] = $file;
         }
         return $files;
-    }
-
-
-    /**
-     * @param $lock Lock
-     * @return bool true if lock acquire
-     * @throws DocumentPreviewException config not initialised
-     */
-    protected function lockAcquire($lock): bool
-    {
-        $timeStarted = time();
-        do {
-            $semAcq = $lock->lock();
-            usleep(10000);
-        } while (false === $semAcq && time() - $timeStarted < (Config::getInstance())->get('semTimeOut'));
-        return $semAcq;
     }
 
     /**
