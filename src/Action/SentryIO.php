@@ -30,6 +30,10 @@ class SentryIO implements MiddlewareInterface
 
         $client->install();
 
+        include(getcwd() . '/buildnumber');
+
+        $client->setRelease($buildNumber);
+
         $client->user_context(
             array(
             'request' => var_export($request, true),
