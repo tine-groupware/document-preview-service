@@ -38,6 +38,17 @@ return [
 ];
 ```
 
+webserver configuration:
+
+    root: /usr/share/documentPreviewService/public/
+    AllowOverride All
+    
+    for ssl auth:
+    SSLVerifyClient optional
+    SSLOptions +ExportCertData
+    SSLOptions +StdEnvVars
+
+
 
     
 [curren version](https://nexus.metaways.net/repository/documentPreview/develop/documentPreviewService.deb)
