@@ -89,13 +89,23 @@ class Directory
      */
     protected static function rmrf(string $dir): void
     {
-        foreach (glob($dir) as $file) {
-            if (is_dir($file)) {
-                self::rmrf("$file/*");
-                rmdir($file);
-            } else {
-                unlink($file);
+        $dir = rtrim($dir, '/') . '/';
+
+        if ($dh = opendir($dir)) {
+            while (($file = readdir($dh)) !== false) {
+                if ($file == '.' || $file == '..') {
+                    continue;
+                }
+
+                $file = $dir.$file;
+                if (is_dir($file)) {
+                    self::rmrf($file);
+                } else {
+                    unlink($file);
+                }
             }
+            closedir($dh);
+            rmdir($dir);
         }
     }
 }

@@ -51,6 +51,14 @@ class PdfToImage implements Converter
             (ErrorHandler::getInstance())->log(0 == $err ? Logger::DEBUG : Logger::INFO, $line, __METHOD__);
         }
 
+        foreach ($rtn as $line) {
+            if (false != strpos($line, "file requires a password")) {
+                throw new DocumentPreviewException('Pdf requires a password', 902, 422);
+            } elseif (false != strpos($line, "No pages will be processed")) {
+                throw new DocumentPreviewException('Pdf is corrupted', 903, 422);
+            }
+        }
+
         if (0 !== $err) {
             (ErrorHandler::getInstance())->dlog([
                 'message' => 'Ghostscript operation failed',

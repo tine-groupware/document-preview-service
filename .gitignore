@@ -9,3 +9,4 @@ testing/
 Vagrantfile
 clover.xml
 coveralls-upload.json
+buildnumber

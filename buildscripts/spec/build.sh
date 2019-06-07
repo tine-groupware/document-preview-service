@@ -30,7 +30,7 @@ mkdir build/var/log/documentPreviewService/
 
 mkdir build/DEBIAN
 
-echo "__VERSION_T__ - __PROJECT_URL" > build/usr/share/documentPreviewService/buildnumber
+echo '<?php $buildNumber = "__VERSION_T__";' > build/usr/share/documentPreviewService/buildnumber
 
 sed -i "s/VERSION/__VERSION_N_MM__/g" build/usr/share/documentPreviewService/config/config.php
 
