@@ -65,11 +65,6 @@ class DocumentToPdf implements Converter
         }
 
         if (0 !== $err) {
-            copy(
-                $file->getPath(),
-                (Config::getInstance())->get('tempdir') . 'error-file' .
-                (ErrorHandler::getInstance())->getUid() . '.' .  pathinfo($this)['extension']
-            );
             throw new DocumentPreviewException('soffice operation failed', 601, 500);
         }
 
