@@ -29,7 +29,7 @@ class SentryIO implements MiddlewareInterface
         $client = new Raven_Client($this->sentryURL);
 
         $client->install();
-        
+
         $client->setRelease(file_get_contents(getcwd() . '/buildnumber'));
 
         $client->user_context(
