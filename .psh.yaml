@@ -1,5 +1,7 @@
 paths: []
-const: []
+const:
+  UBUNTU_DEPENDENCIES: "graphicsmagick, php7.2-xml, php7.2-cli, php7.2-mbstring, php7.2-curl, ghostscript, unzip, libreoffice"
+  DEBIAN_DEPENDENCIES: ""
 dynamic:
   VERSION_N_MM: echo $(php composer.phar show --self | sed '4q;d' | cut -c 14-)
   VERSION_N_MMP: echo $(php composer.phar show --self | sed '4q;d' | cut -c 14-).$CI_PIPELINE_ID

@@ -36,7 +36,7 @@ sed -i "s/VERSION/__VERSION_N_MM__/g" build/usr/share/documentPreviewService/con
 
 sed "s/VERSION/__VERSION_N_MM__/g" sample_config.php > build/etc/documentPreviewService/__VERSION_N_MM__/config.php
 
-sed "s/VERSION/__VERSION_N_MMP__/g" packageinfo > build/DEBIAN/control
+sed -e "s/VERSION/__VERSION_N_MMP__/g" -e "s/PACKAGE_DEPENDENCIES/__UBUNTU_DEPENDENCIES__/g" packageinfo > build/DEBIAN/control
 
 sed "s/VERSION/__VERSION_N_MM__/g" postinst.sh > build/DEBIAN/postinst
 
