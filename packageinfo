@@ -3,7 +3,7 @@ Version: VERSION
 Section: misc
 Priority: extra
 Architecture: all
-Depends: PACKAGE_DEPENDENCIESS
+Depends: PACKAGE_DEPENDENCIES
 Installed-Size: 34300
 Maintainer: Metaways <info@metaways.de>
 Homepage: metaways.de
