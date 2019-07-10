@@ -1,4 +1,5 @@
-### Install ubuntu (bionic)
+## Install 
+#### ubuntu (bionic)
 
 add repos:
 
@@ -10,7 +11,29 @@ install:
     apt-get update
     apt-get install documentPreviewService
     
-### config
+#### depian stretch
+
+install tools:
+
+    apt-get update
+    apt-get install -y apt-transport-https gnupg wget
+    
+add php7.2 and documentservice repos and backports for libreoffice6.1:
+
+    wget -q -O- https://packages.sury.org/php/apt.gpg | apt-key add -
+    echo "deb https://packages.sury.org/php/ stretch main" | tee /etc/apt/sources.list.d/php.list
+    echo "deb [trusted=yes] http://apt.metaways.net/private/documentservice/ bionic main" | tee /etc/apt/sources.list.d/documentservice.list
+    echo "deb http://deb.debian.org/debian stretch-backports main" | tee /etc/apt/sources.list.d/backports.list
+    apt-get update
+    
+install libreoffice and documentservice:
+
+    apt-get -t stretch-backports install libreoffice
+    apt-get install documentpreviewservice
+
+
+    
+## config
     
 /etc/documentPreviewService/2.1/config.php
 
