@@ -3,7 +3,9 @@
 
 add repos:
 
-    add-apt-repository 'deb [trusted=yes] http://apt.metaways.net/private/documentservice/ bionic main'
+    wget -q -O- https://apt.metaways.net/private/documentservice/pubkey.gpg | apt-key add -
+
+    add-apt-repository 'deb http://apt.metaways.net/private/documentservice/ bionic main'
     add-apt-repository ppa:libreoffice/libreoffice-6-1
 
 install:
@@ -21,8 +23,9 @@ install tools:
 add php7.2 and documentservice repos and backports for libreoffice6.1:
 
     wget -q -O- https://packages.sury.org/php/apt.gpg | apt-key add -
+    wget -q -O- https://apt.metaways.net/private/documentservice/pubkey.gpg | apt-key add -
     echo "deb https://packages.sury.org/php/ stretch main" | tee /etc/apt/sources.list.d/php.list
-    echo "deb [trusted=yes] http://apt.metaways.net/private/documentservice/ bionic main" | tee /etc/apt/sources.list.d/documentservice.list
+    echo "deb http://apt.metaways.net/private/documentservice/ bionic main" | tee /etc/apt/sources.list.d/documentservice.list
     echo "deb http://deb.debian.org/debian stretch-backports main" | tee /etc/apt/sources.list.d/backports.list
     apt-get update
     
