@@ -13,7 +13,7 @@ install:
     apt-get update
     apt-get install documentPreviewService
     
-#### depian stretch
+#### debian stretch
 
 install tools:
 
