@@ -60,6 +60,7 @@ class DocumentPreview implements MiddlewareInterface
                     (Config::getInstance())->get('maxProc'),
                     (Config::getInstance())->get('maxProcHighPrio')
                 );
+                // gets unlocked with lock destruction
                 $semAcq = $lock->lock((Config::getInstance())->get('semTimeOut'));
                 if (false === $semAcq) {
                     (ErrorHandler::getInstance())->dlog("Error: Service occupied", __METHOD__);

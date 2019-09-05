@@ -42,8 +42,7 @@ class File
         $this->format = $format;
 
         if (array_key_exists(strtolower($ext), (Config::getInstance())->get('extToMime'))) {
-            if ((Config::getInstance())->get('extToMime')[$ext] != mime_content_type($path)
-            ) {
+            if (false == in_array(mime_content_type($path), (Config::getInstance())->get('extToMime')[$ext])) {
                 $mime_type = mime_content_type($path);
                 if ($reference) {
                     unlink($path);
