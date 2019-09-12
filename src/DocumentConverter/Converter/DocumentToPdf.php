@@ -49,7 +49,7 @@ class DocumentToPdf implements Converter
 
         //TMPDIR sets soffice tempdir. so lu*.tmp files can be deleted
         //-env:UserInstallation=file:///... otherwise only one instance of soffice can run for the current user
-        $cmd = 'TMPDIR=' . $tmpDir->getPath() . ' ' . (Config::getInstance())->get('ooBinary')
+        $cmd = (Config::getInstance())->get('locales') . ' TMPDIR=' . $tmpDir->getPath() . ' ' . (Config::getInstance())->get('ooBinary')
             . ' -env:SingleAppInstance=false -env:UserInstallation=file:///' .$ooDir->getPath() . ' --convert-to pdf '
             . $file->getPath() . ' --outdir ' . $dir->getPath() . ' --headless --norestore 2>&1';
 

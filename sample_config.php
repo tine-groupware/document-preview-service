@@ -6,6 +6,7 @@ return [
         "maxProc" => 4, //maximum concurrent conversions
         "loggerOut" => "/var/log/documentPreviewService/doc.log", // log file documentPreview, can be a file path (or a zend logger)
 	"ooBinary"=>'soffice',
+    'locales' => 'LC_ALL="de_DE.UTF-8"', #locales must be installed
 	"logLevel" => "8",
     ],
     'authLogger' => '/var/log/documentPreviewService/auth.log', // auth logger, can be a file path (or a zend logger)
