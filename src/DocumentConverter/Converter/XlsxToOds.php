@@ -43,7 +43,7 @@ class XlsxToOds implements Converter
         $dir = new Directory();
         $ooDir = new Directory();
 
-        $cmd = (Config::getInstance())->get('ooBinary').' -env:SingleAppInstance=false -env:UserInstallation=file:///'
+        $cmd = (Config::getInstance())->get('locales') . ' ' . (Config::getInstance())->get('ooBinary').' -env:SingleAppInstance=false -env:UserInstallation=file:///'
             .$ooDir->getPath().' --convert-to ods ' . $file->getPath() . ' --outdir ' . $dir->getPath()
             . ' --headless --norestore 2>&1';
         $rtn = array();
