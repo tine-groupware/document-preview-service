@@ -63,7 +63,6 @@ class ConfigProvider
                 'documentPreviewService' =>
                     ['name' => 'documentPreviewService', 'permission' => '(1=1)', 'required' => false],
             ],
-            'locales' => 'LC_ALL="en_US.UTF-8"', #locales must be installed
         ];
     }
 
