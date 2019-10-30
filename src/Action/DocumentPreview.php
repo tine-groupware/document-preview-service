@@ -157,6 +157,7 @@ class DocumentPreview implements MiddlewareInterface
     protected function getConf(ServerRequestInterface $request): array
     {
         if (false === isset($request->getParsedBody()["config"])) {
+            $this->warnUploadFileSize();
             throw new BadRequestException("Bad request missing arguments", 111, 400);
         }
         $json = $request->getParsedBody()["config"];
@@ -186,6 +187,7 @@ class DocumentPreview implements MiddlewareInterface
         } elseif (array_key_exists('files', $request->getUploadedFiles())) {
             $UploadedFiles = $request->getUploadedFiles()['files'];
         } else {
+            $this->warnUploadFileSize();
             throw new BadRequestException("Parameter file or files not set", 103, 400);
         }
 
@@ -223,6 +225,11 @@ class DocumentPreview implements MiddlewareInterface
         return $files;
     }
 
+    protected function warnUploadFileSize() {
+        (ErrorHandler::getInstance())->log(Logger::WARN, "php post_max_size=" . ini_get('post_max_size') . " might be to small");
+        (ErrorHandler::getInstance())->log(Logger::WARN, "php upload_max_filesize=" . ini_get('upload_max_filesize') . " might be to small");
+    }
+
     /**
      * Check config, also done in documentConverter
      *
@@ -230,7 +237,7 @@ class DocumentPreview implements MiddlewareInterface
      */
     protected function checkConfig(): bool
     {
-        //todo
+        //todo -> but is also checked later
         return true;
     }
 }
