@@ -42,24 +42,33 @@ class File
         $this->format = $format;
 
         if (array_key_exists(strtolower($ext), (Config::getInstance())->get('extToMime'))) {
-            if (false == in_array(mime_content_type($path), (Config::getInstance())->get('extToMime')[$ext])) {
-                $mime_type = mime_content_type($path);
-                if ($reference) {
-                    unlink($path);
+            $mime_type = mime_content_type($path);
+            if (false == in_array($mime_type, (Config::getInstance())->get('extToMime')[$ext])) {
+                if ($mime_type !== "application/octet-stream") {
+
+                    if ($reference) {
+                        unlink($path);
+                    }
+
+                    (ErrorHandler::getInstance())->log(
+                        Logger::DEBUG,
+                        "path: " . $path . " mimetype: \"" . $mime_type . "\"",
+                        __METHOD__
+                    );
+
+                    throw new ExtensionDoseNotMatchMineTypeException($ext, $mime_type, 703);
                 }
 
                 (ErrorHandler::getInstance())->log(
-                    Logger::DEBUG,
-                    "path: " . $path . " mimetype: \"" . $mime_type . "\"",
+                    Logger::NOTICE,
+                    "bad mimetype:: path: " . $path . " has mimetype application/octet-stream, but extension is $ext.",
                     __METHOD__
                 );
-
-                throw new ExtensionDoseNotMatchMineTypeException($ext, $mime_type, 703);
             }
         } else {
             (ErrorHandler::getInstance())->dlog(
                 [
-                    "message" => "Unmaped extension",
+                    "message" => "Unmapped extension",
                     "ext" => $ext,
                     "path" => $path,
                     "extMime" => (Config::getInstance())->get('extToMime'),
