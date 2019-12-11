@@ -41,7 +41,7 @@ class PdfToImage implements Converter
     {
         $dir = new Directory();
         $cmd = 'gs -q -dQUIET -dSAFER -dBATCH -dNOPAUSE -dNOPROMPT -dMaxBitmap=500000000 -dAlignToPixels=0 -dGridFitTT'.
-            '=2 "-sDEVICE=pngalpha" -dTextAlphaBits=4 -dGraphicsAlphaBits=4 "-r150x150" -sOutputFile='
+            '=2 "-sDEVICE=pngalpha" -dTextAlphaBits=4 -dGraphicsAlphaBits=4 "-r300x300" -sOutputFile='
             . escapeshellarg($dir->getPath() . 'image%03d.png') . ' '. escapeshellarg($file->getPath())
             . ' -c quit  2>&1';
         $err = 0;
