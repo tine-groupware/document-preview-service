@@ -48,7 +48,11 @@ key import:
 sources.list:
 
     echo "deb https://USER:PASS@apt.metaways.net/private/documentservice/ bionic main" | tee /etc/apt/sources.list.d/documentservice.list
-    
+
+## update
+
+    apt-get update && apt-get install install documentpreviewservice
+
 ## config
     
 /etc/documentPreviewService/2.1/config.php
