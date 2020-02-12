@@ -9,7 +9,7 @@ return [
 	"ooBinary"=>'soffice'
     ],
     'authLogger' => '/var/log/documentPreviewService/auth.log', // auth logger, can be a file or a zend logger
-    'sentryio' => 'https://<key>:<secret>@sentry.io/<project>', //sentry uri
+    'sentryio' => '', // 'https://<key>:<secret>@sentry.io/<project>', //sentry uri
     'auth' => [
         [
             'name' => 'documentPreviewService', // used for identification
