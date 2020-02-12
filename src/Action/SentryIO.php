@@ -26,6 +26,9 @@ class SentryIO implements MiddlewareInterface
      */
     public function process(ServerRequestInterface $request, RequestHandlerInterface $delegate): ResponseInterface
     {
+        if (empty($this->sentryURL)) {
+            return $delegate->handle($request);
+        }
         $client = new Raven_Client($this->sentryURL);
 
         $client->install();
