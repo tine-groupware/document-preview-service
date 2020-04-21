@@ -6,7 +6,10 @@ stages:
  - deploy
 
 cache:
- untracked: true
+ key: ${CI_PIPELINE_ID}
+ paths:
+  - ./build
+  - documentPreviewService-2.1.${CI_PIPELINE_ID}.deb
 
 build_branch:
  stage: build
@@ -18,8 +21,6 @@ build_branch:
 test:
  stage: test
  script:
-  - touch 1
-  - ls
   - php psh.phar git:test
 
 deploy_to_repo:
@@ -27,5 +28,4 @@ deploy_to_repo:
  only:
   - master
  script:
-  - ls
   - php psh.phar git-branches:deploytorepo
