@@ -1,51 +1,19 @@
 image: dockerregistry.metaways.net/tine20/documentpreview/build
 
 stages:
- - build
  - test
- - deploy
-
-cache:
- untracked: true
-
-build_tag:
- stage: build
- only:
-  - tags
- script:
-  - php psh.phar git-tags:build
-
-build_branch:
- stage: build
- only:
-  - branches
- script:
-  - php psh.phar git-branches:build
+ - build_and_deploy
 
 test:
  stage: test
  script:
   - php psh.phar git:test
 
-deploy_tag:
- stage: deploy
- only:
-  - tags
- script:
-  - php psh.phar git-tags:deploy
-
-deploy_branch:
- stage: deploy
- only:
-  - branches
- script:
-  - php psh.phar git-branches:deploy
-
 deploy_to_repo:
- stage: deploy
+ stage: build_and_deploy
  only:
   - master
  script:
-  - sleep 1h
+  - php psh.phar git-branches:build
   - php psh.phar git-branches:deploytorepo
 
