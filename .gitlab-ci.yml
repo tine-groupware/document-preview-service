@@ -1,4 +1,4 @@
-image:
+image: dockerregistry.metaways.net/tine20/documentpreview/build
 
 stages:
  - build
