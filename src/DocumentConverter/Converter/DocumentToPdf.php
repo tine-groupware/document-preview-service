@@ -64,12 +64,12 @@ class DocumentToPdf implements Converter
             (ErrorHandler::getInstance())->log(0 == $err ? Logger::DEBUG : Logger::INFO, $line, __METHOD__);
         }
 
-        if (0 !== $err) {
-            throw new DocumentPreviewException('soffice operation failed', 601, 500);
-        }
-
         if ($rtn[sizeof($rtn)-1] == "Error: source file could not be loaded") {
             throw new DocumentPreviewException('corrupted document', 602, 400);
+        }
+
+        if (0 !== $err) {
+            throw new DocumentPreviewException("soffice operation failed! output: \n" .  join("\n", $rtn), 601, 500);
         }
 
         try {
@@ -77,7 +77,7 @@ class DocumentToPdf implements Converter
         } catch (\Exception $exception) {
             (ErrorHandler::getInstance())->dlog(
                 [
-                    'mime_tyoe' => mime_content_type($file->getPath()),
+                    "mime_tyoe' => mime_content_type($file->getPath()),
                     'path' => $file->getPath(),
                     'hash' => $file->getMd5Hash()
                 ],

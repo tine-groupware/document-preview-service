@@ -60,7 +60,7 @@ class XlsxToOds implements Converter
                 (Config::getInstance())->get('tempdir') . 'error-file' .
                 (ErrorHandler::getInstance())->getUid() . '.' .  pathinfo($this)['extension']
             );
-            throw new DocumentPreviewException('soffice operation failed', 601, 500);
+            throw new DocumentPreviewException("soffice operation failed! output: \n" .  join("\n", $rtn), 601, 500);
         }
 
         return [$dir->getFiles($this->defaultTo)[0]];

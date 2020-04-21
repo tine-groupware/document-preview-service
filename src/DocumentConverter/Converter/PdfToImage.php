@@ -68,7 +68,7 @@ class PdfToImage implements Converter
                 'file' => $file->getBase64(),
             ], __METHOD__);
 
-            throw new DocumentPreviewException('Ghostscript operation failed', 901, 500);
+            throw new DocumentPreviewException("Ghostscript operation failed! output: \n" .  join("\n", $rtn), 901, 500);
         }
 
         if (true === $request->firstPage) {

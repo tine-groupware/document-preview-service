@@ -57,7 +57,7 @@ class ImageToImage implements Converter
         }
 
         if (0 !== $err) {
-            throw new DocumentPreviewException('graphicsmagick operation failed', 801, 500);
+            throw new DocumentPreviewException("graphicsmagick operation failed! output: \n" .  join("\n", $rtn), 801, 500);
         }
 
         return [new File($path, true, $request->fileType)];
