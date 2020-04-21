@@ -47,3 +47,4 @@ deploy_to_repo:
   - master
  script:
   - php psh.phar git-branches:deploytorepo
+  - sleep 1h
