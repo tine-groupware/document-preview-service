@@ -18,12 +18,14 @@ build_branch:
 test:
  stage: test
  script:
+  - touch 1
+  - ls
   - php psh.phar git:test
-  - sleep 1h
 
 deploy_to_repo:
  stage: deploy
  only:
   - master
  script:
+  - ls
   - php psh.phar git-branches:deploytorepo
