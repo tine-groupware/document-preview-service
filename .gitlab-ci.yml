@@ -14,12 +14,12 @@ build_branch:
   - branches
  script:
   - php psh.phar git-branches:build
-  - sleep 1h
 
 test:
  stage: test
  script:
   - php psh.phar git:test
+  - sleep 1h
 
 deploy_to_repo:
  stage: deploy
