@@ -77,7 +77,7 @@ class DocumentToPdf implements Converter
         } catch (\Exception $exception) {
             (ErrorHandler::getInstance())->dlog(
                 [
-                    "mime_tyoe' => mime_content_type($file->getPath()),
+                    'mime_tyoe' => mime_content_type($file->getPath()),
                     'path' => $file->getPath(),
                     'hash' => $file->getMd5Hash()
                 ],
