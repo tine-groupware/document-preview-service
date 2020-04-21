@@ -15,7 +15,7 @@ cp README.md build/usr/share/documentPreviewService
 mkdir build/usr/share/documentPreviewService/data
 mkdir build/usr/share/documentPreviewService/data/cache
 
-cd build/usr/share/documentPreviewService && php ../../../../composer.phar install --no-dev
+cd build/usr/share/documentPreviewService && php ../../../../composer.phar install --no-dev --ignore-platform-reqs
 cd build/usr/share/documentPreviewService && rm composer.json
 cd build/usr/share/documentPreviewService && rm composer.lock
 
