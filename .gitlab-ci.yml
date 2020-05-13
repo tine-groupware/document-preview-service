@@ -29,3 +29,8 @@ deploy_to_repo:
   - master
  script:
   - php psh.phar git-branches:deploytorepo
+ rulse:
+  - if: $PUSH_TO_REPO == "false"
+    when: never
+  - when: on_success
+ 
