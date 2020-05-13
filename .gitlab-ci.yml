@@ -26,11 +26,9 @@ test:
 deploy_to_repo:
  stage: deploy
  only:
-  - master
+  refs:
+   - master
+  variables:
+   - $PUSH_TO_REPO != "false"
  script:
   - php psh.phar git-branches:deploytorepo
- rules:
-  - if: $PUSH_TO_REPO == "false"
-    when: never
-  - when: on_success
- 
