@@ -13,6 +13,7 @@ class File
     protected $path;
     protected $reference;
     protected $format;
+    protected $original;
 
     /**
      * File constructor.
@@ -21,8 +22,11 @@ class File
      * @param bool $reference "
      *
      * @param string|null $format
+     * @param bool $original
+     * @throws DocumentPreviewException
+     * @throws ExtensionDoseNotMatchMineTypeException
      */
-    public function __construct(string $path, bool $reference = false, string $format = null)
+    public function __construct(string $path, bool $reference = false, string $format = null, $original = false)
     {
         if (!is_file($path) && !is_readable($path)) {
             throw new DocumentPreviewException("Not a readable file", 701, 500);
@@ -33,6 +37,8 @@ class File
             __METHOD__,
             true
         );
+
+        $this->original = $original;
 
         $ext =  strtolower(pathinfo($path)['extension']);
 
@@ -132,6 +138,10 @@ class File
     public function getFormat()
     {
         return $this->format;
+    }
+
+    public function isOriginal() {
+        return $this->original;
     }
 
     /**

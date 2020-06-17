@@ -2,6 +2,7 @@
 
 namespace DocumentService\DocumentConverter;
 
+use DocumentService\DocumentConverter\Converter\ImageToImage;
 use DocumentService\DocumentConverter\FileSystem\File;
 use DocumentService\DocumentPreviewException;
 
@@ -48,7 +49,13 @@ class PipelineConverter
     protected function convertFile(File $file, Request $request): array
     {
         if ($file->getFormat() === $request->fileType) {
-            return [$file];
+            /*
+             * bug fix hack
+             * images which are already $request->fileType do not get resized
+             */
+            if (! ($file->isOriginal() && in_array($file->getFormat(), (new ImageToImage())->from())) ) {
+                return [$file];
+            }
         }
 
         $converter = $this->getNextConverter($file->getFormat(), $request->fileType);
