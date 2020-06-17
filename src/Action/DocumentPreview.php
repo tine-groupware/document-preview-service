@@ -218,7 +218,7 @@ class DocumentPreview implements MiddlewareInterface
                 throw new DocumentPreviewException("File upload error", 104, 500);
             }
 
-            $file = new File($path, true);
+            $file = new File($path, true, null, true);
 
             $files[] = $file;
         }
