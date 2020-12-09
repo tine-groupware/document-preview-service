@@ -6,7 +6,7 @@
 wget -q -O- https://apt.metaways.net/private/documentservice/pubkey.gpg | apt-key add -
 
 add-apt-repository 'deb http://apt.metaways.net/private/documentservice/ bionic main'
-add-apt-repository ppa:libreoffice/libreoffice-6-1
+add-apt-repository ppa:libreoffice/libreoffice-6-4
 ```
 2. Packet installieren
 ```shell script
@@ -14,6 +14,7 @@ apt-get update
 apt-get install documentPreviewService
 ```
 #### Packet Debian (stretch)
+TODO: update to libreoffice 6.4!
 1. Php 7.2, Document Preview und Libre Office 6.1 Repos hinzufügen
 ```shell script
 apt-get update
