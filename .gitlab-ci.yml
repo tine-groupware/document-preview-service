@@ -17,6 +17,10 @@ build_branch:
   - branches
  script:
   - php psh.phar git-branches:build
+ artifacts:
+  paths:
+   - documentPreviewService-2.1.${CI_PIPELINE_ID}.deb
+  expire_in: 3 days
 
 test:
  stage: test
