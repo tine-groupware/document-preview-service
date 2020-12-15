@@ -1,5 +1,21 @@
 # Document Preview Service
 ## Installation
+
+#### Packet Ubuntu (focal)
+1. Document Preview und Libre Office Repos hinzufügen
+```shell script
+wget -q -O- https://apt.metaways.net/private/documentservice/pubkey.gpg | apt-key add -
+
+add-apt-repository 'deb http://apt.metaways.net/private/documentservice/ focal main'
+add-apt-repository ppa:libreoffice/libreoffice-6-4
+add-apt-repository ppa:ondrej/php
+```
+2. Packet installieren
+```shell script
+apt-get update
+apt-get install documentPreviewService
+```
+
 #### Packet Ubuntu (bionic)
 1. Document Preview und Libre Office Repos hinzufügen
 ```shell script
