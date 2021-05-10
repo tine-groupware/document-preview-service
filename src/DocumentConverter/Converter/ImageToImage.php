@@ -13,6 +13,7 @@ use Zend\Log\Logger;
 
 class ImageToImage implements Converter
 {
+    use ExecTrait;
 
     public function from(): array
     {
@@ -48,16 +49,14 @@ class ImageToImage implements Converter
                 . escapeshellarg($request->x . 'x' . $request->y);
         }
         $cmd .= ' ' . escapeshellarg($path);
-        $rtn = array();
+        $rtn = '';
         $err = 0;
-        exec($cmd, $rtn, $err);
+        $this->exec($cmd, $rtn, $err);
 
-        foreach ($rtn as $line) {
-            (ErrorHandler::getInstance())->log(0 == $err ? Logger::DEBUG : Logger::INFO, $line, __METHOD__);
-        }
+        (ErrorHandler::getInstance())->log(0 == $err ? Logger::DEBUG : Logger::INFO, $rtn, __METHOD__);
 
         if (0 !== $err) {
-            throw new DocumentPreviewException("graphicsmagick operation failed! output: \n" .  join("\n", $rtn), 801, 500);
+            throw new DocumentPreviewException("graphicsmagick operation failed! output: \n" .  $rtn, 801, 500);
         }
 
         return [new File($path, true, $request->fileType)];

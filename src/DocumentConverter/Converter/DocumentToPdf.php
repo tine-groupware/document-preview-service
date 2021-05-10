@@ -15,6 +15,8 @@ use Zend\Log\Logger;
 class DocumentToPdf implements Converter
 {
 
+    use ExecTrait;
+
     public function from(): array
     {
         return [
@@ -54,22 +56,19 @@ class DocumentToPdf implements Converter
             . $file->getPath() . ' --outdir ' . $dir->getPath() . ' --headless --norestore 2>&1';
 
 
-        $rtn = array();
+        $rtn = '';
         $err = 0;
-        exec($cmd, $rtn, $err);
+        $this->exec($cmd, $rtn, $err);
 
         (ErrorHandler::getInstance())->dlog(['sofficeReturnCode' => $err, 'output' => $rtn], __METHOD__);
+        (ErrorHandler::getInstance())->log(0 == $err ? Logger::DEBUG : Logger::INFO, $rtn, __METHOD__);
 
-        foreach ($rtn as $line) {
-            (ErrorHandler::getInstance())->log(0 == $err ? Logger::DEBUG : Logger::INFO, $line, __METHOD__);
-        }
-
-        if ($rtn[sizeof($rtn)-1] == "Error: source file could not be loaded") {
+        if (strpos($rtn, "Error: source file could not be loaded") !== false) {
             throw new DocumentPreviewException('corrupted document', 602, 400);
         }
 
         if (0 !== $err) {
-            throw new DocumentPreviewException("soffice operation failed! output: \n" .  join("\n", $rtn), 601, 500);
+            throw new DocumentPreviewException("soffice operation failed! output: \n" .  $rtn, 601, 500);
         }
 
         try {

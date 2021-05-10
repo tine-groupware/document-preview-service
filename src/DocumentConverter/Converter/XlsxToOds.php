@@ -14,6 +14,7 @@ use Zend\Log\Logger;
 
 class XlsxToOds implements Converter
 {
+    use ExecTrait;
 
     public function from(): array
     {
@@ -46,13 +47,11 @@ class XlsxToOds implements Converter
         $cmd = (Config::getInstance())->get('locales') . ' ' . (Config::getInstance())->get('ooBinary').' -env:SingleAppInstance=false -env:UserInstallation=file:///'
             .$ooDir->getPath().' --convert-to ods ' . $file->getPath() . ' --outdir ' . $dir->getPath()
             . ' --headless --norestore 2>&1';
-        $rtn = array();
+        $rtn = '';
         $err = 0;
-        exec($cmd, $rtn, $err);
+        $this->exec($cmd, $rtn, $err);
 
-        foreach ($rtn as $line) {
-            (ErrorHandler::getInstance())->log(0 == $err ? Logger::DEBUG : Logger::INFO, $line, __METHOD__);
-        }
+        (ErrorHandler::getInstance())->log(0 == $err ? Logger::DEBUG : Logger::INFO, $rtn, __METHOD__);
 
         if (0 !== $err) {
             copy(
@@ -60,7 +59,7 @@ class XlsxToOds implements Converter
                 (Config::getInstance())->get('tempdir') . 'error-file' .
                 (ErrorHandler::getInstance())->getUid() . '.' .  pathinfo($this)['extension']
             );
-            throw new DocumentPreviewException("soffice operation failed! output: \n" .  join("\n", $rtn), 601, 500);
+            throw new DocumentPreviewException("soffice operation failed! output: \n" .  $rtn, 601, 500);
         }
 
         return [$dir->getFiles($this->defaultTo)[0]];

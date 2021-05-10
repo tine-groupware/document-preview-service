@@ -13,6 +13,7 @@ use Zend\Log\Logger;
 
 class PdfToImage implements Converter
 {
+    use ExecTrait;
 
     public function from(): array
     {
@@ -45,18 +46,16 @@ class PdfToImage implements Converter
             . escapeshellarg($dir->getPath() . 'image%03d.png') . ' '. escapeshellarg($file->getPath())
             . ' -c quit  2>&1';
         $err = 0;
-        exec($cmd, $rtn, $err);
+        $rtn = '';
+        $this->exec($cmd, $rtn, $err);
 
-        foreach ($rtn as $line) {
-            (ErrorHandler::getInstance())->log(0 == $err ? Logger::DEBUG : Logger::INFO, $line, __METHOD__);
+        (ErrorHandler::getInstance())->log(0 == $err ? Logger::DEBUG : Logger::INFO, $rtn, __METHOD__);
+
+        if (false !== strpos($rtn, "file requires a password")) {
+            throw new DocumentPreviewException('Pdf requires a password', 902, 422);
         }
-
-        foreach ($rtn as $line) {
-            if (false != strpos($line, "file requires a password")) {
-                throw new DocumentPreviewException('Pdf requires a password', 902, 422);
-            } elseif (false != strpos($line, "No pages will be processed")) {
-                throw new DocumentPreviewException('Pdf is corrupted', 903, 422);
-            }
+        if (false !== strpos($rtn, "No pages will be processed")) {
+            throw new DocumentPreviewException('Pdf is corrupted', 903, 422);
         }
 
         if (0 !== $err) {
@@ -68,7 +67,7 @@ class PdfToImage implements Converter
                 'file' => $file->getBase64(),
             ], __METHOD__);
 
-            throw new DocumentPreviewException("Ghostscript operation failed! output: \n" .  join("\n", $rtn), 901, 500);
+            throw new DocumentPreviewException("Ghostscript operation failed! output: \n" .  $rtn, 901, 500);
         }
 
         if (true === $request->firstPage) {
