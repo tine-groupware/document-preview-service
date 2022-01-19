@@ -11,21 +11,17 @@ cache:
   - ./build
   - documentPreviewService-2.1.${CI_PIPELINE_ID}.deb
 
-build_branch:
+build_and_test_branch:
  stage: build
  only:
   - branches
  script:
   - php psh.phar git-branches:build
+  - php psh.phar git:test
  artifacts:
   paths:
    - documentPreviewService-2.1.${CI_PIPELINE_ID}.deb
   expire_in: 3 days
-
-test:
- stage: test
- script:
-  - php psh.phar git:test
 
 deploy_to_repo:
  stage: deploy
