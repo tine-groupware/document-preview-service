@@ -1,0 +1,8 @@
+version: '3'
+services:
+  documentPreviewService:
+    image: docker.io/tinegroupware/document-preview-service:2.1
+    ports:
+      - 80:80
+    #volumes:
+    #  - ./config.php:/etc/documentPreviewService/VERSION/config.php
