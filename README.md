@@ -19,6 +19,10 @@ docker run --restart=always -p 80:80 -d --name document-preview-service -v /path
 # listening only locally on 8080
 # this can then could be forwarded by an nginx reverse proxy with ssl 
 docker run --restart=always -p 127.0.0.1:8080:80 -d --name document-preview-service docker.io/tinegroupware/document-preview-service:<version>
+
+# with docker-compose
+# copy docker-compose file
+docker-compose up
 ```
 
 #### Packet Ubuntu (focal)
