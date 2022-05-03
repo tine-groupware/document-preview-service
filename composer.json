@@ -5,15 +5,20 @@
     {
       "type": "vcs",
       "url": "git@gitlab.metaways.net:tine20/auth-middleware.git"
+    }, {
+      "type": "github",
+      "url": "https://github.com/tine20/proc-wrap.git"
     }
   ],
   "require": {
-    "php": "^7.1",
+    "php": "^7.2",
     "ext-json":"*",
     "ext-fileinfo":"*",
+    "ext-pcntl": "*",
     "ext-sysvsem":"*",
     "ext-shmop":"*",
     "tine20/auth-middleware": "dev-develop",
+    "tine20/proc-wrap": "0.1-pl72",
     "zendframework/zend-component-installer": "^2.1.1",
     "zendframework/zend-config-aggregator": "^1.0",
     "zendframework/zend-diactoros": "^1.7.1 || ^2.0",
