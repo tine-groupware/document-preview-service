@@ -1,7 +1,7 @@
 MAJOR_MINIOR_VERSION=$(shell cat composer.json | jq -r '.version')
 FULL_VERSION=${MAJOR_MINIOR_VERSION}.${shell git rev-parse --short HEAD}
-MAJOR_MINIOR_VERSION_IMAGE_NAME=tinegroupware/document-preview-service:${MAJOR_MINIOR_VERSION}
-FULL_VERSION_IMAGE_NAME=tinegroupware/document-preview-service:${FULL_VERSION}
+MAJOR_MINIOR_VERSION_IMAGE_NAME=registry.metaways.net/tine/document-preview-service:${MAJOR_MINIOR_VERSION}
+FULL_VERSION_IMAGE_NAME=registry.metaways.net/tine/document-preview-service:${FULL_VERSION}
 
 docker: Dockerfile $(shell find ./etc) $(shell find ./config) $(shell find ./public) $(shell find ./src) $(shell find ./bin)
 	rm -rf vendor || true

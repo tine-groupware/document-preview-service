@@ -11,14 +11,14 @@
 1. Install docker
 2. Start Document Preview Service as docker container
 ```shell script
-docker run --restart=always -p 80:80 -d --name document-preview-service docker.io/tinegroupware/document-preview-service:<version>
+docker run --restart=always -p 80:80 -d --name document-preview-service registry.metaways.net/tine/document-preview-service:<version>
 
 # with config
-docker run --restart=always -p 80:80 -d --name document-preview-service -v /path/to/config:/etc/documentPreviewService/VERSION/config.php docker.io/tinegroupware/document-preview-service:<version>
+docker run --restart=always -p 80:80 -d --name document-preview-service -v /path/to/config:/etc/documentPreviewService/VERSION/config.php registry.metaways.net/tine/document-preview-service:<version>
 
 # listening only locally on 8080
 # this can then could be forwarded by an nginx reverse proxy with ssl 
-docker run --restart=always -p 127.0.0.1:8080:80 -d --name document-preview-service docker.io/tinegroupware/document-preview-service:<version>
+docker run --restart=always -p 127.0.0.1:8080:80 -d --name document-preview-service registry.metaways.net/tine/document-preview-service:<version>
 
 # with docker-compose
 # copy docker-compose file
