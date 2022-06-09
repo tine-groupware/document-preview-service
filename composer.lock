@@ -4,7 +4,7 @@
         "Read more about it at https://getcomposer.org/doc/01-basic-usage.md#installing-dependencies",
         "This file is @generated automatically"
     ],
-    "content-hash": "da162b82b274866ce9474e5aaa16f535",
+    "content-hash": "638cd89b1d7350abb2bf0df40b1a997f",
     "packages": [
         {
             "name": "container-interop/container-interop",
@@ -593,20 +593,19 @@
         },
         {
             "name": "tine20/proc-wrap",
-            "version": "0.1-pl72",
+            "version": "0.1.1-pl72",
             "source": {
                 "type": "git",
                 "url": "https://github.com/tine20/proc-wrap.git",
-                "reference": "44c957ebd0606e8783a3a03ad39636354e1c8d46"
+                "reference": "88976182db7e9bf6ae315fbe59df0c2721fe5880"
             },
             "dist": {
                 "type": "zip",
-                "url": "https://api.github.com/repos/tine20/proc-wrap/zipball/44c957ebd0606e8783a3a03ad39636354e1c8d46",
-                "reference": "44c957ebd0606e8783a3a03ad39636354e1c8d46",
+                "url": "https://api.github.com/repos/tine20/proc-wrap/zipball/88976182db7e9bf6ae315fbe59df0c2721fe5880",
+                "reference": "88976182db7e9bf6ae315fbe59df0c2721fe5880",
                 "shasum": ""
             },
             "require": {
-                "ext-pcntl": "*",
                 "php": ">=7.2"
             },
             "require-dev": {
@@ -670,9 +669,9 @@
             ],
             "support": {
                 "issues": "https://github.com/tine20/proc-wrap/issues",
-                "source": "https://github.com/tine20/proc-wrap/tree/0.1php72"
+                "source": "https://github.com/tine20/proc-wrap/tree/0.1.1-pl72"
             },
-            "time": "2022-05-03T09:10:10+00:00"
+            "time": "2022-06-09T12:18:06+00:00"
         },
         {
             "name": "zendframework/zend-component-installer",
