@@ -9,11 +9,9 @@ trait ExecTrait
         $cmd = new \Tine20\ProcWrap\Cmd($cmd);
         $cmd->setTimeoutInSeconds($timeout);
 
-        pcntl_async_signals(true);
         $cmd->exec();
         $return = $cmd->getExitCode();
         $stdErr = $cmd->getStdErr();
         $out = ($stdErr ? $stdErr . PHP_EOL : '') . $cmd->getStdOut();
-        pcntl_async_signals(false);
     }
 }
