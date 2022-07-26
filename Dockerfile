@@ -25,6 +25,7 @@ RUN mkdir /run/php \
 
 COPY etc/supervisord/* /etc/supervisor/conf.d/
 COPY etc/nginx/vhost.conf /etc/nginx/sites-enabled/default
+COPY etc/nginx/lb/check.php /etc/nginx/lb/check.php
 copy etc/documentPreviewService/config.php /etc/documentPreviewService/VERSION/config.php
 
 COPY bin /usr/share/document-preview/bin
