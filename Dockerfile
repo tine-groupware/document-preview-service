@@ -9,7 +9,7 @@ RUN apt update \
 
 RUN apt install -y php7.2-xml php7.2-cli php7.2-mbstring php7.2-curl
 RUN apt install -y graphicsmagick ghostscript unzip libreoffice
-RUN apt install -y nginx php7.2-fpm supervisor locales
+RUN apt install -y nginx php7.2-fpm supervisor locales logrotate cron
 
 RUN locale-gen --lang de_DE.UTF-8
 
@@ -26,7 +26,9 @@ RUN mkdir /run/php \
 COPY etc/supervisord/* /etc/supervisor/conf.d/
 COPY etc/nginx/vhost.conf /etc/nginx/sites-enabled/default
 COPY etc/nginx/lb/check.php /etc/nginx/lb/check.php
-copy etc/documentPreviewService/config.php /etc/documentPreviewService/VERSION/config.php
+COPY etc/logrotate/* /etc/logrotate.d/
+RUN chmod 644 /etc/logrotate.d/*
+COPY etc/documentPreviewService/config.php /etc/documentPreviewService/VERSION/config.php
 
 COPY bin /usr/share/document-preview/bin
 COPY config /usr/share/document-preview/config
