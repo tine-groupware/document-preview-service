@@ -13,8 +13,10 @@ docker: Dockerfile $(shell find ./etc) $(shell find ./config) $(shell find ./pub
 
 dockerReleaseMw: docker
 	docker tag ${FULL_VERSION_IMAGE_NAME} ${MW_IMAGE}:${MAJOR_MINIOR_VERSION}
+	docker tag ${FULL_VERSION_IMAGE_NAME} ${MW_IMAGE}:latest
 	docker push ${FULL_VERSION_IMAGE_NAME} 
 	docker push ${MW_IMAGE}:${MAJOR_MINIOR_VERSION}
+	docker push ${MW_IMAGE}:latest
 
 dockerReleaseDockerhub: docker
 	docker tag ${FULL_VERSION_IMAGE_NAME} ${DOCKERHUB_IMAGE}:${MAJOR_MINIOR_VERSION}
