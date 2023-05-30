@@ -3,8 +3,7 @@ FROM ubuntu:20.04 as php
 RUN apt update \
     && apt install -y  software-properties-common dirmngr apt-transport-https lsb-release ca-certificates curl gnupg \
     && add-apt-repository ppa:ondrej/php \
-    && curl http://mirror.hsn.metaways.net/keys/libreoffice.gpg | apt-key add \
-    && echo "deb http://mirror.hsn.metaways.net/ppa/libreoffice/libreoffice-7-0/ubuntu-latest-docservice/ focal main" > /etc/apt/sources.list.d/libreoffice.list \
+    && add-apt-repository ppa:libreoffice/ppa  \
     && apt update
 
 RUN apt install -y php7.2-xml php7.2-cli php7.2-mbstring php7.2-curl
