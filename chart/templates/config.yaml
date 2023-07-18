@@ -1,0 +1,29 @@
+apiVersion: v1
+kind: Secret
+metadata:
+  name: {{ include "common.names.fullname" . }}
+  namespace: {{ .Release.Namespace | quote }}
+  labels: {{- include "common.labels.standard" . | nindent 4 }}
+stringData:
+  # /etc/documentPreviewService/VERSION/config.php
+  config.php: |-
+    <?php
+    return [
+        // configure for documentPreview
+        'documentService' => [
+            "tempDir" => "/var/lib/documentPreviewService/", //temp folder
+            "maxProc" => 4, //maximum concurrent conversions
+            "loggerOut" => "/var/log/documentPreviewService/doc.log", // log file documentPreview, can be a file or a zend logger
+      "logLevel" => "8",
+      "ooBinary"=>'soffice'
+        ],
+        'authLogger' => '/var/log/documentPreviewService/auth.log', // auth logger, can be a file or a zend logger
+        'sentryio' => '{{ .Values.documentpreviewservice.sentryurl }}', // 'https://<key>:<secret>@sentry.io/<project>', //sentry uri
+        'auth' => [
+            [
+                'name' => 'documentPreviewService', // used for identification
+                'required' => false,
+                'permission' => '(1=1)'
+            ]
+        ]
+    ];

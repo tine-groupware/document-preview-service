@@ -10,3 +10,6 @@ Vagrantfile
 clover.xml
 coveralls-upload.json
 buildnumber
+/chart/charts
+/values.yaml
+documentpreviewservice-*.tgz

@@ -1,0 +1,40 @@
+documentpreviewservice:
+  hostname:
+  sentryurl:
+  resources:
+    limits:
+      memory: 4Gi
+      cpu: 2
+    requests:
+      memory: 100Mi
+      cpu: 2
+  podAnnotations: {}
+  priorityClassName:
+  terminationGracePeriodSeconds: 30
+  image:
+    registry: docker.io
+    repository: tinegroupware/document-preview-service
+    tag: VERSION_T
+    digest: ""
+    pullPolicy: IfNotPresent
+    pullSecrets: []
+  customLivenessProbe: {}
+  customReadinessProbe: {}
+  customStartupProbe: {}
+
+ingress:
+  enabled: true
+  annotations: {}
+  ingressClassName: nginx
+  pathType: ImplementationSpecific
+  tls: true
+  selfSigned: false
+  extraTls: []
+
+service:
+  annotations: {}
+
+diagnosticMode:
+  enabled: false
+  command: ""
+  args: ""

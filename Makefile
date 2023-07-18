@@ -1,4 +1,5 @@
 MW_IMAGE=registry.metaways.net/tine/document-preview-service
+HELM_REGISTRY=dockerregistry.metaways.net/tine20/documentpreview/charts
 DOCKERHUB_IMAGE=tinegroupware/document-preview-service
 MAJOR_MINIOR_VERSION=$(shell cat composer.json | jq -r '.version')
 FULL_VERSION=${MAJOR_MINIOR_VERSION}.${shell git rev-parse --short HEAD}
@@ -25,3 +26,18 @@ dockerReleaseDockerhub: docker
 	docker push ${DOCKERHUB_IMAGE}:${MAJOR_MINIOR_VERSION}
 
 dockerRelease: dockerReleaseMw dockerReleaseDockerhub
+
+helm: chart/Chart.yaml chart/Chart.lock chart/values.yaml $(shell find ./chart/templates)
+	helm dependency build chart
+	sed -i "s/VERSION_T/${FULL_VERSION}/g" chart/Chart.yaml
+	sed -i "s/VERSION_T/${FULL_VERSION}/g" chart/values.yaml
+	helm package chart
+	sed -i "s/${FULL_VERSION}/VERSION_T/g" chart/Chart.yaml
+	sed -i "s/${FULL_VERSION}/VERSION_T/g" chart/values.yaml
+
+helmRelease: helm
+	helm push documentpreviewservice-*.tgz oci://${HELM_REGISTRY}
+
+releaseMw: dockerReleaseMw helmRelease
+
+release: dockerRelease helmRelease

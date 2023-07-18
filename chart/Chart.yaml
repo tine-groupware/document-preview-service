@@ -1,0 +1,14 @@
+appVersion: VERSION_T
+dependencies:
+  - name: common
+    repository: oci://registry-1.docker.io/bitnamicharts
+    tags:
+      - bitnami-common
+    version: 2.x.x
+description: document preview service  helm chart
+home: https://gitlab.metaways.net/tine20/documentpreviewservice
+maintainers:
+  - name: Metaways Infosystems GmbH
+    url: https://www.metaways.de/
+name: documentpreviewservice
+version: 1.0.0

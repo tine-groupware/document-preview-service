@@ -1,0 +1,78 @@
+apiVersion: {{ include "common.capabilities.deployment.apiVersion" . }}
+kind: Deployment
+metadata:
+  name: {{ template "common.names.fullname" . }}
+  namespace: {{ include "common.names.namespace" . | quote }}
+  labels: {{- include "common.labels.standard" . | nindent 4 }}
+    app.kubernetes.io/component: documentpreviewservice
+spec:
+  strategy:
+    type: RollingUpdate
+  selector:
+    matchLabels: {{- include "common.labels.matchLabels" . | nindent 6 }}
+      app.kubernetes.io/component: documentpreviewservice
+  template:
+    metadata:
+      annotations:
+        {{- if .Values.documentpreviewservice.podAnnotations }}
+        {{- include "common.tplvalues.render" (dict "value" .Values.documentpreviewservice.podAnnotations "context" $) | nindent 8 }}
+        {{- end }}
+      labels: {{- include "common.labels.standard" . | nindent 8 }}
+        app.kubernetes.io/component: documentpreviewservice
+    spec:
+      {{- include "documentpreviewservice.imagePullSecrets" . | nindent 6 }}
+      {{- if .Values.documentpreviewservice.priorityClassName }}
+      priorityClassName: {{ .Values.documentpreviewservice.priorityClassName | quote }}
+      {{- end }}
+      securityContext:
+        fsGroup: 999
+      {{- if .Values.documentpreviewservice.terminationGracePeriodSeconds }}
+      terminationGracePeriodSeconds: {{ .Values.documentpreviewservice.terminationGracePeriodSeconds }}
+      {{- end }}
+      containers:
+        - name: documentpreviewservice
+          image: {{ template "documentpreviewservice.image" . }}
+          imagePullPolicy: {{ .Values.documentpreviewservice.image.pullPolicy }}
+          securityContext:
+            # runAsUser: 999
+            # runAsNonRoot: true
+            readOnlyRootFilesystem: false
+            allowPrivilegeEscalation: false
+          {{- if .Values.diagnosticMode.enabled }}
+          command: {{- include "common.tplvalues.render" (dict "value" .Values.diagnosticMode.command "context" $) | nindent 12 }}
+          {{- end }}
+          {{- if .Values.diagnosticMode.enabled }}
+          args: {{- include "common.tplvalues.render" (dict "value" .Values.diagnosticMode.args "context" $) | nindent 12 }}
+          {{- end }}
+          resources: {{- toYaml .Values.documentpreviewservice.resources | nindent 12 }}
+          ports:
+            - name: http
+              containerPort: 80
+          {{- if not .Values.diagnosticMode.enabled }}
+          livenessProbe:
+            httpGet:
+              path: /v2/ping
+              port: 80
+            initialDelaySeconds: 8
+            periodSeconds: 30
+          readinessProbe:
+            httpGet:
+              path: /v2/ping
+              port: 80
+            initialDelaySeconds: 2
+            periodSeconds: 5
+          startupProbe:
+            httpGet:
+              path: /v2/ping
+              port: 80
+            initialDelaySeconds: 2
+            periodSeconds: 5
+          {{- end }}
+          volumeMounts:
+            - name: config
+              mountPath: /etc/documentPreviewService/VERSION/config.php
+              subPath: config.php
+      volumes:
+        - name: config
+          secret:
+            secretName: {{ include "common.names.fullname" . }}
