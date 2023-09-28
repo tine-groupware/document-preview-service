@@ -55,7 +55,7 @@ spec:
               port: 80
             initialDelaySeconds: 8
             periodSeconds: 30
-            timeoutSeconds: 60
+            timeoutSeconds: 1200
           readinessProbe:
             httpGet:
               path: /v2/ping
