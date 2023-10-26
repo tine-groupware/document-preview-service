@@ -23,6 +23,7 @@ spec:
       {{- include "documentpreviewservice.imagePullSecrets" . | nindent 6 }}
       {{- if .Values.documentpreviewservice.priorityClassName }}
       priorityClassName: {{ .Values.documentpreviewservice.priorityClassName | quote }}
+      replicas: {{ .Values.documentpreviewservice.replicas | quote }}
       {{- end }}
       securityContext:
         fsGroup: 999

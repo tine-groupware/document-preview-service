@@ -1,6 +1,7 @@
 documentpreviewservice:
   hostname:
   sentryurl:
+  replicas: 2
   resources:
     limits:
       memory: 4Gi
