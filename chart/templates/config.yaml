@@ -13,9 +13,11 @@ stringData:
         'documentService' => [
             "tempDir" => "/var/lib/documentPreviewService/", //temp folder
             "maxProc" => 4, //maximum concurrent conversions
+            "maxProcHighPrio" => 4,
             "loggerOut" => "/var/log/documentPreviewService/doc.log", // log file documentPreview, can be a file or a zend logger
-      "logLevel" => "8",
-      "ooBinary"=>'soffice'
+            "logLevel" => "8",
+            "ooBinary"=>'soffice',
+            "locales" => "LC_ALL=de_DE.UTF-8",
         ],
         'authLogger' => '/var/log/documentPreviewService/auth.log', // auth logger, can be a file or a zend logger
         'sentryio' => '{{ .Values.documentpreviewservice.sentryurl }}', // 'https://<key>:<secret>@sentry.io/<project>', //sentry uri
