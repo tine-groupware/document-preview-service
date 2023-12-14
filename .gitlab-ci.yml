@@ -27,7 +27,7 @@ deploy_to_repo:
  stage: deploy
  only:
   refs:
-   - master
+   - main
   variables:
    - $PUSH_TO_REPO != "false"
  script:
