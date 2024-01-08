@@ -8,5 +8,6 @@ test_branch:
  only:
   - branches
  script:
+  - chmod +x composer.phar 
   - ./composer.phar install
   - ./vendor/phpunit/phpunit/phpunit
