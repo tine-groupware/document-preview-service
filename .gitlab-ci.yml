@@ -1,34 +1,13 @@
 image: dockerregistry.metaways.net/tine20/documentpreview/build
 
 stages:
- - build
  - test
- - deploy
 
-cache:
- key: ${CI_PIPELINE_ID}
- paths:
-  - ./build
-  - documentPreviewService-2.1.${CI_PIPELINE_ID}.deb
-
-build_and_test_branch:
- stage: build
+test_branch:
+ stage: test
  only:
   - branches
  script:
-  - php psh.phar git-branches:build
-  - php psh.phar git:test
- artifacts:
-  paths:
-   - documentPreviewService-2.1.${CI_PIPELINE_ID}.deb
-  expire_in: 3 days
-
-deploy_to_repo:
- stage: deploy
- only:
-  refs:
-   - main
-  variables:
-   - $PUSH_TO_REPO != "false"
- script:
-  - php psh.phar git-branches:deploytorepo
+  - chmod +x composer.phar 
+  - ./composer.phar install
+  - ./vendor/phpunit/phpunit/phpunit
