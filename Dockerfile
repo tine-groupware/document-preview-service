@@ -27,6 +27,7 @@ COPY etc/nginx/vhost.conf /etc/nginx/sites-enabled/default
 COPY etc/nginx/lb/check.php /etc/nginx/lb/check.php
 COPY etc/logrotate/* /etc/logrotate.d/
 RUN chmod 644 /etc/logrotate.d/*
+COPY etc/php/7.2/fpm/conf.d/* etc/php/7.2/fpm/conf.d/
 COPY etc/documentPreviewService/config.php /etc/documentPreviewService/VERSION/config.php
 
 COPY bin /usr/share/document-preview/bin
