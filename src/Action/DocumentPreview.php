@@ -195,7 +195,17 @@ class DocumentPreview implements MiddlewareInterface
         $files = [];
         foreach ($UploadedFiles as $UploadedFile) {
             if (null == $UploadedFile || UPLOAD_ERR_OK !== $UploadedFile->getError()) {
-                throw new BadRequestException('No File Uploaded', 104, 400);
+                if (null == $UploadedFile || $UploadedFile->getError() === 4) {
+                    throw new BadRequestException('No file was uploaded', 104, 400);
+                }
+
+                if ($UploadedFile->getError() === 1) {
+                    (ErrorHandler::getInstance())->log(Logger::INFO, 'upload_max_filesize exceeded' , __METHOD__);
+                    throw new BadRequestException('File to large', 105, 400);
+                }
+
+                (ErrorHandler::getInstance())->log(Logger::INFO,'php file upload error coder: '. $UploadedFile->getError(), __METHOD__);
+                throw new BadRequestException('File upload error ', 106, 400);
             }
             $path = (Config::getInstance())->get('tempdir') . 'upload' . uniqid()
                 . basename($UploadedFile->getClientFilename());
@@ -215,7 +225,7 @@ class DocumentPreview implements MiddlewareInterface
 
                 ], __METHOD__);
 
-                throw new DocumentPreviewException("File upload error", 104, 500);
+                throw new DocumentPreviewException("File upload error", 107, 500);
             }
 
             $file = new File($path, true, null, true);
