@@ -40,16 +40,17 @@ class File
 
         $this->original = $original;
 
-        $ext =  strtolower(pathinfo($path)['extension']);
+        $info = pathinfo($path);
+        $ext = isset($info['extension']) ? strtolower($info['extension']) : '';
 
         if (null === $format) {
             $format = $ext;
         }
         $this->format = $format;
 
-        if (array_key_exists(strtolower($ext), (Config::getInstance())->get('extToMime'))) {
+        if (! empty($ext) && array_key_exists(strtolower($ext), (Config::getInstance())->get('extToMime'))) {
             $mime_type = mime_content_type($path);
-            if (false == in_array($mime_type, (Config::getInstance())->get('extToMime')[$ext])) {
+            if (!in_array($mime_type, (Config::getInstance())->get('extToMime')[$ext])) {
                 if ($mime_type !== "application/octet-stream") {
 
                     if ($reference) {
