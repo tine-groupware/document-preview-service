@@ -2,6 +2,7 @@
 ## Build
 #### Docker
 1. install composer locally
+2. update chart version in chart/chart.yaml
 2. make docker, to build the docker image
 3. make dockerRelease, to push the images and the chart to docker hub 
 
