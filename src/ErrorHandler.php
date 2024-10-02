@@ -27,6 +27,8 @@ class ErrorHandler
     private $sentryClient = null;
     private $request = null;
     private $uid;
+    private $sourceFileHash = "";
+    private $remoteIP = "";
 
     /**
      * Singleton
@@ -41,6 +43,15 @@ class ErrorHandler
     protected function __construct()
     {
         $this->uid = uniqid('', true);
+    }
+
+    public function registerSourceFiles($files) {
+        $hashs = [];
+        foreach ($files as $file) {
+            $hashs[] = $file->getMd5Hash();
+        }
+
+        $this->sourceFileHash = implode(',', $hashs);
     }
 
     /**
@@ -133,6 +144,7 @@ class ErrorHandler
         }
         if (null !== $this->sentryClient && ($exception->getStatusCode() < 400 || $exception->getStatusCode() > 499)) {
             $this->sentryClient->user_context(['logUid' => $this->uid]);
+            $this->sentryClient->user_context(['sourceFileHash' => $this->sourceFileHash]);
             $this->sentryClient->captureException($exception);
         }
         return $this->getResponse($exception);
@@ -172,7 +184,7 @@ class ErrorHandler
         if (null !== $this->logger) {
             $this->logger->log(
                 $priority,
-                "[$priority][$this->uid][".$this->request->getAttribute('certInfo')['cn']."][$source] $message"
+                "[uid=$this->uid] [sourceFileHash=$this->sourceFileHash] [source=$source] \"$message\""
             );
         }
     }

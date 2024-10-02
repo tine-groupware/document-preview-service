@@ -71,6 +71,8 @@ class DocumentPreview implements MiddlewareInterface
 
             $startTime = microtime(true);
 
+            (ErrorHandler::getInstance())->registerSourceFiles($files);
+
             $rtn = (new DocumentConverter())($files, $conf);
 
             (ErrorHandler::getInstance())->log(Logger::DEBUG, "Converted files in "
@@ -90,12 +92,11 @@ class DocumentPreview implements MiddlewareInterface
             return (ErrorHandler::getInstance())->handelException($exception);
 
         } finally {
+            (ErrorHandler::getInstance())->log(Logger::DEBUG, "Finished", __METHOD__);
             $lock = null;
         }
 
         clearstatcache();
-
-        (ErrorHandler::getInstance())->dlog("Success", __METHOD__);
 
         return new JsonResponse($rtn);
     }
