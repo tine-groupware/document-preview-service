@@ -1,4 +1,4 @@
-MW_IMAGE=registry.metaways.net/tine/document-preview-service
+MW_IMAGE=registry.rz1.metaways.net/tine/document-preview-service
 HELM_REGISTRY=dockerregistry.metaways.net/tine20/documentpreview/charts
 DOCKERHUB_IMAGE=tinegroupware/document-preview-service
 MAJOR_MINIOR_VERSION=$(shell cat composer.json | jq -r '.version')
