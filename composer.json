@@ -58,7 +58,8 @@
   },
   "config": {
     "allow-plugins": {
-      "zendframework/zend-component-installer": true
+      "zendframework/zend-component-installer": true,
+      "ocramius/package-versions": false
     }
   }
 }

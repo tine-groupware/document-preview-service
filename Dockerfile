@@ -1,19 +1,14 @@
-FROM ubuntu:20.04 as php
+FROM dockerregistry.metaways.net/se/php-fpm-nginx-docker/php-fpm-nginx:7.2-ubuntu24.04-mw26.04.13.1
 
-RUN apt update \
-    && apt install -y  software-properties-common dirmngr apt-transport-https lsb-release ca-certificates curl gnupg \
-    && add-apt-repository ppa:ondrej/php \
-    && add-apt-repository ppa:libreoffice/ppa  \
-    && apt update
+USER root
 
-RUN apt install -y php7.2-xml php7.2-cli php7.2-mbstring php7.2-curl
+RUN apt install -y curl gnupg ca-certificates lsb-release
 RUN apt install -y graphicsmagick ghostscript unzip libreoffice
-RUN apt install -y nginx php7.2-fpm supervisor locales logrotate cron
+RUN apt install -y supervisor locales logrotate cron
 
 RUN locale-gen --lang de_DE.UTF-8
 
-RUN mkdir /run/php \
-    && mkdir -p /var/log/documentPreviewService/ \
+RUN mkdir -p /var/log/documentPreviewService/ \
     && mkdir -p /var/lib/documentPreviewService/ \
     && mkdir -p /usr/share/document-preview/ \
     && mkdir -p /var/www/.cache/ \
@@ -22,7 +17,7 @@ RUN mkdir /run/php \
     && chown www-data:www-data /var/www/.cache/ \
     && echo '<?php $buildNumber = "VERSION_T";' >> /usr/share/document-preview/buildnumber
 
-COPY etc/supervisord/* /etc/supervisor/conf.d/
+COPY etc/supervisord/* /etc/supervisor/
 COPY etc/nginx/vhost.conf /etc/nginx/sites-enabled/default
 COPY etc/nginx/lb/check.php /etc/nginx/lb/check.php
 COPY etc/logrotate/* /etc/logrotate.d/
@@ -35,5 +30,3 @@ COPY config /usr/share/document-preview/config
 COPY public /usr/share/document-preview/public
 COPY src /usr/share/document-preview/src
 COPY vendor /usr/share/document-preview/vendor
-
-CMD "/usr/bin/supervisord" "-c" "/etc/supervisor/supervisord.conf" "--nodaemon"
