@@ -2,6 +2,7 @@ FROM dockerregistry.metaways.net/se/php-fpm-nginx-docker/php-fpm-nginx:7.2-ubunt
 
 USER root
 
+RUN apt update
 RUN apt install -y curl gnupg ca-certificates lsb-release
 RUN apt install -y graphicsmagick ghostscript unzip libreoffice
 RUN apt install -y supervisor locales logrotate cron
