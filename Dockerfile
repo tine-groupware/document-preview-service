@@ -5,7 +5,7 @@ USER root
 RUN apt update
 RUN apt install -y curl gnupg ca-certificates lsb-release
 RUN apt install -y graphicsmagick ghostscript unzip libreoffice
-RUN apt install -y supervisor locales logrotate cron
+RUN apt install -y supervisor locales logrotate cron procps
 
 RUN locale-gen --lang de_DE.UTF-8
 
@@ -18,7 +18,7 @@ RUN mkdir -p /var/log/documentPreviewService/ \
     && chown www-data:www-data /var/www/.cache/ \
     && echo '<?php $buildNumber = "VERSION_T";' >> /usr/share/document-preview/buildnumber
 
-COPY etc/supervisord/* /etc/supervisor/
+COPY etc/supervisord/* /etc/supervisor/conf.d/
 COPY etc/nginx/vhost.conf /etc/nginx/sites-enabled/default
 COPY etc/nginx/lb/check.php /etc/nginx/lb/check.php
 COPY etc/logrotate/* /etc/logrotate.d/
