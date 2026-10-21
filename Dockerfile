@@ -1,4 +1,4 @@
-FROM dockerregistry.metaways.net/se/php-fpm-nginx-docker/php-fpm-nginx:7.2-ubuntu24.04-mw26.04.13.1
+FROM dockerregistry.metaways.net/se/php-fpm-nginx-docker/php-fpm-nginx:7.2-ubuntu24.04-mw26.10.21.2
 
 USER root
 
